@@ -33,7 +33,7 @@ $: tabularData = $processedData.map(arrayItemToRecord);
           id="all-data-dim-{i}"
           data={ tabularData }
           dimension={ i+"" }
-          width={ 300 }
+          width={ 320 }
           height={ 50 }
         />
       </div>

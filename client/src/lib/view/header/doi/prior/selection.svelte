@@ -15,18 +15,23 @@ $: tabularData = $selectedItems.map(arrayItemToRecord);
   width={ 400 }
   message="Visualizes the distributions in the data items selected as interesting using the brush across all dimensions marked as interesting."
 >
-  { #each $selectedDimensionsOfInterest as dim, i }
-    <div class="dimension">
-      <h3>{dim}</h3>
-      <Histogram
-        id="doi-selected-dim-{i}"
-        data={ tabularData }
-        dimension={ i+"" }
-        width={ 300 }
-        height={ 50 }
-      />
-    </div>
-  { /each }
+  <p class="selected">
+    <span class="count">{ $selectedItems.length }</span> items in selections.
+  </p>
+  <div class="histograms">
+    { #each $selectedDimensionsOfInterest as dim, i }
+      <div class="dimension">
+        <h3>{dim}</h3>
+        <Histogram
+          id="doi-selected-dim-{i}"
+          data={ tabularData }
+          dimension={ i+"" }
+          width={ 350 }
+          height={ 50 }
+        />
+      </div>
+    { /each }
+  </div>
   { #if $selectedDimensionsOfInterest.length === 0 }
     <p class="message">Hint: No dimensions of interest specified. Use the "dimensions" component to do so.</p>
   { :else if $selectedItems.length === 0 }
@@ -35,6 +40,12 @@ $: tabularData = $selectedItems.map(arrayItemToRecord);
 </DoiConfig>
 
 <style>
+  p.selected {
+    margin-bottom: 20px;
+  }
+  span.count {
+    font-weight: bold;
+  }
   h3 {
     margin: 0;
     font-size: 10pt;
