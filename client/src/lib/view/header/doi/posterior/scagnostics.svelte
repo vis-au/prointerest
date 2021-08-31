@@ -42,7 +42,7 @@ udpateSelected();
 </script>
 
 
-<DoiConfig title="Configure Scagnostics">
+<DoiConfig title="Configure Scagnostics" message="Define the scatterplot diagnostics that interest you and set their weights." width={ 500 }>
   <Column>
     <h3 style="margin-top:0;">Select interesting scagnostics</h3>
     <div class="scagnostic-checklist" style="max-width:{maxWidth}px">
@@ -67,6 +67,9 @@ udpateSelected();
       valueWeights={ selectedWeights }
       totalSize={ maxWidth }
     />
+    { #if selectedWeights.size === 0 }
+      <p class="empty">Select interesting scagnostics above.</p>
+    { /if }
   </Column>
 </DoiConfig>
 
@@ -92,5 +95,9 @@ udpateSelected();
   div.scagnostic-checklist div.item input:checked+label {
     background: black;
     color: white;
+  }
+  p.empty {
+    margin: 0;
+    color: #999;
   }
 </style>

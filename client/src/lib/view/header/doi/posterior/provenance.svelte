@@ -8,7 +8,7 @@ import WeightedValues from "$lib/widgets/weighted-values.svelte";
 </script>
 
 
-<DoiConfig title="Configure Provenance">
+<DoiConfig title="Configure Provenance" message="Configure how much weight each interaction should be assigned to, when computing the data of interest." width={ 500 }>
   <Column>
     <h3>Assign weights to interactions</h3>
     <WeightedValues
