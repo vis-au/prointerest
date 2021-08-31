@@ -17,7 +17,7 @@ export class InteractionLog {
     this.log.splice(this.log.length - SIZE_BEFORE_FLUSH, this.log.length)
   }
 
-  public add(interaction: DoiInteraction) {
+  public add(interaction: DoiInteraction): void {
     interaction.timestamp = this.log.length;
     this.log.push(interaction);
   }
@@ -35,7 +35,7 @@ export class InteractionLog {
     return this.log[this.log.length - 1].timestamp;
   }
 
-  public getLatestInteractionOfType(type: InteractionMode, maxAge=10) {
+  public getLatestInteractionOfType(type: InteractionMode, maxAge=10): DoiInteraction {
     const recentInteractions = this.getNRecentSteps(maxAge);
     const lastIndexOfType = recentInteractions
       .map(interaction => interaction.mode)
@@ -51,6 +51,6 @@ export class InteractionLog {
 
 const instance: InteractionLog = new InteractionLog();
 
-export function getInteractionLog() {
+export function getInteractionLog(): InteractionLog {
   return instance;
 }

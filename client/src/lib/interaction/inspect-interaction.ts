@@ -15,7 +15,7 @@ export default class Inspect implements DoiInteraction {
     return Math.sqrt((x0 - x1)**2 + (y0 - y1)**2);
   }
 
-  public getAffectedItems() {
+  public getAffectedItems(): DataItem[] {
     const x0 = this.x - this.std*2;
     const x3 = this.x + this.std*2;
     const y0 = this.y - this.std*2;

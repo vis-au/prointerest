@@ -20,11 +20,11 @@ export default class InteractionFactory {
     this.screenWidth = width;
     this.screenHeight = height;
     this.quadtree = quadtree;
-    this.getItemsInRegion = (x0: number, y0: number, x3: number, y3: number) => [];
+    this.getItemsInRegion = () => [];
     this.getTimestamp = () => -1;
   }
 
-  public createBrushInteraction(x0: number, y0: number, x1: number, y1: number) {
+  public createBrushInteraction(x0: number, y0: number, x1: number, y1: number): Brush {
     const brushInteraction = new Brush();
 
     brushInteraction.quadtree = this.quadtree;
@@ -39,7 +39,7 @@ export default class InteractionFactory {
     return brushInteraction;
   }
 
-  public createZoomInteraction(transform: ZoomTransform) {
+  public createZoomInteraction(transform: ZoomTransform): ZoomAndPan {
     const zoomInteraction = new ZoomAndPan();
 
     zoomInteraction.quadtree = this.quadtree;
@@ -53,7 +53,7 @@ export default class InteractionFactory {
     return zoomInteraction;
   }
 
-  public createInspectInteraction(x: number, y: number) {
+  public createInspectInteraction(x: number, y: number): Inspect {
     const inspectInteraction = new Inspect();
 
     inspectInteraction.quadtree = this.quadtree;
@@ -66,7 +66,7 @@ export default class InteractionFactory {
     return inspectInteraction;
   }
 
-  public createSelectInteraction(x: number, y: number) {
+  public createSelectInteraction(x: number, y: number): Select {
     const selectInteraction = new Select();
 
     selectInteraction.quadtree = this.quadtree;

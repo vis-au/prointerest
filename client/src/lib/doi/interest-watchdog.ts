@@ -1,8 +1,8 @@
 import type DataItem from "../types/data-item";
-import type { DoiWeights } from "../types/doi-weights";
 import type { DoiInteraction, InteractionMode } from "../interaction/doi-interaction";
 import { interactionModes } from "../interaction/doi-interaction";
 import { InteractionLog, getInteractionLog } from "../interaction/interaction-log";
+import { interactionWeights } from "$lib/state/interaction-technique-weights";
 
 const DEFAULT_EPSILON = 100;
 
@@ -15,15 +15,12 @@ export default class InterestWatchDog {
   public interactionLog: InteractionLog = getInteractionLog();
   public recentSteps = 10;
   public interestThreshold = 0.75;
-  public doiWeights: DoiWeights = {
-    inspect: 1,
-    zoom: 0,
-    select: 0,
-    brush: 0
-  };
+  private doiWeights: Map<InteractionMode, number>;
 
   constructor(findPointsWithinRadius: (x: number, y: number, r: number) => DataItem[]) {
     this.findPointsWithinRadius = findPointsWithinRadius;
+
+    interactionWeights.subscribe(newWeights => this.doiWeights = newWeights);
   }
 
   private isItemAffectedByInteraction(item: DataItem, interaction: DoiInteraction) {
@@ -70,7 +67,8 @@ export default class InterestWatchDog {
 
   private getWeightedDoiSum(subspace: DataItem[]) {
     const interestPerItem: number[] = [];
-    const weightSum = Object.values(this.doiWeights).reduce((a, b) => a+b, 0);
+    const values = Array.from(this.doiWeights.values());
+    const weightSum = Object.values(values).reduce((a, b) => a+b, 0);
     let totalDoiSum = 0;
     let weightedDoiSum = 0;
 
@@ -83,7 +81,7 @@ export default class InterestWatchDog {
         // how recently did user interact with that subspace?
         const adjustedFrequency = this.applyDecay(absoluteFrequency, type);
         // how expressively did user interact with that subspace?
-        const weightedDoi = adjustedFrequency * this.doiWeights[type];
+        const weightedDoi = adjustedFrequency * this.doiWeights.get(type);
 
         totalDoiSum += weightedDoi;
       });
@@ -95,9 +93,10 @@ export default class InterestWatchDog {
     return interestPerItem;
   }
 
-  private getRegionGrowingNeighbors(item: DataItem): DataItem[] {
-    return [];
-  }
+  // TODO: implement region growing
+  // private getRegionGrowingNeighbors(item: DataItem): DataItem[] {
+  //   return [];
+  // }
 
   private getRandomSample(n: number): DataItem[] {
     // adapted from https://stackoverflow.com/a/11935263
