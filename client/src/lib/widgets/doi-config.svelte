@@ -23,6 +23,8 @@ const maxWidth = width < 0 ? "" : `max-width:${width}px`;
     min-height: 150px;
     padding: 1rem 1.5rem 2.5rem;
     overflow: auto;
+    border: 1px solid #efefef;
+    border-radius: 4px;
   }
   div.doi-config h2 {
     margin: 10px 0;
