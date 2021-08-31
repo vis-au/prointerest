@@ -1,7 +1,7 @@
 <script lang="typescript">
 
 import { hoveredPosition } from "$lib/state/hovered-position";
-import { selectedBins } from "$lib/state/selected-bin";
+import { selectedBins } from "$lib/state/selected-bins";
 import { currentTransform, isZooming } from "$lib/state/zoom";
 import { hexbinning } from "$lib/state/hexbinning";
 import { select } from "d3-selection";
@@ -150,7 +150,7 @@ onMount(() => {
 });
 
 afterUpdate(() => {
-  const canvas = select(zoomCanvasElement) as Selection<Element, unknown, any, any>;
+  const canvas = select(zoomCanvasElement) as Selection<Element, unknown, null, null>;
   const myZoom = zoomTransform(zoomCanvasElement);
 
   // check if the zoom transform has changed
