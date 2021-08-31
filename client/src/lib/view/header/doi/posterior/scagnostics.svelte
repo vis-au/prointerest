@@ -10,50 +10,51 @@ export let maxWidth: number;
 
 let selectedWeights = new Map<Scagnostic, number>();
 
+const isSelected = {};
+scagnostics.forEach(s => isSelected[s] = false);
+$selectedScagnostics.forEach(s => isSelected[s] = true);
 
-function udpateSelected() {
-  const newWeights = new Map<Scagnostic, number>();
+$: $selectedScagnostics = scagnostics.filter(s => isSelected[s]);
 
-  $selectedScagnostics.forEach(scagnostic => {
-    newWeights.set(scagnostic, $scagnosticWeights.get(scagnostic));
+selectedScagnostics.subscribe(newSelection => {
+  selectedWeights = new Map();
+  newSelection.forEach(scagnostic => {
+    selectedWeights.set(scagnostic, $scagnosticWeights.get(scagnostic))
   });
+});
 
-  selectedWeights = newWeights;
-}
-
-function toggleScagnostic(scagnostic: Scagnostic) {
-  const index = $selectedScagnostics.indexOf(scagnostic);
-
-  if (index > -1) {
-    // reactive slice
-    $selectedScagnostics.splice(index, 1);
-    const leftHalf = $selectedScagnostics.slice(0, index);
-    const rightHalf = $selectedScagnostics.slice(index, $selectedScagnostics.length);
-    $selectedScagnostics = leftHalf.concat(rightHalf);
+function toggleAll() {
+  if ($selectedScagnostics.length === scagnostics.length) {
+    // deselect all
+    scagnostics.forEach(s => isSelected[s] = false);
   } else {
-    // reactive push
-    $selectedScagnostics = [...$selectedScagnostics, scagnostic];
+    // select all
+    scagnostics.forEach(s => isSelected[s] = true);
   }
-
-  udpateSelected();
 }
-
-udpateSelected();
 </script>
 
 
 <DoiConfig title="Configure Scagnostics" message="Define the scatterplot diagnostics that interest you and set their weights." width={ 500 }>
   <Column>
-    <h3 style="margin-top:0;">Select interesting scagnostics</h3>
+    <div class="top-row">
+      <h3 style="margin-top:0;">Select interesting scagnostics</h3>
+      <button on:click={ toggleAll }>
+        { #if $selectedScagnostics.length === scagnostics.length }
+          Deselect all
+        { :else }
+          Select all
+        { /if }
+      </button>
+    </div>
     <div class="scagnostic-checklist" style="max-width:{maxWidth}px">
       { #each scagnostics as scagnostic }
         <div class="item">
           <input
             id={ scagnostic }
-            type="checkbox"
+            type=checkbox
             value={ scagnostic }
-            checked={ $selectedScagnostics.indexOf(scagnostic) > -1 }
-            on:click={ () => toggleScagnostic(scagnostic) } />
+            bind:checked={ isSelected[scagnostic] } />
           <label for={ scagnostic }>{ scagnostic }</label>
         </div>
       { /each }
@@ -75,6 +76,25 @@ udpateSelected();
 
 
 <style>
+  div.top-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  div.top-row button {
+    margin-bottom: 20px;
+    background: white;
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 4px 10px;
+    color: black;
+    cursor: pointer;
+    transition: background 0.05s ease-in-out;
+  }
+  div.top-row button:hover {
+    background: #efefef;
+  }
   div.scagnostic-checklist {
     display: flex;
     flex-flow: row wrap;

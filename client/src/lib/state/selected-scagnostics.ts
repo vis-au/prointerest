@@ -15,13 +15,17 @@ selectedScagnostics.subscribe(newSelection => {
   // for simplicity, we assume that either items have been removed or added, but never both.
   if (newLength > oldLength) {
     // new items in selection, so reduce the interest in the existing selection
-    const delta = newLength - oldLength;
-    const deltaInterest = delta / newLength;
-    const reducedInterest = deltaInterest / oldLength;
+    const newElements = newLength - oldLength;
+
+    const oldWeight = oldLength / newLength;
+    const newWeight = newElements / newLength;
+
+    //
+    const equalWeightInNew = 1 / newElements;
 
     // reduce the weight of scagn. already selected
     weights.forEach((value, key) => {
-      weights.set(key, value - reducedInterest);
+      weights.set(key, value * oldWeight);
     });
 
     // find the new items
@@ -30,31 +34,20 @@ selectedScagnostics.subscribe(newSelection => {
     });
 
     // set their interest
-    newItems.forEach(item => weights.set(item, deltaInterest));
-
-  } else if (newLength === oldLength) {
-    // items were removed from the list. Because of the way that writable works, newlength and
-    // oldlength are the same here. This means that we need to figure out, how much interest is
-    // "missing" from those items, and then add it evenly.
-    const outdatedSelection: Scagnostic[] = [];
-    weights.forEach((value, key) => {
-      outdatedSelection.push(key);
-    });
-
-    const deselectedItems = outdatedSelection.filter(item => newSelection.indexOf(item) === -1);
-
-    const delta = deselectedItems
+    newItems.forEach(item => weights.set(item, newWeight * equalWeightInNew));
+  } else {
+    // get the leftover interest sum
+    const newSum = newSelection
       .map(item => weights.get(item))
       .reduce((a, b) => a+b, 0);
-    const increasedInterest = delta / newLength;
 
-    // delete the weights for unselected scagn.
-    deselectedItems.forEach(item => weights.delete(item));
+    // normalize leftover entries to new total interest sum
+    newSelection.forEach(item => weights.set(item, weights.get(item) / newSum));
 
-    // increase the weights for those that remain
-    weights.forEach((value, key) => {
-      weights.set(key, value + increasedInterest);
-    });
+    // delete the weights for deselected scagn.
+    currentSelectedScagnostics
+      .filter(item => newSelection.indexOf(item) === -1)
+      .forEach(item => weights.delete(item));
   }
 
   currentSelectedScagnostics = newSelection;
