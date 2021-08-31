@@ -1,6 +1,7 @@
 <script lang="typescript">
 
 export let title: string;
+export let message = "";
 export let width = -1;
 
 const maxWidth = width < 0 ? "" : `max-width:${width}px`;
@@ -9,6 +10,9 @@ const maxWidth = width < 0 ? "" : `max-width:${width}px`;
 
 <div class="doi-config" style={maxWidth}>
   <h2>{ title }</h2>
+  { #if message.length > 0 }
+    <p class="message">{ message }</p>
+  { /if }
   <slot></slot>
 </div>
 
