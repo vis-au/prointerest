@@ -11,7 +11,7 @@ $: tabularData = $selectedItems.map(arrayItemToRecord);
 </script>
 
 <DoiConfig
-  title="Selected Data Items"
+  title="Inspect Selected Data Items"
   width={ 400 }
   message="Visualizes the distributions in the data items selected as interesting using the brush across all dimensions marked as interesting."
 >
@@ -27,11 +27,19 @@ $: tabularData = $selectedItems.map(arrayItemToRecord);
       />
     </div>
   { /each }
+  { #if $selectedDimensionsOfInterest.length === 0 }
+    <p class="message">Hint: No dimensions of interest specified. Use the "dimensions" component to do so.</p>
+  { :else if $selectedItems.length === 0 }
+    <p class="message">Hint: No items selected. You can use the brush or select individual bins.</p>
+  { /if }
 </DoiConfig>
 
 <style>
   h3 {
     margin: 0;
     font-size: 10pt;
+  }
+  p.message {
+    color: #999;
   }
 </style>
