@@ -8,14 +8,14 @@ import { afterUpdate, onMount } from 'svelte';
 
 import { hexbinning } from '$lib/state/hexbinning';
 import type { BinType } from '$lib/types/bin-type';
-import { processedData } from '$lib/state/processed-data';
+import { visibleData } from '$lib/state/visible-data';
 
 export let id = "binned-scatterplot-view";
 export let width = 100;
 export let height = 100;
 export let color = scaleSequential(interpolateBuPu);
 
-$: bins = $hexbinning($processedData);
+$: bins = $hexbinning($visibleData);
 
 let canvasElement: HTMLCanvasElement;
 

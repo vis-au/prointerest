@@ -6,7 +6,7 @@ import { selectAll } from 'd3-selection';
 
 import { currentTransform } from '$lib/state/zoom';
 import { scaleX, scaleY } from '$lib/state/scales';
-import { processedData } from '$lib/state/processed-data';
+import { visibleData, xEncoding, yEncoding } from '$lib/state/visible-data';
 
 
 export let id = "deck-gl-scatterplot";
@@ -15,7 +15,7 @@ export let height = 50;
 export let radius = 5; // size of points
 export let orientation = "right"; // left or right side of the screen?
 
-const data = $processedData;
+const data = $visibleData;
 
 const INITIAL_VIEW_STATE = {
   zoom: 0,
@@ -45,7 +45,7 @@ function render() {
   layers = [
     new ScatterplotLayer({
       id: `${id}-layer`,
-      getPosition: d => [t.applyX($scaleX(d[0])), t.applyY($scaleY(d[1]))],
+      getPosition: d => [t.applyX($scaleX(d[xEncoding])), t.applyY($scaleY(d[yEncoding]))],
       getRadius: radius,
       getLineWidth: 0,
       opacity: 0.3,
