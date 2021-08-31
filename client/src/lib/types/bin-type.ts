@@ -1,0 +1,1 @@
+export type BinType = [number, number, number]; // x, y, id
