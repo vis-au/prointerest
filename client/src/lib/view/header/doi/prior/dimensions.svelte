@@ -9,6 +9,12 @@ import Row from "$lib/widgets/row.svelte";
 
 $: tabularData = $processedData.map(arrayItemToRecord);
 
+const isInteresting = {};
+$dimensions.forEach(dim => isInteresting[dim] = false);
+$selectedDimensionsOfInterest.forEach(dim => isInteresting[dim] = true);
+
+$: $selectedDimensionsOfInterest = $dimensions.filter(dim => isInteresting[dim]);
+
 </script>
 
 
@@ -19,24 +25,17 @@ $: tabularData = $processedData.map(arrayItemToRecord);
   { #each $dimensions as dim, i }
     <Row>
       <label for={ dim }>{ dim }</label>
-      <input type="checkbox" value={ dim } checked={ $selectedDimensionsOfInterest.indexOf(dim) > -1 } id={ dim } on:change={ () => {
-        const index = $selectedDimensionsOfInterest.indexOf(dim);
-        if (index > -1) {
-          $selectedDimensionsOfInterest.splice(index, 1);
-        } else {
-          $selectedDimensionsOfInterest.push(dim);
-        }
-      }} />
+      <input id={ dim } type=checkbox value={ dim } bind:checked={ isInteresting[dim] } />
 
-      <div class="dimension">
+      { #if $selectedDimensionsOfInterest.indexOf(dim) > -1 }
         <Histogram
           id="all-data-dim-{i}"
           data={ tabularData }
           dimension={ i+"" }
-          width={ 320 }
+          width={ 300 }
           height={ 50 }
         />
-      </div>
+      { /if }
     </Row>
   { /each }
 </DoiConfig>

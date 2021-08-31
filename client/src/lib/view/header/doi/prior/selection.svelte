@@ -1,5 +1,6 @@
 <script lang="typescript">
-import { selectedDimensionsOfInterest } from "$lib/state/selected-dimensions-of-interest";
+import { dimensions } from "$lib/state/processed-data";
+
 import { selectedItems } from "$lib/state/selected-items";
 import { arrayItemToRecord } from "$lib/util/item-transform";
 import BigNumber from "$lib/widgets/big-number.svelte";
@@ -14,28 +15,26 @@ $: tabularData = $selectedItems.map(arrayItemToRecord);
 <DoiConfig
   title="Inspect Selected Data Items"
   width={ 400 }
-  message="Visualizes the distributions in the data items selected as interesting using the brush across all dimensions marked as interesting."
+  message="Visualizes the distributions in the data items selected as interesting using the brush across all dimensions in the data."
 >
   <p class="selected">
     <BigNumber>{ $selectedItems.length }</BigNumber> items in selections.
   </p>
   <div class="histograms">
-    { #each $selectedDimensionsOfInterest as dim, i }
+    { #each $dimensions as dim, i }
       <div class="dimension">
         <h3>{dim}</h3>
         <Histogram
           id="doi-selected-dim-{i}"
           data={ tabularData }
           dimension={ i+"" }
-          width={ 350 }
+          width={ 310 }
           height={ 50 }
         />
       </div>
     { /each }
   </div>
-  { #if $selectedDimensionsOfInterest.length === 0 }
-    <p class="message">Hint: No dimensions of interest specified. Use the "dimensions" component to do so.</p>
-  { :else if $selectedItems.length === 0 }
+  { #if $selectedItems.length === 0 }
     <p class="message">Hint: No items selected. You can use the brush or select individual bins.</p>
   { /if }
 </DoiConfig>
