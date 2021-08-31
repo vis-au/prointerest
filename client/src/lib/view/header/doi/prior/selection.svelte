@@ -2,6 +2,7 @@
 import { selectedDimensionsOfInterest } from "$lib/state/selected-dimensions-of-interest";
 import { selectedItems } from "$lib/state/selected-items";
 import { arrayItemToRecord } from "$lib/util/item-transform";
+import BigNumber from "$lib/widgets/big-number.svelte";
 
 import DoiConfig from "$lib/widgets/doi-config.svelte";
 import Histogram from "$lib/widgets/histogram.svelte";
@@ -16,7 +17,7 @@ $: tabularData = $selectedItems.map(arrayItemToRecord);
   message="Visualizes the distributions in the data items selected as interesting using the brush across all dimensions marked as interesting."
 >
   <p class="selected">
-    <span class="count">{ $selectedItems.length }</span> items in selections.
+    <BigNumber>{ $selectedItems.length }</BigNumber> items in selections.
   </p>
   <div class="histograms">
     { #each $selectedDimensionsOfInterest as dim, i }
