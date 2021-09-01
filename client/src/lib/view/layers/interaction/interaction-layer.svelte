@@ -4,7 +4,6 @@ import { brush } from "d3-brush";
 import type { D3BrushEvent } from "d3-brush";
 import { select } from "d3-selection";
 import type { Selection } from "d3-selection";
-import { quadtree } from "d3-quadtree";
 import { zoom, zoomTransform } from "d3-zoom";
 import type { D3ZoomEvent } from "d3-zoom";
 
@@ -14,12 +13,15 @@ import { currentTransform, isZooming } from "$lib/state/zoom";
 import { hexbinning } from "$lib/state/hexbinning";
 import { activeBrush } from "$lib/state/active-brush";
 import { activeInteractionMode } from "$lib/state/active-interaction-mode";
-import { selectedItems } from "$lib/state/selected-items";
-import GuidanceProvider from "$lib/doi/guidance-provider";
 import InterestWatchDog from "$lib/doi/interest-watchdog";
 import InteractionFactory from "$lib/interaction/doi-interaction-factory";
 import type DataItem from "$lib/types/data-item";
 import { getDummyDataItem } from "$lib/util/dummy-data-item";
+import { quadtree } from "$lib/state/quadtree";
+import { getPointsInR, getPointsInRect } from "$lib/util/find-in-quadtree";
+import type { DoiInteraction } from "$lib/interaction/doi-interaction";
+import { interactionWeights } from "$lib/state/interaction-technique-weights";
+import { interestingItems } from "$lib/state/interesting-items";
 
 export let id = "view-interaction-layer";
 export let width: number;
@@ -30,11 +32,12 @@ export let lineWidth = 4;
 let brushCanvasElement: SVGElement;
 let zoomCanvasElement: HTMLCanvasElement;
 
-const tree = quadtree<DataItem>();
-const guidanceProvider = new GuidanceProvider();
-const doiWatchdog = new InterestWatchDog(findItemsWithinRadius);
-const interactionFactory = new InteractionFactory(width, height, tree);
+const doiWatchdog = new InterestWatchDog(getPointsInR);
+$: doiWatchdog.processedDataspace = $quadtree.data();
 
+const interactionFactory = new InteractionFactory(width, height, $quadtree);
+interactionFactory.getItemsInRegion = getPointsInRect;
+interactionFactory.getTimestamp = () => doiWatchdog.interactionLog.getLatestTimestamp();
 
 const zoomBehavior = zoom()
   .scaleExtent([0.75, 10])
@@ -45,13 +48,11 @@ const zoomBehavior = zoom()
 const brushBehavior = brush()
   .on("end", onBrushEnd);
 
-$: console.log($selectedItems);
 
-
-function findItemsWithinRadius(x: number, y: number, r: number) {
-  return [];
+function onInteraction(interaction: DoiInteraction) {
+  doiWatchdog.interactionLog.add(interaction);
+  $interestingItems = doiWatchdog.getDataOfInterest();
 }
-
 
 function onZoom(event: D3ZoomEvent<Element, void>) {
   if (event.sourceEvent === null) {
@@ -59,6 +60,9 @@ function onZoom(event: D3ZoomEvent<Element, void>) {
   }
 
   $currentTransform = event.transform;
+
+  const interaction = interactionFactory.createZoomInteraction($currentTransform);
+  onInteraction(interaction);
 }
 
 function onHover(event) {
@@ -88,6 +92,9 @@ function onClick(event) {
       return currentlySelectedBins = currentlySelectedBins.concat([clickedBin]);
     }
   });
+
+  const interaction = interactionFactory.createSelectInteraction(x, y);
+  onInteraction(interaction);
 }
 
 function onBrushEnd(event: D3BrushEvent<DataItem>) {
@@ -108,6 +115,9 @@ function onBrushEnd(event: D3BrushEvent<DataItem>) {
   // the brush is drawn by the brush-layer component to make the brushed region persist zoom+pan
   // we can therefore hide it here
   select(brushCanvasElement).selectAll("rect.selection,rect.handle").style("display", "none");
+
+  const interaction = interactionFactory.createBrushInteraction(_x0, _y0, _x1, _y1);
+  onInteraction(interaction);
 }
 
 function renderHoveredBin(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {

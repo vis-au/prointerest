@@ -14,7 +14,7 @@ export default class InterestWatchDog {
   public processedDataspace: DataItem[] = [];
   public interactionLog: InteractionLog = getInteractionLog();
   public recentSteps = 10;
-  public interestThreshold = 0.75;
+  public interestThreshold = 0.23;
   private doiWeights: Map<InteractionMode, number>;
 
   constructor(findPointsWithinRadius: (x: number, y: number, r: number) => DataItem[]) {
