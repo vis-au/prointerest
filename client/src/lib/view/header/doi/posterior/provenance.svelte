@@ -34,6 +34,7 @@
 						id="doi-selected-dim-{i}"
 						data={tabularData}
 						dimension={i + ''}
+						colors={ ["orange"] }
 						width={310}
 						height={50}
 					/>

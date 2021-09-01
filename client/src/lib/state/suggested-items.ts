@@ -5,6 +5,7 @@ import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import { activeIndicateMode } from './active-indicate-mode';
 import { interestingItems } from './interesting-items';
+import { quadtree } from './quadtree';
 
 const guide = new GuidanceProvider();
 
@@ -31,4 +32,8 @@ interestingItems.subscribe((newItems) => {
 activeIndicateMode.subscribe((newMode) => {
 	currentMode = newMode;
 	updateSuggestedItems();
+});
+
+quadtree.subscribe((newTree) => {
+	guide.processedDataspace = newTree.data();
 });
