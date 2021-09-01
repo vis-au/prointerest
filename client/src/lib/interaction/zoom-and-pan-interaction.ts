@@ -1,4 +1,5 @@
-import { Quadtree, quadtree as d3_quadtree } from "d3-quadtree";
+import { quadtree as d3_quadtree} from "d3-quadtree";
+import type { Quadtree } from "d3-quadtree";
 import { zoomIdentity, ZoomTransform } from "d3-zoom";
 import type DataItem from "../types/data-item";
 import type { DoiInteraction, InteractionMode } from "./doi-interaction";

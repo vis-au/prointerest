@@ -1,21 +1,25 @@
 <script lang="typescript">
+import { afterUpdate, onMount } from "svelte";
+import { brush } from "d3-brush";
+import type { D3BrushEvent } from "d3-brush";
+import { select } from "d3-selection";
+import type { Selection } from "d3-selection";
+import { quadtree } from "d3-quadtree";
+import { zoom, zoomTransform } from "d3-zoom";
+import type { D3ZoomEvent } from "d3-zoom";
 
 import { hoveredPosition } from "$lib/state/hovered-position";
 import { selectedBins } from "$lib/state/selected-bins";
 import { currentTransform, isZooming } from "$lib/state/zoom";
 import { hexbinning } from "$lib/state/hexbinning";
-import { select } from "d3-selection";
-import type { Selection } from "d3-selection";
-import { zoom, zoomTransform } from "d3-zoom";
-import type { D3ZoomEvent } from "d3-zoom";
-import { afterUpdate, onMount } from "svelte";
-import { scaleX, scaleY } from "$lib/state/scales";
-import { brush } from "d3-brush";
-import type { D3BrushEvent } from "d3-brush";
-import type { BinType } from "$lib/types/bin-type";
 import { activeBrush } from "$lib/state/active-brush";
 import { activeInteractionMode } from "$lib/state/active-interaction-mode";
 import { selectedItems } from "$lib/state/selected-items";
+import GuidanceProvider from "$lib/doi/guidance-provider";
+import InterestWatchDog from "$lib/doi/interest-watchdog";
+import InteractionFactory from "$lib/interaction/doi-interaction-factory";
+import type DataItem from "$lib/types/data-item";
+import { getDummyDataItem } from "$lib/util/dummy-data-item";
 
 export let id = "view-interaction-layer";
 export let width: number;
@@ -25,6 +29,12 @@ export let lineWidth = 4;
 
 let brushCanvasElement: SVGElement;
 let zoomCanvasElement: HTMLCanvasElement;
+
+const tree = quadtree<DataItem>();
+const guidanceProvider = new GuidanceProvider();
+const doiWatchdog = new InterestWatchDog(findItemsWithinRadius);
+const interactionFactory = new InteractionFactory(width, height, tree);
+
 
 const zoomBehavior = zoom()
   .scaleExtent([0.75, 10])
@@ -38,6 +48,11 @@ const brushBehavior = brush()
 $: console.log($selectedItems);
 
 
+function findItemsWithinRadius(x: number, y: number, r: number) {
+  return [];
+}
+
+
 function onZoom(event: D3ZoomEvent<Element, void>) {
   if (event.sourceEvent === null) {
     return;
@@ -48,18 +63,20 @@ function onZoom(event: D3ZoomEvent<Element, void>) {
 
 function onHover(event) {
   const rect = event.target.getBoundingClientRect();
-  const x = $scaleX.invert($currentTransform.invertX(event.clientX - rect.left));
-  const y = $scaleY.invert($currentTransform.invertY(event.clientY - rect.top));
+  const x = $currentTransform.invertX(event.clientX - rect.left);
+  const y = $currentTransform.invertY(event.clientY - rect.top);
 
   hoveredPosition.set([ x, y ]);
 }
 
 function onClick(event) {
   const rect = event.target.getBoundingClientRect();
-  const x = $scaleX.invert($currentTransform.invertX(event.clientX - rect.left));
-  const y = $scaleY.invert($currentTransform.invertY(event.clientY - rect.top));
+  const x = $currentTransform.invertX(event.clientX - rect.left);
+  const y = $currentTransform.invertY(event.clientY - rect.top);
 
-  const clickedBin = $hexbinning([[x,y,-1]])[0];
+  const dummyItem = getDummyDataItem();
+  dummyItem.position = { x, y};
+  const clickedBin = $hexbinning([dummyItem])[0];
   const selectedBin = $selectedBins.find(bin => bin.x === clickedBin.x && bin.y === clickedBin.y);
   const selectedIndex = $selectedBins.indexOf(selectedBin);
 
@@ -73,7 +90,7 @@ function onClick(event) {
   });
 }
 
-function onBrushEnd(event: D3BrushEvent<BinType>) {
+function onBrushEnd(event: D3BrushEvent<DataItem>) {
   const selection = event.selection;
 
   if (selection === null || selection === undefined) {
@@ -94,7 +111,10 @@ function onBrushEnd(event: D3BrushEvent<BinType>) {
 }
 
 function renderHoveredBin(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
-  const hoveredBin = $hexbinning([[ ...$hoveredPosition, -1]])[0];
+  const dummyItem = getDummyDataItem();
+  dummyItem.position.x = $hoveredPosition[0];
+  dummyItem.position.y = $hoveredPosition[1];
+  const hoveredBin = $hexbinning([dummyItem])[0];
 
   if (!hoveredBin) {
     return;

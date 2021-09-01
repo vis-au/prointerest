@@ -7,8 +7,8 @@ import { interpolateBuPu } from "d3-scale-chromatic";
 import { afterUpdate, onMount } from 'svelte';
 
 import { hexbinning } from '$lib/state/hexbinning';
-import type { BinType } from '$lib/types/bin-type';
 import { visibleData } from '$lib/state/visible-data';
+import type DataItem from '$lib/types/data-item';
 
 export let id = "binned-scatterplot-view";
 export let width = 100;
@@ -42,8 +42,8 @@ function render() {
   const ctx = canvasElement.getContext("2d");
   const hexagonPath = new Path2D($hexbinning.hexagon());
 
-  const minCount = (min(bins, (d: HexbinBin<BinType>) => d.length) || 0);
-  const maxCount = (max(bins, (d: HexbinBin<BinType>) => d.length) || 1);
+  const minCount = (min(bins, (d: HexbinBin<DataItem>) => d.length) || 0);
+  const maxCount = (max(bins, (d: HexbinBin<DataItem>) => d.length) || 1);
 
   if (color.range().length === 3) {
     color.domain([maxCount, 0, minCount]);

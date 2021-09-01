@@ -5,8 +5,8 @@ import { ScatterplotLayer } from '@deck.gl/layers';
 import { selectAll } from 'd3-selection';
 
 import { currentTransform } from '$lib/state/zoom';
-import { scaleX, scaleY } from '$lib/state/scales';
-import { visibleData, xEncoding, yEncoding } from '$lib/state/visible-data';
+import type DataItem from '$lib/types/data-item';
+import { visibleData } from '$lib/state/visible-data';
 
 
 export let id = "deck-gl-scatterplot";
@@ -42,10 +42,12 @@ function render() {
 
   const t = $currentTransform;
 
+  console.log(data);
+
   layers = [
     new ScatterplotLayer({
       id: `${id}-layer`,
-      getPosition: d => [t.applyX($scaleX(d[xEncoding])), t.applyY($scaleY(d[yEncoding]))],
+      getPosition: (d: DataItem) => [t.applyX(d.position.x), t.applyY(d.position.y)],
       getRadius: radius,
       getLineWidth: 0,
       opacity: 0.3,

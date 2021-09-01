@@ -1,13 +1,14 @@
 <script lang="typescript">
 
-import { dimensions, processedData } from "$lib/state/processed-data";
+import { dimensions } from "$lib/state/processed-data";
+import { quadtree } from "$lib/state/quadtree";
 import { selectedDimensionsOfInterest } from "$lib/state/selected-dimensions-of-interest";
-import { arrayItemToRecord } from "$lib/util/item-transform";
+import { dataItemToRecord } from "$lib/util/item-transform";
 import DoiConfig from "$lib/widgets/doi-config.svelte";
 import Histogram from "$lib/widgets/histogram.svelte";
 import Row from "$lib/widgets/row.svelte";
 
-$: tabularData = $processedData.map(arrayItemToRecord);
+$: tabularData = $quadtree.data().map(dataItemToRecord);
 
 const isInteresting = {};
 $dimensions.forEach(dim => isInteresting[dim] = false);

@@ -1,7 +1,9 @@
-export function arrayItemToRecord(arrayItem: number[]): Record<string, unknown> {
+import type DataItem from "$lib/types/data-item";
+
+export function dataItemToRecord(dataItem: DataItem): Record<string, unknown> {
   const item = {};
 
-  arrayItem.forEach((val, i) => {
+  dataItem.values.forEach((val, i) => {
     item[""+i] = val;
   });
 

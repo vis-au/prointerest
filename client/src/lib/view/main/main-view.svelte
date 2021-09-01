@@ -9,22 +9,11 @@ import BinnedScatterplotView from "../layers/visualization/binned-scatterplot-vi
 import { activeViewMode } from "$lib/state/active-view-mode";
 import UiOverlay from "./ui-overlay.svelte";
 
-let innerWidth = 500;
-let innerHeight = 350;
-const margin = {
-  horizontal: 2,
-  vertical: 35
-};
-
-$: plotWidth = innerWidth - margin.horizontal;
-$: plotHeight = innerHeight - margin.vertical;
-$: $scaleX.range([0, plotWidth]);
-$: $scaleY.range([0, plotHeight]);
+export let plotWidth: number;
+export let plotHeight: number;
 
 let uiVisible = true;
 </script>
-
-<svelte:window bind:innerWidth={ innerWidth } bind:innerHeight={ innerHeight } />
 
 <div class="main" on:mouseenter={ () => uiVisible = true } on:mouseleave={() => uiVisible = false }>
   { #if $activeViewMode === "scatter" }

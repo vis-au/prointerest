@@ -2,14 +2,14 @@
 import { dimensions } from "$lib/state/processed-data";
 
 import { selectedItems } from "$lib/state/selected-items";
-import { arrayItemToRecord } from "$lib/util/item-transform";
+import { dataItemToRecord } from "$lib/util/item-transform";
 import BigNumber from "$lib/widgets/big-number.svelte";
 
 import DoiConfig from "$lib/widgets/doi-config.svelte";
 import Histogram from "$lib/widgets/histogram.svelte";
 
 
-$: tabularData = $selectedItems.map(arrayItemToRecord);
+$: tabularData = $selectedItems.map(dataItemToRecord);
 </script>
 
 <DoiConfig
