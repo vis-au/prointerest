@@ -59,6 +59,7 @@
 	}
 
 	function onResizingEnded() {
+		resize = null;
 		document.removeEventListener("mousemove", onResizing);
 		document.removeEventListener("mouseup", onResizingEnded);
 	}

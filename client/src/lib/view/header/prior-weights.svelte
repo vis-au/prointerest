@@ -9,8 +9,8 @@
 	<h2>Prior</h2>
 	<WeightedValues
 		group="doi-weights"
-		valueWeights={$priorWeights}
 		totalSize={400}
+		bind:valueWeights={$priorWeights}
 		bind:activeWeight={$selectedDoiWeight}
 	/>
 </Row>

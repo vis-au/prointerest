@@ -36,6 +36,6 @@ import type { ResizeEvent } from "$lib/types/resize-event";
 		background: #ccc;
 	}
   div.divider.active {
-    background: steelblue;
+    background: #333;
   }
 </style>

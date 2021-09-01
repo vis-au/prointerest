@@ -15,6 +15,7 @@
 	$selectedScagnostics.forEach((s) => (isSelected[s] = true));
 
 	$: $selectedScagnostics = scagnostics.filter((s) => isSelected[s]);
+	$: selectedWeights.forEach((value, key) => $scagnosticWeights.set(key, value))
 
 	selectedScagnostics.subscribe((newSelection) => {
 		selectedWeights = new Map();
@@ -69,8 +70,8 @@
 		<h3>Assign weights</h3>
 		<WeightedValues
 			group="selected-scagnostics"
-			valueWeights={selectedWeights}
 			totalSize={maxWidth}
+			bind:valueWeights={selectedWeights}
 		/>
 		{#if selectedWeights.size === 0}
 			<p class="empty">Select interesting scagnostics above.</p>

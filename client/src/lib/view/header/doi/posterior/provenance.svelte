@@ -21,8 +21,8 @@
 		<h3>Assign weights to interactions</h3>
 		<WeightedValues
 			group="interaction-technique-weights"
-			valueWeights={$interactionWeights}
 			totalSize={310}
+			bind:valueWeights={$interactionWeights}
 		/>
 	</Column>
 	<Column>
