@@ -9,11 +9,11 @@ export const defaultDecay = (oldValue: number): number => 0.99 * oldValue;
 export const defaultItemInRegion = (...params: any): DataItem[] => [];
 
 export interface DoiInteraction {
-  mode: InteractionMode,
-  std: number,
-  x: number,
-  y: number,
-  quadtree: Quadtree<DataItem>,
-  timestamp: number,
-  getAffectedItems: () => DataItem[],
+	mode: InteractionMode;
+	std: number;
+	x: number;
+	y: number;
+	quadtree: Quadtree<DataItem>;
+	timestamp: number;
+	getAffectedItems: () => DataItem[];
 }

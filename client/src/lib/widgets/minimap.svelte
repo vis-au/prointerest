@@ -1,1 +1,1 @@
-<div class="minimap"></div>
+<div class="minimap" />
