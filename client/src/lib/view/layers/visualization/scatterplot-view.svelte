@@ -42,8 +42,6 @@ function render() {
 
   const t = $currentTransform;
 
-  console.log(data);
-
   layers = [
     new ScatterplotLayer({
       id: `${id}-layer`,

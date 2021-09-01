@@ -20,7 +20,6 @@ import { getDummyDataItem } from "$lib/util/dummy-data-item";
 import { quadtree } from "$lib/state/quadtree";
 import { getPointsInR, getPointsInRect } from "$lib/util/find-in-quadtree";
 import type { DoiInteraction } from "$lib/interaction/doi-interaction";
-import { interactionWeights } from "$lib/state/interaction-technique-weights";
 import { interestingItems } from "$lib/state/interesting-items";
 
 export let id = "view-interaction-layer";
@@ -29,8 +28,9 @@ export let height: number;
 export let color = "rgba(255,255,255,1)";
 export let lineWidth = 4;
 
-let brushCanvasElement: SVGElement;
+let selectionCanvas: HTMLCanvasElement;
 let zoomCanvasElement: HTMLCanvasElement;
+let brushCanvasElement: SVGElement;
 
 const doiWatchdog = new InterestWatchDog(getPointsInR);
 $: doiWatchdog.processedDataspace = $quadtree.data();
@@ -156,12 +156,12 @@ function renderSelectedBins(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) 
 }
 
 function render() {
-  if (!zoomCanvasElement) {
+  if (!selectionCanvas) {
     return;
   }
 
   const hexagonPath = new Path2D($hexbinning.hexagon());
-  const ctx = zoomCanvasElement.getContext("2d");
+  const ctx = selectionCanvas.getContext("2d");
   ctx.clearRect(0, 0, width, height);
 
   renderHoveredBin(ctx, hexagonPath);
@@ -174,8 +174,8 @@ onMount(() => {
   setTimeout(() => {
     const brushSvg = select(brushCanvasElement);
     brushSvg.call(brushBehavior);
-    const zoomSvg = select(zoomCanvasElement);
-    zoomSvg.call(zoomBehavior);
+    const zoomCanvas = select(zoomCanvasElement);
+    zoomCanvas.call(zoomBehavior);
   }, 10);
 });
 
@@ -194,6 +194,13 @@ afterUpdate(() => {
 </script>
 
 <div class="interaction-canvas-container">
+  <canvas
+    id="{id}-selection-canvas"
+    class="selection interaction-canvas"
+    width={ width }
+    height={ height }
+    bind:this={ selectionCanvas }
+  />
   <canvas
     id="{id}-zoom-canvas"
     class="zoom interaction-canvas {$activeInteractionMode !== "zoom" ? "hidden": ""}"
