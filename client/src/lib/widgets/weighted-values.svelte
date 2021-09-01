@@ -1,9 +1,16 @@
 <script lang="typescript">
+	import type { ResizeEvent } from "$lib/types/resize-event";
+
+	import Divider from "./divider.svelte";
+
 	export let group: string;
 	export let valueWeights: Map<string, number>;
 	export let activeWeight: string = null;
 	export let totalSize = 250;
 	export let showValue = false;
+
+	$: weights = Array.from(valueWeights.entries());
+	let resize: ResizeEvent;
 
 	function getId(key: string) {
 		return `${key.split(' ').join('_')}-${group}`;
@@ -17,10 +24,54 @@
 			activeWeight = weight;
 		}
 	}
+
+	function onResizing(event: MouseEvent) {
+		const deltaX = event.movementX;
+
+		const leftWeight = valueWeights.get(resize.leftId);
+		const rightWeight = valueWeights.get(resize.rightId);
+		const leftSize = leftWeight * totalSize;
+		const rightSize = rightWeight * totalSize;
+
+		let newLeftSize: number = leftSize;
+		let newRightSize: number = rightSize;
+
+		if (deltaX > 0) {
+			// growing left and shrinking right
+			newRightSize = Math.max(rightSize - deltaX, 0);
+			if (newRightSize > 0) {
+				newLeftSize = leftSize + deltaX
+			}
+		} else {
+			// shrinking left and growing right
+			newLeftSize = Math.max(leftSize + deltaX, 0);
+			if (newLeftSize > 0) {
+				newRightSize = rightSize - deltaX
+			}
+		}
+
+		const newLeftWeight = newLeftSize / totalSize;
+		const newRightWeight = newRightSize / totalSize;
+
+		valueWeights.set(resize.leftId, newLeftWeight);
+		valueWeights.set(resize.rightId, newRightWeight);
+		valueWeights = new Map(valueWeights);
+	}
+
+	function onResizingEnded() {
+		document.removeEventListener("mousemove", onResizing);
+		document.removeEventListener("mouseup", onResizingEnded);
+	}
+
+	function onResizingStarted(event: ResizeEvent) {
+		resize = event;
+		document.addEventListener("mousemove", onResizing);
+		document.addEventListener("mouseup", onResizingEnded);
+	}
 </script>
 
 <div id={group} class="weighted-values">
-	{#each Array.from(valueWeights.entries()) as entry, i}
+	{#each weights as entry, i}
 		<div
 			class="entry {activeWeight === entry[0] ? 'active' : ''}"
 			style="width:{entry[1] * totalSize}px"
@@ -44,7 +95,13 @@
 		</div>
 
 		{#if i !== Array.from(valueWeights.entries()).length - 1}
-			<div class="divider" />
+			<Divider
+				left={ weights[i][0] }
+				right={ weights[i+1][0] }
+				isResizing={ resize && resize.leftId==weights[i][0] && resize.rightId==weights[i+1][0] }
+				{ group }
+				on:resize-started={ (e) => onResizingStarted(e.detail) }
+			/>
 		{/if}
 	{/each}
 </div>
@@ -89,14 +146,5 @@
 
 	div.entry input {
 		display: none;
-	}
-
-	div.divider {
-		min-width: 0.5rem;
-		min-height: 12px;
-		cursor: w-resize;
-	}
-	div.divider:hover {
-		background: #ccc;
 	}
 </style>
