@@ -64,9 +64,6 @@ function onZoom(event: D3ZoomEvent<Element, void>) {
 
 function onZoomEnd() {
   $isZooming = false;
-
-  const interaction = interactionFactory.createZoomInteraction($currentTransform);
-  onInteraction(interaction);
 }
 
 function onHover(event) {

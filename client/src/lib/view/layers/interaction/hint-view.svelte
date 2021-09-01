@@ -19,19 +19,17 @@ $: hintItems = $activeIndicateMode === "explored" ? $interestingItems
   : $activeIndicateMode === "dissimilar" ? guide.getItemsDissimilarToInterest($interestingItems)
   : [];
 
-$: visibleItems = hintItems.filter(item => {
-  const pos = item.position;
-  return pos.x > $vp.minX && pos.x < $vp.maxX && pos.y > $vp.minY && pos.y < $vp.maxY;
+$: bins = $hexbinning(hintItems);
+$: visibleBins = bins.filter(bin => {
+  return bin.x > $vp.minX && bin.x < $vp.maxX && bin.y > $vp.minY && bin.y < $vp.maxY;
 });
-$: offscreenItems = hintItems.filter(item => {
-  visibleItems.indexOf(item) === -1;
+$: offscreenBins = bins.filter(bin => {
+  return visibleBins.indexOf(bin) === -1;
 });
 
-$: visibleBins = $hexbinning(visibleItems);
-$: offscreenBins = $hexbinning(offscreenItems);
 
 let canvas: HTMLCanvasElement;
-const pad = 100;
+const arrowPadding = 10;
 
 function renderVisibleGuides(ctx: CanvasRenderingContext2D) {
     const hexagonPath = new Path2D($hexbinning.hexagon());
@@ -52,10 +50,6 @@ function renderVisibleGuides(ctx: CanvasRenderingContext2D) {
 }
 
 function renderOffscreenGuides(ctx: CanvasRenderingContext2D) {
-  if (offscreenItems.length === 0) {
-    return;
-  }
-
   ctx.fillStyle = "rgba(255,199,0,1)";
   const w = 30;
   const triangle = new Path2D(`M0,0L${w},0L${w/2},${w*.6}Z`);
@@ -66,17 +60,17 @@ function renderOffscreenGuides(ctx: CanvasRenderingContext2D) {
     let rot = 0;
 
     if (x < 0) {
-      x = pad + pad;
+      x = arrowPadding + arrowPadding;
       rot = Math.PI * .5;
     } else if (x > width) {
-      x = width - pad - pad;
+      x = width - arrowPadding - arrowPadding;
       rot = Math.PI * 1.5;
     }
     if (y < 0) {
-      y = pad + pad;
+      y = arrowPadding + arrowPadding;
       rot = Math.PI;
     } else if (y > height) {
-      y = height - pad - pad;
+      y = height - arrowPadding - arrowPadding;
     }
 
     ctx.translate(x, y);
