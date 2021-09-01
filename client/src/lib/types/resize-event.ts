@@ -3,5 +3,7 @@ export interface ResizeEvent {
   startX: number,
   startY: number,
   leftId: string,
-  rightId: string
+  rightId: string,
+  leftValue: number,
+  rightValue: number
 }

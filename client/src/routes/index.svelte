@@ -10,11 +10,14 @@
 	import ActiveDoiPanel from '$lib/view/header/doi/active-doi-panel.svelte';
 	import { quadtree } from '$lib/state/quadtree';
 	import { scaleX, scaleY } from '$lib/state/scales';
+	import { isResizing } from '$lib/state/is-resizing';
+	import ResizingOverlay from '$lib/view/main/resizing-overlay.svelte';
 
 	const data = range(0, 10000).map(() => [Math.random(), Math.random(), Math.random()] as number[]);
 
 	let innerWidth: number;
 	let innerHeight: number;
+	let mousePosition = [-1, -1];
 
 	$processedData = data;
 	$dimensions = ['dimension a', 'dimension b', 'dimension c'];
@@ -48,9 +51,12 @@
 	<Header />
 	<MainView {plotWidth} {plotHeight} />
 	<ActiveDoiPanel />
+	<ResizingOverlay x={mousePosition[0]} y={$isResizing?.startY} />
 </div>
 
 <svelte:window bind:innerWidth bind:innerHeight />
+
+<svelte:body on:mousemove={ e => mousePosition = [e.clientX, e.clientY] } />
 
 <style>
 	:global(body) {

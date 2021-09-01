@@ -1,29 +1,33 @@
 <script lang="typescript">
-import type { ResizeEvent } from "$lib/types/resize-event";
-
   import { createEventDispatcher } from "svelte";
+
+  import type { ResizeEvent } from "$lib/types/resize-event";
 
   export let group: string;
   export let left: string;
   export let right: string;
   export let isResizing = false;
+  export let weights: Map<string, number>;
 
   const dispatch = createEventDispatcher();
 
   function resizeStart(x, y) {
     dispatch("resize-started", {
       group,
+      weights,
       startX: x,
       startY: y,
       leftId: left,
-      rightId: right
+      rightId: right,
+      leftValue: 0,
+      rightValue: 0
     } as ResizeEvent);
   }
 </script>
 
 <div
   class="divider {isResizing ? "active" : ""}"
-  on:mousedown={ (e) => resizeStart(e.screenX, e.screenY) }
+  on:mousedown={ (e) => resizeStart(e.clientX, e.clientY) }
 />
 
 <style>

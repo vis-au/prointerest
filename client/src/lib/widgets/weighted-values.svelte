@@ -1,4 +1,5 @@
 <script lang="typescript">
+	import { isResizing } from "$lib/state/is-resizing";
 	import type { ResizeEvent } from "$lib/types/resize-event";
 
 	import Divider from "./divider.svelte";
@@ -55,17 +56,22 @@
 
 		valueWeights.set(resize.leftId, newLeftWeight);
 		valueWeights.set(resize.rightId, newRightWeight);
+		$isResizing.leftValue = newLeftWeight;
+		$isResizing.rightValue = newRightWeight;
+
 		valueWeights = new Map(valueWeights);
 	}
 
 	function onResizingEnded() {
 		resize = null;
+		$isResizing = null;
 		document.removeEventListener("mousemove", onResizing);
 		document.removeEventListener("mouseup", onResizingEnded);
 	}
 
 	function onResizingStarted(event: ResizeEvent) {
 		resize = event;
+		$isResizing = event;
 		document.addEventListener("mousemove", onResizing);
 		document.addEventListener("mouseup", onResizingEnded);
 	}
@@ -101,6 +107,7 @@
 				right={ weights[i+1][0] }
 				isResizing={ resize && resize.leftId==weights[i][0] && resize.rightId==weights[i+1][0] }
 				{ group }
+				weights={ valueWeights }
 				on:resize-started={ (e) => onResizingStarted(e.detail) }
 			/>
 		{/if}
