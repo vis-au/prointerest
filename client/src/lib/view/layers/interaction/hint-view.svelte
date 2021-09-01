@@ -1,10 +1,6 @@
 <script lang="typescript">
-import GuidanceProvider from "$lib/doi/guidance-provider";
-
-import { activeIndicateMode } from "$lib/state/active-indicate-mode";
-
 import { hexbinning } from "$lib/state/hexbinning";
-import { interestingItems } from "$lib/state/interesting-items";
+import { suggestedItems } from "$lib/state/suggested-items";
 import { viewPort as vp } from "$lib/state/visible-data";
 import { afterUpdate } from "svelte";
 
@@ -12,14 +8,7 @@ import { afterUpdate } from "svelte";
 export let width;
 export let height;
 
-const guide = new GuidanceProvider();
-
-$: hintItems = $activeIndicateMode === "explored" ? $interestingItems
-  : $activeIndicateMode === "similar" ? guide.getItemsSimilarToInterest($interestingItems)
-  : $activeIndicateMode === "dissimilar" ? guide.getItemsDissimilarToInterest($interestingItems)
-  : [];
-
-$: bins = $hexbinning(hintItems);
+$: bins = $hexbinning($suggestedItems);
 $: visibleBins = bins.filter(bin => {
   return bin.x > $vp.minX && bin.x < $vp.maxX && bin.y > $vp.minY && bin.y < $vp.maxY;
 });
