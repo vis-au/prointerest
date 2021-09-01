@@ -1,9 +1,8 @@
 <script lang="typescript">
 
-import { scaleX, scaleY } from "$lib/state/scales";
 import BrushLayer from "../layers/interaction/brush-layer.svelte";
 import InteractionLayer from "../layers/interaction/interaction-layer.svelte";
-import HintLayer from "../layers/visualization/hint-view.svelte";
+import HintView from "../layers/interaction/hint-view.svelte";
 import ScatterplotView from "../layers/visualization/scatterplot-view.svelte";
 import BinnedScatterplotView from "../layers/visualization/binned-scatterplot-view.svelte";
 import { activeViewMode } from "$lib/state/active-view-mode";
@@ -22,7 +21,7 @@ let uiVisible = true;
     <BinnedScatterplotView width={ plotWidth } height={ plotHeight } />
   { /if }
 
-  <HintLayer />
+  <HintView width={ plotWidth } height={ plotHeight } />
   <BrushLayer width={ plotWidth } height={ plotHeight } />
   <InteractionLayer width={ plotWidth } height={ plotHeight } />
   <UiOverlay width={ plotWidth } height={ plotHeight } visible={ uiVisible } />

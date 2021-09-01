@@ -105,6 +105,5 @@ function generateDeckComponent() {
   }
   div.scatterplot-view canvas.scatterplot-view {
     position: absolute;
-    border: 1px solid blue;
   }
 </style>
