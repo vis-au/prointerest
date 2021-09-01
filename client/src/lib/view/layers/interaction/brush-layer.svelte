@@ -21,8 +21,6 @@ function render() {
   const x1 = t.applyX(_x1);
   const y1 = t.applyY(_y1);
 
-  console.log(width, height);
-
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.beginPath();
