@@ -4,10 +4,16 @@ import { quadtree } from "$lib/state/quadtree";
 
 
 let currentQuadtree: Quadtree<DataItem>;
-quadtree.subscribe(newQuadtree => currentQuadtree = newQuadtree);
+
+// this is async to avoid error when loading page caused by access to lexical declaration of quadtr.
+setTimeout(() => quadtree.subscribe(newQuadtree => currentQuadtree = newQuadtree), 0);
 
 // uses UNTRANSFORMED screen positions!
 export function getPointsInR(x: number, y: number, r: number): DataItem[] {
+  if (currentQuadtree === undefined) {
+    return [];
+  }
+
   const pointsInR: DataItem[] = [];
   const radius2 = r*r;
 
@@ -31,6 +37,10 @@ export function getPointsInR(x: number, y: number, r: number): DataItem[] {
 
 // uses UNTRANSFORMED screen positions!
 export function getPointsInRect(x0: number, y0: number, x3: number, y3: number): DataItem[] {
+  if (currentQuadtree === undefined) {
+    return [];
+  }
+
   const pointsInRect: DataItem[] = [];
 
   currentQuadtree.visit((node, x1, y1, x2, y2) => {

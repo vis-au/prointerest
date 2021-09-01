@@ -43,7 +43,7 @@ const zoomBehavior = zoom()
   .scaleExtent([0.75, 10])
   .on("start", () => $isZooming = true)
   .on("zoom", onZoom)
-  .on("end", () => $isZooming = false);
+  .on("end", onZoomEnd);
 
 const brushBehavior = brush()
   .on("end", onBrushEnd);
@@ -60,6 +60,10 @@ function onZoom(event: D3ZoomEvent<Element, void>) {
   }
 
   $currentTransform = event.transform;
+}
+
+function onZoomEnd() {
+  $isZooming = false;
 
   const interaction = interactionFactory.createZoomInteraction($currentTransform);
   onInteraction(interaction);

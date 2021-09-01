@@ -14,6 +14,10 @@ let currentSelectedBins: HexbinBin<DataItem>[] = [];
 let currentBrush: [[number, number], [number, number]] = [[-1, -1], [-1, -1]];
 
 function getBrushedItems() {
+  if (currentBrush === null || currentBrush[0] === null) {
+    return [];
+  }
+
   const [[x0, y0], [x1, y1]] = currentBrush;
   return getPointsInRect(x0, y0, x1, y1);
 }
