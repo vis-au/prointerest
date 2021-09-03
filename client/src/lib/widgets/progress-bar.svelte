@@ -1,6 +1,8 @@
 <script lang="typescript">
 	export let id: string;
 	export let progress: number;
+	export let current: number;
+	export let total: number;
 	export let width: number = null;
 	export let height: number;
 </script>
@@ -9,8 +11,8 @@
 	id="{id}-progress-bar"
 	class="progress-bar"
 	style="width:{width}px;min-height:{height}px"
-	title="{Math.floor(progress * 10000) / 100}%"
->
+	title="{current}/{total}">
+
 	<div class="progress" style="width:{progress * 100}%;height:{height}px" />
 </div>
 
