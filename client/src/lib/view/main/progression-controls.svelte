@@ -1,5 +1,5 @@
 <script lang="typescript">
-  import { processedData } from "$lib/state/processed-data";
+  import { processedData, totalSize } from "$lib/state/processed-data";
   import { pauseProgression, progressionState, resetProgression, startProgression } from "$lib/state/progression";
   import Column from "$lib/widgets/column.svelte";
   import ProgressBar from "$lib/widgets/progress-bar.svelte";
@@ -9,10 +9,9 @@
   export let x: number;
   export let y: number;
 
-  const total = 1000;
   const width = 150;
 
-  $: progress = $processedData.length / total;
+  $: progress = $processedData.length / $totalSize;
 </script>
 
 
@@ -20,13 +19,13 @@
   <Column>
     <div id="progression-text">
       <span>Processed:</span>
-      <span>{ Math.round(progress * 10000) / 100 }%</span>
+      <span>{ $processedData.length }</span>
     </div>
     <ProgressBar
       id={"progression"}
       progress={ progress }
       current={ $processedData.length }
-      total={ total }
+      total={ $totalSize }
       width={ width }
       height={ 5 }
     />

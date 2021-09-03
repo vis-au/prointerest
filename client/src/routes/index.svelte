@@ -1,5 +1,5 @@
 <script lang="typescript">
-	import { dimensions } from '$lib/state/processed-data';
+	import { dimensions, totalSize } from '$lib/state/processed-data';
 	import Header from '$lib/view/header/header.svelte';
 	import MainView from '$lib/view/main/main-view.svelte';
 	import { onMount } from 'svelte';
@@ -10,7 +10,7 @@
 	import { scaleX, scaleY } from '$lib/state/scales';
 	import { isResizing } from '$lib/state/is-resizing';
 	import ResizingOverlay from '$lib/view/main/resizing-overlay.svelte';
-	import { getDimensionNames } from '$lib/util/requests';
+	import { getDimensionNames, getTotalDatasize } from '$lib/util/requests';
 	import ProgressionControls from '$lib/view/main/progression-controls.svelte';
 	import { activeViewEncodings } from '$lib/state/active-view-encodings';
 	import { viewPort } from '$lib/state/visible-data';
@@ -48,6 +48,8 @@
 			$dimensions = await getDimensionNames();
 			$activeViewEncodings.x = "trip_distance";
 			$activeViewEncodings.y = "total_amount";
+
+			$totalSize = await getTotalDatasize();
 		}, 0);
 	});
 </script>

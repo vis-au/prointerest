@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 CHUNK_SIZE = 100
 DIMENSIONS = 5
+TOTAL_SIZE = 112145904
 
 # database constants
 PATH = "./data/nyc_taxis.shuffled_full.csv.gz"
@@ -43,6 +44,12 @@ def get_dimensions_in_data():
   dimensions = list(item.columns)
   return dimensions
 
+def get_data_size():
+  # computing count() on-demand takes too long for large data
+  # query = f"SELECT COUNT(*) FROM {TABLE}"
+  # size = cursor.execute(query).fetchall()[0]
+  return TOTAL_SIZE
+
 
 def get_random_sample():
   return [ [random.random() for __ in range(DIMENSIONS)] for _ in range(CHUNK_SIZE) ];
@@ -75,6 +82,12 @@ def get_next_chunk():
   # chunk = get_random_sample()
   chunk = get_next_chunk_from_db()
   return cors_response(chunk)
+
+
+@app.route("/size", methods=["GET"])
+def get_size():
+  size = get_data_size()
+  return cors_response(size)
 
 
 if __name__ == "__main__":

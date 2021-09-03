@@ -7,6 +7,10 @@ async function sendRequestToBaseURL(path: string) {
     .then(d => d.json());
 }
 
+export async function getTotalDatasize(): Promise<number> {
+  return sendRequestToBaseURL("/size");
+}
+
 export async function getDimensionNames(): Promise<string[]> {
   return sendRequestToBaseURL("/dimensions");
 }
