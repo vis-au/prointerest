@@ -13,14 +13,13 @@
 	import { hexbinning } from '$lib/state/hexbinning';
 	import { activeBrush } from '$lib/state/active-brush';
 	import { activeInteractionMode } from '$lib/state/active-interaction-mode';
-	import InterestWatchDog from '$lib/doi/interest-watchdog';
 	import InteractionFactory from '$lib/interaction/doi-interaction-factory';
 	import type DataItem from '$lib/types/data-item';
 	import { getDummyDataItem } from '$lib/util/dummy-data-item';
 	import { quadtree } from '$lib/state/quadtree';
-	import { getPointsInR, getPointsInRect } from '$lib/util/find-in-quadtree';
+	import { getPointsInRect } from '$lib/util/find-in-quadtree';
 	import type { DoiInteraction } from '$lib/interaction/doi-interaction';
-	import { interestingItems } from '$lib/state/interesting-items';
+	import { getLatestTimestamp, registerNewInteraction } from '$lib/state/interesting-items';
 
 	export let id = 'view-interaction-layer';
 	export let width: number;
@@ -32,12 +31,9 @@
 	let zoomCanvasElement: HTMLCanvasElement;
 	let brushCanvasElement: SVGElement;
 
-	const doiWatchdog = new InterestWatchDog(getPointsInR);
-	$: doiWatchdog.processedDataspace = $quadtree.data();
-
 	const interactionFactory = new InteractionFactory(width, height, $quadtree);
 	interactionFactory.getItemsInRegion = getPointsInRect;
-	interactionFactory.getTimestamp = () => doiWatchdog.interactionLog.getLatestTimestamp();
+	interactionFactory.getTimestamp = getLatestTimestamp;
 
 	const zoomBehavior = zoom()
 		.scaleExtent([0.75, 10])
@@ -48,8 +44,7 @@
 	const brushBehavior = brush().on('end', onBrushEnd);
 
 	function onInteraction(interaction: DoiInteraction) {
-		doiWatchdog.interactionLog.add(interaction);
-		$interestingItems = doiWatchdog.getDataOfInterest();
+		registerNewInteraction(interaction);
 	}
 
 	function onZoom(event: D3ZoomEvent<Element, void>) {
@@ -62,6 +57,8 @@
 
 	function onZoomEnd() {
 		$isZooming = false;
+		const interaction = interactionFactory.createZoomInteraction($currentTransform);
+		onInteraction(interaction);
 	}
 
 	function onHover(event) {
