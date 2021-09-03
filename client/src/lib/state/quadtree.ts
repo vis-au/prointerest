@@ -6,23 +6,17 @@ import { writable } from 'svelte/store';
 import { scaleX, scaleY } from './scales';
 import { activeViewEncodings } from './active-view-encodings';
 import { dimensions } from './processed-data';
+import { resetProgression } from './progression';
 
 let currentQuadtree = createQuadtree();
 export const quadtree = writable(currentQuadtree);
 
 let currentScaleX: ScaleLinear<number, number> = null;
 let currentScaleY: ScaleLinear<number, number> = null;
-scaleX.subscribe((newScale) => currentScaleX = newScale);
-scaleY.subscribe((newScale) => currentScaleY = newScale);
 
 let currentDimensions: string[] = [];
 let xIndex = -1;
 let yIndex = -1;
-dimensions.subscribe(newDims => currentDimensions = newDims);
-activeViewEncodings.subscribe(newEncodings => {
-	xIndex = currentDimensions.indexOf(newEncodings.x);
-	yIndex = currentDimensions.indexOf(newEncodings.y);
-});
 
 
 function createQuadtree() {
@@ -61,3 +55,14 @@ setTimeout(() => {
 		quadtree.set(currentQuadtree);
 	});
 }, 0);
+
+scaleX.subscribe((newScale) => currentScaleX = newScale);
+scaleY.subscribe((newScale) => currentScaleY = newScale);
+
+dimensions.subscribe(newDims => currentDimensions = newDims);
+
+activeViewEncodings.subscribe(newEncodings => {
+	xIndex = currentDimensions.indexOf(newEncodings.x);
+	yIndex = currentDimensions.indexOf(newEncodings.y);
+	resetProgression();
+});

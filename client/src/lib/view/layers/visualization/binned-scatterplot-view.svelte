@@ -53,7 +53,9 @@
 		renderBins(ctx, hexagonPath);
 	}
 
-	afterUpdate(render);
+	afterUpdate(() => {
+		setTimeout(render, 0);
+	});
 	onMount(render);
 </script>
 

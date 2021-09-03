@@ -12,8 +12,10 @@
 			console.error('vega embed is undefined');
 			return;
 		}
-		console.log(spec);
-		vegaEmbed.embed(`#${id}-vega-container`, spec, { actions: false });
+
+		setTimeout(() => {
+			vegaEmbed.embed(`#${id}-vega-container`, spec, { actions: false });
+		}, 0);
 	});
 </script>
 
