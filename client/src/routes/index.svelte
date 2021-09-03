@@ -17,9 +17,12 @@
 	let innerHeight = 0;
 	let mousePosition = [-1, -1];
 
+
+	const headerHeight = 35;
+
 	const margin = {
 		horizontal: 2,
-		vertical: 35
+		vertical: headerHeight + 2
 	};
 
 	$: plotWidth = innerWidth - margin.horizontal;
@@ -46,7 +49,7 @@
 </script>
 
 <div id="pro-interest">
-	<Header />
+	<Header height={ headerHeight }/>
 	<MainView {plotWidth} {plotHeight} />
 	<ActiveDoiPanel />
 	<ResizingOverlay x={mousePosition[0]} y={$isResizing?.startY} />

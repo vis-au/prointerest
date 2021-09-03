@@ -7,7 +7,7 @@
 	export let height: number;
 </script>
 
-<div class="ui-overlay {visible ? '' : 'hidden'}" style="width:{width}px">
+<div class="ui-overlay {visible ? '' : 'hidden'}" style="width:{width}px;max-height:{height}px">
 	<ViewControls />
 	<Minimap />
 </div>

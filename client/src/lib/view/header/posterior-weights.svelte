@@ -9,7 +9,7 @@
 	<h2>Posterior</h2>
 	<WeightedValues
 		group="doi-weights"
-		totalSize={250}
+		totalSize={350}
 		bind:valueWeights={$posteriorWeights}
 		bind:activeWeight={$selectedDoiWeight}
 	/>
