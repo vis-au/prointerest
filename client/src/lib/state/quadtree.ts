@@ -3,27 +3,40 @@ import type { ScaleLinear } from 'd3-scale';
 import type DataItem from '$lib/types/data-item';
 import { processedData } from './processed-data';
 import { writable } from 'svelte/store';
-import { xEncoding, yEncoding } from './visible-data';
 import { scaleX, scaleY } from './scales';
+import { activeViewEncodings } from './active-view-encodings';
+import { dimensions } from './processed-data';
 
-const currentQuadtree = d3_quadtree<DataItem>()
-	.x((d) => d.position.x)
-	.y((d) => d.position.y);
-
+let currentQuadtree = createQuadtree();
 export const quadtree = writable(currentQuadtree);
 
 let currentScaleX: ScaleLinear<number, number> = null;
 let currentScaleY: ScaleLinear<number, number> = null;
-scaleX.subscribe((newScale) => (currentScaleX = newScale));
-scaleY.subscribe((newScale) => (currentScaleY = newScale));
+scaleX.subscribe((newScale) => currentScaleX = newScale);
+scaleY.subscribe((newScale) => currentScaleY = newScale);
 
+let currentDimensions: string[] = [];
+let xIndex = -1;
+let yIndex = -1;
+dimensions.subscribe(newDims => currentDimensions = newDims);
+activeViewEncodings.subscribe(newEncodings => {
+	xIndex = currentDimensions.indexOf(newEncodings.x);
+	yIndex = currentDimensions.indexOf(newEncodings.y);
+});
+
+
+function createQuadtree() {
+	return d3_quadtree<DataItem>()
+		.x((d) => d.position.x)
+		.y((d) => d.position.y);
+}
 
 function arrayToDataItem(item: number[]) {
 	const newItem: DataItem = {
 		id: Math.random(),
 		position: {
-			x: currentScaleX(item[xEncoding]),
-			y: currentScaleY(item[yEncoding])
+			x: currentScaleX(item[xIndex]),
+			y: currentScaleY(item[yIndex])
 		},
 		iteration: 0,
 		values: item
@@ -37,9 +50,14 @@ setTimeout(() => {
 	processedData.subscribe((newData) => {
 		const newItems = newData.map(arrayToDataItem);
 
-		console.log(newItems);
+		if (newData.length === 0) {
+			// in case the progression was reset, clear the quadtree as well.
+			currentQuadtree = createQuadtree();
+		} else {
+			// otherwise just add the data to the quadtree
+			currentQuadtree.addAll(newItems);
+		}
 
-		currentQuadtree.addAll(newItems);
 		quadtree.set(currentQuadtree);
 	});
 }, 0);

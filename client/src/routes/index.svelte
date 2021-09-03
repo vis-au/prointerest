@@ -12,14 +12,14 @@
 	import ResizingOverlay from '$lib/view/main/resizing-overlay.svelte';
 	import { getDimensionNames } from '$lib/util/requests';
 	import ProgressionControls from '$lib/view/main/progression-controls.svelte';
+	import { activeViewEncodings } from '$lib/state/active-view-encodings';
+	import { viewPort } from '$lib/state/visible-data';
 
 	let innerWidth = 0;
 	let innerHeight = 0;
 	let mousePosition = [-1, -1];
 
-
 	const headerHeight = 35;
-
 	const margin = {
 		horizontal: 2,
 		vertical: headerHeight + 2
@@ -27,6 +27,8 @@
 
 	$: plotWidth = innerWidth - margin.horizontal;
 	$: plotHeight = innerHeight - margin.vertical;
+	$: $viewPort.maxX = innerWidth;
+	$: $viewPort.maxY = innerHeight;
 
 	$: $scaleX?.range([0, plotWidth]);
 	$: $scaleY?.range([0, plotHeight]);
@@ -44,6 +46,8 @@
 			]);
 
 			$dimensions = await getDimensionNames();
+			$activeViewEncodings.x = "trip_distance";
+			$activeViewEncodings.y = "total_amount";
 		}, 0);
 	});
 </script>
@@ -54,6 +58,12 @@
 	<ActiveDoiPanel />
 	<ResizingOverlay x={mousePosition[0]} y={$isResizing?.startY} />
 	<ProgressionControls x={10} y={plotHeight - 10} />
+
+	<svg id="sprites">
+		<symbol id="select-arrow-down" viewBox="0 0 10 6">
+			<polyline points="1 1 5 5 9 1"></polyline>
+		</symbol>
+	</svg>
 </div>
 
 <svelte:window bind:innerWidth bind:innerHeight />

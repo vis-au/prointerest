@@ -15,8 +15,12 @@
   $: leftValue = Math.round($isResizing?.leftValue * 10000) / 100;
   $: rightValue = Math.round($isResizing?.rightValue * 10000) / 100;
 
-  $: left = `left:${Math.min(Math.max(x - width / 2, 0), innerWidth - width - margin)}px`;
-  $: top = `top:${y + margin}px`;
+  $: left = $isResizing
+    ? `left:${Math.min(Math.max(x - width / 2, 0), innerWidth - width - margin)}px`
+    : "left: 0";
+  $: top = $isResizing
+    ? `top:${y + margin}px`
+    : "top: 0";
 </script>
 
 <div

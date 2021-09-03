@@ -29,7 +29,7 @@ export function pauseProgression(): void {
 }
 
 export function resetProgression(): void {
-  progressionState.set("paused");
+  pauseProgression();
   processedData.update(() => {
     return [];
   });

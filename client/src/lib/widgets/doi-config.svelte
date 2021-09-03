@@ -19,6 +19,7 @@
 		background: white;
 		min-width: 300px;
 		min-height: 150px;
+		max-height: 700px;
 		padding: 1rem 1.5rem 2.5rem;
 		overflow: auto;
 		border: 1px solid #efefef;
