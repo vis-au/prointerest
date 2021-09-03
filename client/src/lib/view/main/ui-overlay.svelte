@@ -6,7 +6,7 @@
 	import { indicationModes } from '$lib/types/indicate-mode';
 	import { viewModes } from '$lib/types/view-modes';
 	import Alternatives from '$lib/widgets/alternatives.svelte';
-	import Minimap from '$lib/widgets/minimap.svelte';
+	import Minimap from '$lib/view/main/minimap.svelte';
 	import Row from '$lib/widgets/row.svelte';
 
 	export let visible: boolean;
@@ -41,7 +41,6 @@
 			/>
 		</div>
 	</Row>
-
 	<Minimap />
 </div>
 
