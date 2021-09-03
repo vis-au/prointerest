@@ -27,6 +27,6 @@
 	div.active-doi-panel {
 		position: absolute;
 		right: 10px;
-		top: 75px;
+		top: 100px;
 	}
 </style>

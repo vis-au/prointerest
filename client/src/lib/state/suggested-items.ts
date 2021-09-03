@@ -15,6 +15,7 @@ let currentMode: IndicateMode = null;
 export const suggestedItems: Writable<DataItem[]> = writable([]);
 
 function updateSuggestedItems() {
+	console.log(currentlyInterestItems);
 	if (currentMode === 'explored') {
 		suggestedItems.set(currentlyInterestItems);
 	} else if (currentMode === 'similar') {

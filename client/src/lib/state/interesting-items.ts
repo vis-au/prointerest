@@ -15,7 +15,8 @@ export function registerNewInteraction(interaction: DoiInteraction): void {
 }
 
 export function updateInterestingItems(): void {
-  interestingItems.set(doiWatchdog.getDataOfInterest());
+  const interesting = doiWatchdog.getDataOfInterest();
+  interestingItems.set(interesting);
 }
 
 export function getLatestTimestamp(): number {

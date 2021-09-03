@@ -1,6 +1,9 @@
 <script lang="typescript">
   import { createEventDispatcher } from "svelte";
 
+  export let className = "";
+  export let id = "";
+
   const dispatch = createEventDispatcher();
 
   function click() {
@@ -8,7 +11,7 @@
   }
 </script>
 
-<button class="control-button" on:click={ () => click() }>
+<button {id} class="control-button {className}" on:click={ click }>
   <slot></slot>
 </button>
 

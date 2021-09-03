@@ -16,9 +16,11 @@
 
 	$: bins = $hexbinning($visibleData);
 
+	let updateInterval: number;
 	let canvasElement: HTMLCanvasElement;
 
 	function renderBins(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
+		clearInterval(updateInterval);
 		ctx.clearRect(0, 0, width, height);
 		ctx.beginPath();
 		ctx.strokeStyle = 'rgba(255,255,255,1)';
@@ -54,7 +56,7 @@
 	}
 
 	afterUpdate(() => {
-		setTimeout(render, 0);
+		updateInterval = setTimeout(render, 0) as unknown as number;
 	});
 	onMount(render);
 </script>
