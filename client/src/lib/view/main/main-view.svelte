@@ -1,7 +1,7 @@
 <script lang="typescript">
-	import BrushLayer from '../layers/interaction/brush-layer.svelte';
+	import BrushLayer from '../layers/interaction/brushed-regions-layer.svelte';
 	import InteractionLayer from '../layers/interaction/interaction-layer.svelte';
-	import HintView from '../layers/interaction/hint-view.svelte';
+	import SuggestionLayer from '../layers/interaction/suggestion-layer.svelte';
 	import ScatterplotView from '../layers/visualization/scatterplot-view.svelte';
 	import BinnedScatterplotView from '../layers/visualization/binned-scatterplot-view.svelte';
 	import { activeViewMode } from '$lib/state/active-view-mode';
@@ -24,7 +24,7 @@
 		<BinnedScatterplotView width={plotWidth} height={plotHeight} />
 	{/if}
 
-	<HintView width={plotWidth} height={plotHeight} />
+	<SuggestionLayer width={plotWidth} height={plotHeight} />
 	<BrushLayer width={plotWidth} height={plotHeight} />
 	<InteractionLayer width={plotWidth} height={plotHeight} />
 	<UiOverlay width={plotWidth} height={plotHeight} visible={uiVisible} />
