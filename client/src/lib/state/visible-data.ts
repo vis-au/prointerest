@@ -14,14 +14,14 @@ const vp = {
 };
 export const viewPort = writable(vp);
 
-let currentVisibleData = [] as DataItem[];
-export const visibleData = writable(currentVisibleData);
+export const visibleData = writable([] as DataItem[]);
 
 // TODO: if this function is run synchronously, the application crashes on load, due to an error
 // with accessing "quadtree" before its declaration.
 setTimeout(() => {
-	quadtree.subscribe(() => {
-		currentVisibleData = getPointsInRect(vp.minX, vp.minY, vp.maxX, vp.maxY);
+	quadtree.subscribe((d) => {
+		const currentVisibleData = getPointsInRect(vp.minX, vp.minY, vp.maxX, vp.maxY);
+		console.log(currentVisibleData, d.data());
 		visibleData.set(currentVisibleData);
 	});
 }, 0);

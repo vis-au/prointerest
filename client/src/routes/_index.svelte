@@ -25,8 +25,8 @@
 	$: plotWidth = innerWidth - margin.horizontal;
 	$: plotHeight = innerHeight - margin.vertical;
 
-	$: $scaleX?.range([0, plotWidth]);
-	$: $scaleY?.range([0, plotHeight]);
+	$scaleX?.range([0, plotWidth]);
+	$scaleY?.range([0, plotHeight]);
 
 	onMount(() => {
 		setTimeout(async () => {

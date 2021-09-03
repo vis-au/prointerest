@@ -17,22 +17,27 @@ let currentScaleY: ScaleLinear<number, number> = null;
 scaleX.subscribe((newScale) => (currentScaleX = newScale));
 scaleY.subscribe((newScale) => (currentScaleY = newScale));
 
+
+function arrayToDataItem(item: number[]) {
+	const newItem: DataItem = {
+		id: Math.random(),
+		position: {
+			x: currentScaleX(item[xEncoding]),
+			y: currentScaleY(item[yEncoding])
+		},
+		iteration: 0,
+		values: item
+	};
+
+	return newItem;
+}
+
 // is run asynchronously to ensure that the scales are set
 setTimeout(() => {
 	processedData.subscribe((newData) => {
-		const newItems = newData.map((item) => {
-			const newItem: DataItem = {
-				id: Math.random(),
-				position: {
-					x: currentScaleX(item[xEncoding]),
-					y: currentScaleY(item[yEncoding])
-				},
-				iteration: 0,
-				values: item
-			};
+		const newItems = newData.map(arrayToDataItem);
 
-			return newItem;
-		});
+		console.log(newItems);
 
 		currentQuadtree.addAll(newItems);
 		quadtree.set(currentQuadtree);

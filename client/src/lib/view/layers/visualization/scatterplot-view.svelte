@@ -14,7 +14,7 @@
 	export let radius = 5; // size of points
 	export let orientation = 'right'; // left or right side of the screen?
 
-	const data = $visibleData;
+	$: data = $visibleData;
 
 	const INITIAL_VIEW_STATE = {
 		zoom: 0,
