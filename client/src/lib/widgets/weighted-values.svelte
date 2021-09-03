@@ -38,17 +38,21 @@
 		let newRightSize: number = rightSize;
 
 		if (deltaX > 0) {
+			if (rightSize === 0) {
+				return;
+			}
+
 			// growing left and shrinking right
 			newRightSize = Math.max(rightSize - deltaX, 0);
-			if (newRightSize > 0) {
-				newLeftSize = leftSize + deltaX
-			}
+			newLeftSize = Math.min(leftSize + deltaX, leftSize + rightSize);
+
 		} else {
+			if (leftSize === 0) {
+				return;
+			}
 			// shrinking left and growing right
 			newLeftSize = Math.max(leftSize + deltaX, 0);
-			if (newLeftSize > 0) {
-				newRightSize = rightSize - deltaX
-			}
+			newRightSize = Math.min(rightSize - deltaX, leftSize + rightSize);
 		}
 
 		const newLeftWeight = newLeftSize / totalSize;
