@@ -7,7 +7,6 @@
 	import { visibleData } from '$lib/state/visible-data';
 	import type DataItem from '$lib/types/data-item';
 	import { colorScale } from '$lib/state/active-color-scale';
-import ColorLegend from '$lib/view/main/color-legend.svelte';
 
 	export let id = 'binned-scatterplot-view';
 	export let width = 100;
@@ -62,16 +61,6 @@ import ColorLegend from '$lib/view/main/color-legend.svelte';
 
 <div id="{id}-binned-scatterplot-view" class="binned-scatterplot-view">
 	<canvas id="{id}-bins-canvas" class="bins-canvas" {width} {height} bind:this={canvasElement} />
-
-	<ColorLegend
-		id="color"
-		left={ width - 245 }
-		top={ height - 160 }
-		title=""
-		blockSize={ 10 }
-		steps={ 10 }
-		bind:colorScale={ $colorScale }
-	/>
 </div>
 
 <style>

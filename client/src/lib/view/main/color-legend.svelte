@@ -115,6 +115,8 @@
     position: absolute;
     background: rgba(255, 255, 255, 0.73);
     shape-rendering: crispEdges;
+    border: 1px solid #ccc;
+    border-radius: 3px;
   }
   svg.legend * {
     user-select: none;
