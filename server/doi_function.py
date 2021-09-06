@@ -94,10 +94,7 @@ def get_provenance_interest(item: any):
 
 
 def compute_dois(items: list[list[Any]]):
-  print("prior", PRIOR_WEIGHTS)
-  print("posterior", POSTERIOR_WEIGHTS)
-
-  return [compute_doi(item) for item in items]
+  return [[item[0], compute_doi(item)] for item in items]
 
 
 def compute_doi(item: list[Any]):
@@ -110,7 +107,5 @@ def compute_doi(item: list[Any]):
   provenance = get_provenance_interest(item)
 
   # compute combined interest
-  # prior = dimension * outlierness * selection
-  # posterior = scagnostic * provenance
-  # return prior * posterior
-  return [dimension, outlierness, selection, scagnostic, provenance, PRIOR_WEIGHTS, POSTERIOR_WEIGHTS]
+  doi = selection * PRIOR_WEIGHTS["selection"] * provenance * POSTERIOR_WEIGHTS["provenance"]
+  return doi
