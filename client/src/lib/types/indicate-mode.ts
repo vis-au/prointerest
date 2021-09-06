@@ -1,2 +1,2 @@
-export type IndicateMode = 'explored' | 'similar' | 'dissimilar';
-export const indicationModes: IndicateMode[] = ['explored', 'similar', 'dissimilar'];
+export type SuggestionMode = 'explored' | 'similar' | 'dissimilar';
+export const suggestionModes: SuggestionMode[] = ['explored', 'similar', 'dissimilar'];

@@ -1,6 +1,6 @@
 import GuidanceProvider from '$lib/doi/guidance-provider';
 import type DataItem from '$lib/types/data-item';
-import type { IndicateMode } from '$lib/types/indicate-mode';
+import type { SuggestionMode } from '$lib/types/indicate-mode';
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import { activeIndicateMode } from './active-indicate-mode';
@@ -10,7 +10,7 @@ import { quadtree } from './quadtree';
 const guide = new GuidanceProvider();
 
 let currentlyInterestItems: DataItem[] = [];
-let currentMode: IndicateMode = null;
+let currentMode: SuggestionMode = null;
 
 export const suggestedItems: Writable<DataItem[]> = writable([]);
 
