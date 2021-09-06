@@ -13,6 +13,7 @@ let currentScaleX = scaleLinear();
 let currentScaleY = scaleLinear();
 let xIndex = -1;
 let yIndex = -1;
+const margin = .05;
 
 export const scaleX = writable(currentScaleX);
 export const scaleY = writable(currentScaleY);
@@ -27,8 +28,13 @@ function updateScales() {
     ? [0, 1]
     : currentProcessedData.map(d => d.values[yIndex]);
 
-  const xExtent = extent(xValues);
-  const yExtent = extent(yValues);
+  let xExtent = extent(xValues);
+  const xMargin = (xExtent[1] - xExtent[0]) * margin;
+  xExtent = [xExtent[0] - xMargin, xExtent[1] + xMargin];
+
+  let yExtent = extent(yValues);
+  const yMargin = (yExtent[1] - yExtent[0]) * margin;
+  yExtent = [yExtent[0] - yMargin, yExtent[1] + yMargin];
 
   currentScaleX.domain(xExtent)
   currentScaleY.domain(yExtent.reverse());
