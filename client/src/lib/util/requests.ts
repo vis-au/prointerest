@@ -73,7 +73,7 @@ export async function sendInterestingItems(ids: string[], doi: number[]): Promis
   return sendRequestToBaseURL("/interesting_items", "POST", { ids, doi });
 }
 
-export async function getDoiValues(items: DataItem[]): Promise<number[]> {
+export async function getDoiValues(items: DataItem[]): Promise<[number, number][]> {
   const values = items.map(dataItemToList);
   return sendRequestToBaseURL("/doi", "POST", { items: values });
 }
