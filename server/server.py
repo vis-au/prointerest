@@ -1,8 +1,9 @@
-import numpy as np
+
 from flask import Flask, json, jsonify, request
 
-from database import get_data_size, get_dimensions_in_data, get_next_chunk_from_db, initialize_db, get_items_for_ids, reset_progression
-from recommender import train
+from database import *
+from doi_function import *
+from recommender import *
 
 app = Flask(__name__)
 
@@ -42,22 +43,51 @@ def get_size():
 @app.route("/reset", methods=["GET"])
 def reset():
   reset_progression()
+  return cors_response(True)
+
+
+@app.route("/weights/<component>", methods=["POST"])
+def send_weights(component: str):
+  weights = json.loads(request.data)["weights"]
+
+  if component == "prior":
+    set_prior_weights(weights)
+  elif component == "posterior":
+    set_posterior_weights(weights)
+  elif component == "scagnostics":
+    set_scagnostic_weights(weights)
+
   return cors_response("ok")
 
 
-@app.route("/interesting_ids", methods=["POST"])
+@app.route("/dimensions", methods=["POST"])
+def send_interesting_dimensions():
+  dimensions = json.loads(request.data)["dimensions"]
+  set_dimensions_of_interest(dimensions)
+  return cors_response(True)
+
+
+@app.route("/outlierness_metric/<metric>", methods=["POST"])
+def send_outlierness_metric(metric: str):
+  set_outlierness_metric(metric)
+  return cors_response(True)
+
+
+@app.route("/selected_items", methods=["POST"])
+def send_selected_items():
+  items = json.loads(request.data)["items"]
+  set_selected_items(items)
+  return cors_response(True)
+
+
+@app.route("/interesting_items", methods=["POST"])
 def send_interesting_items():
   res = json.loads(request.data)
   ids = res["ids"]
   doi = res["doi"]
 
-  # get numpy array for ids
-  items = get_items_for_ids(ids)
-  interest = np.array(doi)
-
   # send ids to predictor model
-  train(items, interest)
-  print("ooph")
+  set_provenance_items(ids, doi)
 
   return cors_response(True)
 
