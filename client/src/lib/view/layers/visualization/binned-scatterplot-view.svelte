@@ -1,18 +1,17 @@
 <script lang="typescript">
 	import { max, min } from 'd3-array';
 	import type { HexbinBin } from 'd3-hexbin';
-	import { scaleSequential } from 'd3-scale';
-	import { interpolateBuPu } from 'd3-scale-chromatic';
 	import { afterUpdate, onMount } from 'svelte';
 
 	import { hexbinning } from '$lib/state/hexbinning';
 	import { visibleData } from '$lib/state/visible-data';
 	import type DataItem from '$lib/types/data-item';
+	import { colorScale } from '$lib/state/active-color-scale';
+import ColorLegend from '$lib/view/main/color-legend.svelte';
 
 	export let id = 'binned-scatterplot-view';
 	export let width = 100;
 	export let height = 100;
-	export let color = scaleSequential(interpolateBuPu);
 
 	$: bins = $hexbinning($visibleData);
 
@@ -27,7 +26,7 @@
 		ctx.lineWidth = 2;
 		bins.forEach((bin) => {
 			ctx.translate(bin.x, bin.y);
-			ctx.fillStyle = color(bin.length);
+			ctx.fillStyle = $colorScale(bin.length);
 			ctx.stroke(hexagonPath);
 			ctx.fill(hexagonPath);
 			ctx.translate(-bin.x, -bin.y);
@@ -46,10 +45,10 @@
 		const minCount = min(bins, (d: HexbinBin<DataItem>) => d.length) || 0;
 		const maxCount = max(bins, (d: HexbinBin<DataItem>) => d.length) || 1;
 
-		if (color.range().length === 3) {
-			color.domain([maxCount, 0, minCount]);
+		if ($colorScale.range().length === 3) {
+			$colorScale.domain([maxCount, 0, minCount]);
 		} else {
-			color.domain([minCount, maxCount]);
+			$colorScale.domain([minCount, maxCount]);
 		}
 
 		renderBins(ctx, hexagonPath);
@@ -63,6 +62,16 @@
 
 <div id="{id}-binned-scatterplot-view" class="binned-scatterplot-view">
 	<canvas id="{id}-bins-canvas" class="bins-canvas" {width} {height} bind:this={canvasElement} />
+
+	<ColorLegend
+		id="color"
+		left={ width - 245 }
+		top={ height - 160 }
+		title=""
+		blockSize={ 10 }
+		steps={ 10 }
+		bind:colorScale={ $colorScale }
+	/>
 </div>
 
 <style>

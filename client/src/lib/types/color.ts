@@ -1,4 +1,5 @@
 import {
+	interpolateBuPu,
 	interpolateBrBG,
 	interpolateCividis,
 	interpolateCool,
@@ -17,9 +18,9 @@ import {
 	interpolateWarm,
 	interpolateYlGnBu
 } from 'd3-scale-chromatic';
-import { writable } from 'svelte/store';
 
 export const sequentialSchemes = [
+	interpolateBuPu,
 	interpolateYlGnBu,
 	interpolateInferno,
 	interpolateMagma,
@@ -42,5 +43,6 @@ export const divergingSchemes = [
 	interpolateRdYlGn
 ];
 
-export const sequentialScheme = writable(interpolateViridis);
-export const divergingScheme = writable(interpolatePiYG);
+
+export type ColorScaleType = "log" | "linear";
+export const colorScaleTypes: ColorScaleType[] = ["log", "linear"];
