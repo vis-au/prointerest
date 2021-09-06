@@ -47,7 +47,7 @@
 				getPosition: (d: DataItem) => [t.applyX(d.position.x), t.applyY(d.position.y)],
 				getRadius: radius,
 				getLineWidth: 0,
-				opacity: 0.3,
+				opacity: 0.01,
 				lineWidthUnits: 'pixels',
 				stroked: false,
 				data: data
