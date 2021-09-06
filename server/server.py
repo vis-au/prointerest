@@ -1,4 +1,4 @@
-
+from typing import Any
 from flask import Flask, json, jsonify, request
 
 from database import *
@@ -75,8 +75,13 @@ def send_outlierness_metric(metric: str):
 
 @app.route("/selected_items", methods=["POST"])
 def send_selected_items():
-  items = json.loads(request.data)["items"]
-  set_selected_items(items)
+  # list of list of values, where the first entry is the item id
+  items: list[list[Any]] = json.loads(request.data)["items"]
+
+  # ids is a list of strings
+  ids: list[str] = [str(item[0]) for item in items]
+
+  set_selected_item_ids(ids)
   return cors_response(True)
 
 
@@ -86,15 +91,27 @@ def send_interesting_items():
   ids = res["ids"]
   doi = res["doi"]
 
-  # send ids to predictor model
   set_provenance_items(ids, doi)
 
   return cors_response(True)
 
 
-@app.route("/get_prediction", methods=["POST"])
+@app.route("/suggested_items", methods=["GET"])
+def get_suggested_items():
+  pass
+
+
+@app.route("/doi", methods=["POST"])
+def get_doi():
+  items: list[list[Any]] = json.loads(request.data)["items"]
+
+  interest = compute_dois(items)
+  return cors_response(interest)
+
+
+@app.route("/prediction", methods=["GET"])
 def get_prediction():
-  print("predicting very hard ...")
+  items: list[list[Any]] = json.loads(request.data)["items"]
   return cors_response([])
 
 
