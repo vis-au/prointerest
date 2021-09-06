@@ -1,6 +1,7 @@
 import type DataItem from "$lib/types/data-item";
 import type { OutliernessMeasure } from "$lib/types/outlier-measures";
 import { scagnostics } from "$lib/types/scagnostics";
+import { dataItemToList } from "./item-transform";
 import { mapToRecord } from "./map-to-record";
 
 const BASE_URL = "http://127.0.0.1:5000";
@@ -64,9 +65,15 @@ export async function sendOutlierMetric(metric: OutliernessMeasure): Promise<voi
 }
 
 export async function sendSelectedItems(items: DataItem[]): Promise<void> {
-  return sendRequestToBaseURL("/selected_items", "POST", { items });
+  const values = items.map(dataItemToList);
+  return sendRequestToBaseURL("/selected_items", "POST", { items: values });
 }
 
 export async function sendInterestingItems(ids: string[], doi: number[]): Promise<void> {
-  return sendRequestToBaseURL("/interesting_ids", "POST", { ids, doi });
+  return sendRequestToBaseURL("/interesting_items", "POST", { ids, doi });
+}
+
+export async function getDoiValues(items: DataItem[]): Promise<number[]> {
+  const values = items.map(dataItemToList);
+  return sendRequestToBaseURL("/doi", "POST", { items: values });
 }
