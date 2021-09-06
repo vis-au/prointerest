@@ -1,4 +1,5 @@
 <script lang="typescript">
+	import { createEventDispatcher } from "svelte";
 	import { isResizing } from "$lib/state/is-resizing";
 	import type { ResizeEvent } from "$lib/types/resize-event";
 
@@ -12,18 +13,26 @@
 
 	$: weights = Array.from(valueWeights.entries());
 	let resize: ResizeEvent;
+	const dispatch = createEventDispatcher();
 
 	function getId(key: string) {
 		return `${key.split(' ').join('_')}-${group}`;
 	}
 
 	function selectWeight(weight: string) {
-		console.log(activeWeight, weight);
 		if (activeWeight === weight) {
 			activeWeight = null;
 		} else {
 			activeWeight = weight;
 		}
+	}
+
+	function onResizingStarted(event: ResizeEvent) {
+		resize = event;
+		$isResizing = event;
+		document.addEventListener("mousemove", onResizing);
+		document.addEventListener("mouseup", onResizingEnded);
+		dispatch("start", resize);
 	}
 
 	function onResizing(event: MouseEvent) {
@@ -45,7 +54,6 @@
 			// growing left and shrinking right
 			newRightSize = Math.max(rightSize - deltaX, 0);
 			newLeftSize = Math.min(leftSize + deltaX, leftSize + rightSize);
-
 		} else {
 			if (leftSize === 0) {
 				return;
@@ -64,6 +72,7 @@
 		$isResizing.rightValue = newRightWeight;
 
 		valueWeights = new Map(valueWeights);
+		dispatch("resizing", resize);
 	}
 
 	function onResizingEnded() {
@@ -71,13 +80,7 @@
 		$isResizing = null;
 		document.removeEventListener("mousemove", onResizing);
 		document.removeEventListener("mouseup", onResizingEnded);
-	}
-
-	function onResizingStarted(event: ResizeEvent) {
-		resize = event;
-		$isResizing = event;
-		document.addEventListener("mousemove", onResizing);
-		document.addEventListener("mouseup", onResizingEnded);
+		dispatch("end", resize);
 	}
 </script>
 
