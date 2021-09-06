@@ -26,12 +26,13 @@
 	export let id = 'view-interaction-layer';
 	export let width: number;
 	export let height: number;
-	export let color = 'rgba(255,69,0,1)';
 	export let lineWidth = 4;
 
 	let selectionCanvas: HTMLCanvasElement;
 	let zoomCanvasElement: HTMLCanvasElement;
 	let brushCanvasElement: SVGElement;
+
+	const color = 'rgba(255,69,0,.7)';
 
 	const interactionFactory = new InteractionFactory(width, height, $quadtree);
 	interactionFactory.getItemsInRegion = getPointsInRect;
@@ -142,11 +143,13 @@
 		ctx.translate(hoveredBin.x, hoveredBin.y);
 		ctx.strokeStyle = color;
 		ctx.fillStyle = 'rgba(0, 0, 0, 0.0)';
-		ctx.lineWidth = lineWidth;
+		ctx.lineWidth = lineWidth * 0.5;
+		ctx.setLineDash([2])
 		ctx.stroke(hexagonPath);
 		ctx.fill(hexagonPath);
 		ctx.translate(-hoveredBin.x, -hoveredBin.y);
 		ctx.closePath();
+		ctx.setLineDash([])
 	}
 
 	function renderSelectedBins(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
