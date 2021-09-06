@@ -196,7 +196,7 @@
 	});
 </script>
 
-<div class="interaction-canvas-container">
+<div class="interaction-canvas-container {$isZooming ? "zooming" : ""}">
 	<canvas
 		id="{id}-selection-canvas"
 		class="selection interaction-canvas"
@@ -227,6 +227,9 @@
 <style>
 	div.interaction-canvas-container {
 		position: relative;
+	}
+	div.interaction-canvas-container.zooming {
+		cursor: all-scroll;
 	}
 	canvas.interaction-canvas,
 	svg.interaction-canvas {
