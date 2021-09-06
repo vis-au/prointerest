@@ -153,14 +153,14 @@ export default class InterestWatchDog {
 		expandedSample.forEach((item, i) => this.doiPerItem.set(item, interestPerExtenedItem[i]));
 	}
 
-	public getDataOfInterest(): DataItem[] {
+	public getDataOfInterest(): Map<DataItem, number> {
 		this.update();
 
-		const dataOfInterest: DataItem[] = [];
+		const dataOfInterest: Map<DataItem, number> = new Map();
 
 		this.doiPerItem.forEach((value, key) => {
 			if (value > this.interestThreshold) {
-				dataOfInterest.push(key);
+				dataOfInterest.set(key, value);
 			}
 		});
 

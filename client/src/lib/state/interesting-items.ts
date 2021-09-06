@@ -5,6 +5,7 @@ import InterestWatchDog from '$lib/doi/interest-watchdog';
 import { getPointsInR } from '$lib/util/find-in-quadtree';
 import { quadtree } from './quadtree';
 import type { DoiInteraction } from '$lib/interaction/doi-interaction';
+import { sendInterestingItems } from '$lib/util/requests';
 
 export const interestingItems: Writable<DataItem[]> = writable([]);
 
@@ -16,7 +17,10 @@ export function registerNewInteraction(interaction: DoiInteraction): void {
 
 export function updateInterestingItems(): void {
   const interesting = doiWatchdog.getDataOfInterest();
-  interestingItems.set(interesting);
+  const items = Array.from(interesting.keys());
+  const values = Array.from(interesting.values());
+  interestingItems.set(items);
+  sendInterestingItems(items.map(d => d.id+""), values);
 }
 
 export function getLatestTimestamp(): number {
