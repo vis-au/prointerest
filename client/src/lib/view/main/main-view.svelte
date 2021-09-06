@@ -32,15 +32,17 @@
 	<BrushLayer width={plotWidth} height={plotHeight} />
 	<InteractionLayer width={plotWidth} height={plotHeight} />
 
-	<ColorLegend
-		id="color"
-		left={ plotWidth - 240 }
-		top={ plotHeight - 100 }
-		title=""
-		blockSize={ 10 }
-		steps={ 10 }
-		bind:colorScale={ $colorScale }
-	/>
+	{#if $activeViewMode === "binned"}
+		<ColorLegend
+			id="color"
+			left={ plotWidth - 240 }
+			top={ plotHeight - 100 }
+			title=""
+			blockSize={ 10 }
+			steps={ 10 }
+			bind:colorScale={ $colorScale }
+		/>
+	{/if}
 	<UiOverlay width={plotWidth} height={plotHeight} visible={uiVisible} />
 </div>
 
