@@ -9,3 +9,7 @@ export function dataItemToRecord(dataItem: DataItem): Record<string, unknown> {
 
 	return item;
 }
+
+export function dataItemToList(dataItem: DataItem): number[] {
+	return dataItem.values;
+}
