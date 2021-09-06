@@ -24,7 +24,7 @@ def mark_ids_plotted(ids: list):
   cursor.execute(query)
 
 
-def get_next_chunk_from_db(chunk_size):
+def get_next_chunk_from_db(chunk_size: int):
   query = f"SELECT * FROM {TABLE} WHERE {ID} NOT IN (SELECT {ID} FROM {PROCESSED}) LIMIT {chunk_size}"
   next_chunk = cursor.execute(query).fetchall()
   ids = [str(item[ID_INDEX]) for item in next_chunk]
@@ -39,6 +39,7 @@ def get_dimensions_in_data():
   dimensions = list(item.columns)
   return dimensions
 
+
 def get_data_size():
   # computing count() on-demand takes too long for large data
   # query = f"SELECT COUNT(*) FROM {TABLE}"
@@ -46,12 +47,12 @@ def get_data_size():
   return TOTAL_SIZE
 
 
-def get_random_sample(chunk_size):
+def get_random_sample(chunk_size: int):
   dimensions = 5
   return [ [random.random() for __ in range(dimensions)] for _ in range(chunk_size) ];
 
 
-def get_random_dims(dimensions):
+def get_random_dims(dimensions: int):
   return [f"dimension_{str(i)}" for i in range(dimensions)]
 
 
@@ -61,6 +62,7 @@ def get_items_for_ids(ids: list[str]):
   df = cursor.execute(query).fetchdf()
   items = df.to_numpy()
   return items
+
 
 def reset_progression():
   query = f"DELETE FROM {PROCESSED}"
