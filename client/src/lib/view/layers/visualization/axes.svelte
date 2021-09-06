@@ -6,6 +6,7 @@
 
   import { scaleX, scaleY } from "$lib/state/scales";
   import { currentTransform } from "$lib/state/zoom";
+  import { activeViewEncodings } from "$lib/state/active-view-encodings";
 
   export let width: number;
   export let height: number;
@@ -25,7 +26,7 @@
 
   afterUpdate(() => {
     const canvas = select(svg);
-    canvas.selectAll("*").remove();
+    canvas.selectAll("g.axis").remove();
     canvas.append("g")
       .attr("class", "axis x")
       .call(xAxis)
@@ -40,11 +41,17 @@
 </script>
 
 
-<svg bind:this={svg} id="axes" { width } { height }></svg>
+<svg bind:this={svg} id="axes" { width } { height }>
+  <text class="label x" transform="translate({width/2},{height-2})">{$activeViewEncodings.x}</text>
+  <text class="label y" transform="translate({2},{height/2})rotate(90)">{$activeViewEncodings.y}</text>
+</svg>
 
 
 <style>
   svg#axes {
     position: absolute;
+  }
+  text.label {
+    text-anchor: middle;
   }
 </style>
