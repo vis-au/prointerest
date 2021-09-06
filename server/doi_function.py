@@ -1,4 +1,8 @@
 # Prior interest components
+import numpy as np
+from database import get_items_for_ids
+
+
 PRIOR_WEIGHTS = {
   "dimensions": 0,
   "outlierness": 0,
@@ -12,7 +16,7 @@ def set_prior_weights(weights: dict[str, float]):
   global PRIOR_WEIGHTS
   PRIOR_WEIGHTS = weights
 
-def set_dimension_interest(dimensions: list[str]):
+def set_dimensions_of_interest(dimensions: list[str]):
   global DIMENSIONS_OF_INTEREST
   DIMENSIONS_OF_INTEREST = dimensions
 
@@ -41,19 +45,27 @@ SCAGNOSTIC_WEIGHTS = {
   "stringy": 0,
   "monotonic": 0
 }
-PROVENANCE_ITEMS = []
+PROVENANCE_ITEMS: list[tuple[str, float]] = []
+
 
 def set_posterior_weights(weights: dict[str, float]):
   global POSTERIOR_WEIGHTS
   POSTERIOR_WEIGHTS = weights
 
+
 def set_scagnostic_weights(weights: dict[str, float]):
   global SCAGNOSTIC_WEIGHTS
   SCAGNOSTIC_WEIGHTS = weights
 
-def set_provenance_items(items: list[any]):
+
+def set_provenance_items(ids: list[str], doi: list[float]):
   global PROVENANCE_ITEMS
-  PROVENANCE_ITEMS = items
+
+  # get numpy array for ids
+  items = get_items_for_ids(ids)
+  interest = np.array(doi)
+
+  PROVENANCE_ITEMS = zip(items, interest)
 
 
 # INTEREST COMPUTATION
