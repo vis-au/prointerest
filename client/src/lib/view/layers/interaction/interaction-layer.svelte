@@ -20,11 +20,13 @@
 	import { getPointsInRect } from '$lib/util/find-in-quadtree';
 	import type { DoiInteraction } from '$lib/interaction/doi-interaction';
 	import { getLatestTimestamp, registerNewInteraction } from '$lib/state/interesting-items';
+	import { sendSelectedItems } from '$lib/util/requests';
+	import { selectedItems } from '$lib/state/selected-items';
 
 	export let id = 'view-interaction-layer';
 	export let width: number;
 	export let height: number;
-	export let color = 'rgba(255,255,255,1)';
+	export let color = 'rgba(255,69,0,1)';
 	export let lineWidth = 4;
 
 	let selectionCanvas: HTMLCanvasElement;
@@ -122,6 +124,8 @@
 
 		const interaction = interactionFactory.createBrushInteraction(_x0, _y0, _x1, _y1);
 		onInteraction(interaction);
+
+		sendSelectedItems($selectedItems);
 	}
 
 	function renderHoveredBin(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
