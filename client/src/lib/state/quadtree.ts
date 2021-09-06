@@ -6,7 +6,7 @@ import { writable } from 'svelte/store';
 import { scaleX, scaleY } from './scales';
 import { activeViewEncodings } from './active-view-encodings';
 import { dimensions } from './processed-data';
-import { resetProgression } from './progression';
+import { CHUNK_SIZE, resetProgression } from './progression';
 
 let currentQuadtree = createQuadtree();
 export const quadtree = writable(currentQuadtree);
@@ -15,6 +15,8 @@ let currentScaleX: ScaleLinear<number, number> = null;
 let currentScaleY: ScaleLinear<number, number> = null;
 
 let currentDimensions: string[] = [];
+
+const idIndex = 0;
 let xIndex = -1;
 let yIndex = -1;
 
@@ -27,7 +29,7 @@ function createQuadtree() {
 
 function arrayToDataItem(item: number[]) {
 	const newItem: DataItem = {
-		id: Math.random(),
+		id: item[idIndex],
 		position: {
 			x: currentScaleX(item[xIndex]),
 			y: currentScaleY(item[yIndex])
@@ -42,7 +44,9 @@ function arrayToDataItem(item: number[]) {
 // is run asynchronously to ensure that the scales are set
 setTimeout(() => {
 	processedData.subscribe((newData) => {
-		const newItems = newData.map(arrayToDataItem);
+		const newItems = newData
+			.slice(newData.length - newData.length - CHUNK_SIZE, newData.length)
+			.map(arrayToDataItem);
 
 		if (newData.length === 0) {
 			// in case the progression was reset, clear the quadtree as well.

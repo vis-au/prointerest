@@ -2,6 +2,10 @@ import type { ProgressionState } from "$lib/types/progression-state";
 import { getNextChunk } from "$lib/util/requests";
 import { writable } from "svelte/store";
 import { processedData } from "./processed-data";
+import { resetProgression as requestReset } from "../util/requests";
+
+
+export const CHUNK_SIZE = 1000;
 
 const currentInterval = 1000;
 export const updateInterval = writable(currentInterval);
@@ -9,7 +13,7 @@ export const updateInterval = writable(currentInterval);
 export const progressionState = writable("paused" as ProgressionState);
 
 const progressionCallback = () => {
-  getNextChunk().then(chunk => {
+  getNextChunk(CHUNK_SIZE).then(chunk => {
     processedData.update(processed => {
       return [...processed, ...chunk];
     });
@@ -33,4 +37,5 @@ export function resetProgression(): void {
   processedData.update(() => {
     return [];
   });
+  requestReset();
 }

@@ -1,6 +1,7 @@
 <script lang="typescript">
   import { processedData, totalSize } from "$lib/state/processed-data";
   import { pauseProgression, progressionState, resetProgression, startProgression } from "$lib/state/progression";
+  import BigNumber from "$lib/widgets/big-number.svelte";
   import Column from "$lib/widgets/column.svelte";
   import ProgressBar from "$lib/widgets/progress-bar.svelte";
   import Row from "$lib/widgets/row.svelte";
@@ -9,7 +10,7 @@
   export let x: number;
   export let y: number;
 
-  const width = 150;
+  const width = 120;
 
   $: progress = $processedData.length / $totalSize;
 </script>
@@ -19,7 +20,7 @@
   <Column>
     <div id="progression-text">
       <span>Processed:</span>
-      <span>{ $processedData.length }</span>
+      <span><BigNumber>{ $processedData.length }</BigNumber></span>
     </div>
     <ProgressBar
       id={"progression"}
@@ -44,6 +45,10 @@
   :global(#progression-controls) {
     position: absolute;
     font-size: 10pt;
+    background: white;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
   }
   div#progression-text {
     display: flex;

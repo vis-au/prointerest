@@ -59,7 +59,7 @@
 	<MainView {plotWidth} {plotHeight} />
 	<ActiveDoiPanel />
 	<ResizingOverlay x={mousePosition[0]} y={$isResizing?.startY} />
-	<ProgressionControls x={10} y={plotHeight - 10} />
+	<ProgressionControls x={plotWidth - 240} y={plotHeight - 20} />
 
 	<svg id="sprites">
 		<symbol id="select-arrow-down" viewBox="0 0 10 6">
