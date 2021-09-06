@@ -5,6 +5,7 @@
 	import DoiConfig from '$lib/widgets/doi-config.svelte';
 	import WeightedValues from '$lib/widgets/weighted-values.svelte';
 	import Column from '$lib/widgets/column.svelte';
+import { sendScagnosticWeights } from '$lib/util/requests';
 
 	export let maxWidth: number;
 
@@ -72,6 +73,7 @@
 			group="selected-scagnostics"
 			totalSize={maxWidth}
 			bind:valueWeights={selectedWeights}
+			on:end={ () => sendScagnosticWeights($scagnosticWeights) }
 		/>
 		{#if selectedWeights.size === 0}
 			<p class="empty">Select interesting scagnostics above.</p>
