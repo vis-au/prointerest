@@ -1,12 +1,12 @@
 <script>
 	import { dragInteractionModes } from '$lib/interaction/doi-interaction';
-	import { activeIndicateMode } from '$lib/state/active-indicate-mode';
+	import { activeSuggestionMode } from '$lib/state/active-indicate-mode';
 	import { activeInteractionMode } from '$lib/state/active-interaction-mode';
   import { activeViewEncodings } from '$lib/state/active-view-encodings';
 	import { activeViewMode } from '$lib/state/active-view-mode';
   import { updateInterestingItems } from '$lib/state/interesting-items';
   import { dimensions } from '$lib/state/processed-data';
-	import { indicationModes } from '$lib/types/indicate-mode';
+	import { suggestionModes } from '$lib/types/indicate-mode';
 	import { viewModes } from '$lib/types/view-modes';
 	import Alternatives from '$lib/widgets/alternatives.svelte';
   import Dropdown from '$lib/widgets/dropdown.svelte';
@@ -40,8 +40,8 @@
     <h2>Guidance</h2>
     <Alternatives
       name="guidance-modes"
-      alternatives={indicationModes}
-      bind:activeAlternative={$activeIndicateMode}
+      alternatives={suggestionModes}
+      bind:activeAlternative={$activeSuggestionMode}
     />
     <ControlButton className="show-me" on:click={ updateInterestingItems }>show me</ControlButton>
   </div>
