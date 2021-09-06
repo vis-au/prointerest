@@ -31,7 +31,7 @@ function updateScales() {
   const yExtent = extent(yValues);
 
   currentScaleX.domain(xExtent)
-  currentScaleY.domain(yExtent);
+  currentScaleY.domain(yExtent.reverse());
 
   scaleX.set(currentScaleX);
   scaleY.set(currentScaleY);
