@@ -6,6 +6,7 @@
 	import BinnedScatterplotView from '../layers/visualization/binned-scatterplot-view.svelte';
 	import { activeViewMode } from '$lib/state/active-view-mode';
 	import UiOverlay from './ui-overlay.svelte';
+	import Axes from '../layers/visualization/axes.svelte';
 
 	export let plotWidth: number;
 	export let plotHeight: number;
@@ -24,6 +25,7 @@
 		<BinnedScatterplotView width={plotWidth} height={plotHeight} />
 	{/if}
 
+	<Axes width={plotWidth} height={plotHeight} />
 	<SuggestionLayer width={plotWidth} height={plotHeight} />
 	<BrushLayer width={plotWidth} height={plotHeight} />
 	<InteractionLayer width={plotWidth} height={plotHeight} />
