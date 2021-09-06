@@ -2,7 +2,7 @@ import type { HexbinBin } from 'd3-hexbin';
 import { writable } from 'svelte/store';
 
 import type DataItem from '$lib/types/data-item';
-import { getPointsInRect } from '$lib/util/find-in-quadtree';
+import { getPointsInR, getPointsInRect } from '$lib/util/find-in-quadtree';
 import { activeBrush } from './active-brush';
 import { quadtree } from './quadtree';
 import { selectedBins } from './selected-bins';
@@ -25,7 +25,9 @@ function getBrushedItems() {
 }
 
 function getItemsInSelectedBins() {
-	return currentSelectedBins.map((d) => d.slice(0)).flat();
+	return currentSelectedBins
+		.map(bin => getPointsInR(bin.x, bin.y, 10))
+		.flat();
 }
 
 function getSelectedItems() {
