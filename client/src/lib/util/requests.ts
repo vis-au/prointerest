@@ -65,6 +65,10 @@ export async function sendInterestingDimensions(dimensions: string[]): Promise<v
   return sendRequestToBaseURL("/dimensions", "POST", { dimensions });
 }
 
+export async function sendAxisDimension(axis: "x"|"y", dimension: string): Promise<void> {
+  return sendRequestToBaseURL(`/axis?axis=${axis}&dimension=${dimension}`);
+}
+
 export async function sendOutlierMetric(metric: OutliernessMeasure): Promise<void> {
   return sendRequestToBaseURL(`/outlierness_metric?metric=${metric}`);
 }

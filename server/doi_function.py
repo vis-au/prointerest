@@ -43,6 +43,10 @@ SCAGNOSTIC_WEIGHTS = {
   "stringy": 0,
   "monotonic": 0
 }
+SCATTERPLOT_AXES: dict[str, str] = {
+  "x": None,
+  "y": None
+}
 
 
 def set_posterior_weights(weights: dict[str, float]):
