@@ -6,12 +6,13 @@
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
   import Column from "$lib/widgets/column.svelte";
   import { sendScagnosticWeights } from "$lib/util/requests";
+  import Options from "$lib/widgets/options.svelte";
 
   export let maxWidth: number;
 
   let selectedWeights = new Map<Scagnostic, number>();
 
-  const isSelected = {};
+  let isSelected = {};
   scagnostics.forEach((s) => (isSelected[s] = false));
   $selectedScagnostics.forEach((s) => (isSelected[s] = true));
 
@@ -52,7 +53,11 @@
         {/if}
       </button>
     </div>
-    <div class="scagnostic-checklist" style="max-width:{maxWidth}px">
+    <Options
+      options={scagnostics}
+      bind:activeOptions={isSelected}
+    />
+    <!-- <div class="scagnostic-checklist" style="max-width:{maxWidth}px">
       {#each scagnostics as scagnostic}
         <div class="item">
           <input
@@ -64,7 +69,7 @@
           <label for={scagnostic}>{scagnostic}</label>
         </div>
       {/each}
-    </div>
+    </div> -->
   </Column>
 
   <Column>
@@ -100,27 +105,6 @@
   }
   div.top-row button:hover {
     background: #efefef;
-  }
-  div.scagnostic-checklist {
-    display: flex;
-    flex-flow: row wrap;
-    line-height: 30px;
-  }
-  div.scagnostic-checklist div.item {
-    margin-right: 15px;
-  }
-  div.scagnostic-checklist div.item input {
-    display: none;
-  }
-  div.scagnostic-checklist div.item label {
-    background: #efefef;
-    cursor: pointer;
-    border-radius: 4px;
-    padding: 3px 10px;
-  }
-  div.scagnostic-checklist div.item input:checked + label {
-    background: black;
-    color: white;
   }
   p.empty {
     margin: 0;

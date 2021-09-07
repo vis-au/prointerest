@@ -9,35 +9,37 @@
   import Axes from "../layers/visualization/axes.svelte";
   import UiOverlay from "./ui-overlay.svelte";
   import ColorLegend from "./color-legend.svelte";
+import ProgressionControls from "./progression-controls.svelte";
 
-  export let plotWidth: number;
-  export let plotHeight: number;
+  export let width: number;
+  export let height: number;
 
   let uiVisible = true;
 </script>
 
-<main>
+<main style="height:{height}px">
   {#if $activeViewMode === "scatter"}
-    <ScatterplotView width={plotWidth} height={plotHeight} />
+    <ScatterplotView {width} {height} />
   {:else if $activeViewMode === "binned"}
-    <BinnedScatterplotView width={plotWidth} height={plotHeight} />
+    <BinnedScatterplotView {width} {height} />
   {/if}
 
-  <Axes width={plotWidth} height={plotHeight} />
-  <SuggestionLayer width={plotWidth} height={plotHeight} />
-  <BrushLayer width={plotWidth} height={plotHeight} />
-  <InteractionLayer width={plotWidth} height={plotHeight} />
+  <Axes {width} {height} />
+  <SuggestionLayer {width} {height} />
+  <BrushLayer {width} {height} />
+  <InteractionLayer {width} {height} />
 
   {#if $activeViewMode === "binned"}
     <ColorLegend
       id="color"
-      left={plotWidth - 240}
-      top={plotHeight - 100}
+      left={width - 240}
+      top={height - 100}
       title=""
       blockSize={10}
       steps={10}
       bind:colorScale={$colorScale}
     />
   {/if}
-  <UiOverlay width={plotWidth} height={plotHeight} visible={uiVisible} />
+  <UiOverlay {width} {height} visible={uiVisible} />
+  <ProgressionControls x={width - 240} y={height - 20} />
 </main>

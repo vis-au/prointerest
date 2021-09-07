@@ -11,9 +11,10 @@
   import { isResizing } from "$lib/state/is-resizing";
   import ResizingOverlay from "$lib/view/main/resizing-overlay.svelte";
   import { getDimensionNames, getTotalDatasize } from "$lib/util/requests";
-  import ProgressionControls from "$lib/view/main/progression-controls.svelte";
   import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { viewPort } from "$lib/state/visible-data";
+	import SplitView from "$lib/view/main/split-view.svelte";
+import SecondaryView from "$lib/view/main/secondary-view.svelte";
 
   let innerWidth = 0;
   let innerHeight = 0;
@@ -27,11 +28,13 @@
 
   $: plotWidth = innerWidth - margin.horizontal;
   $: plotHeight = innerHeight - margin.vertical;
+	$: topHeight = plotHeight * 0.73;
+	$: bottomHeight = plotHeight - topHeight - 1;
   $: $viewPort.maxX = innerWidth;
-  $: $viewPort.maxY = innerHeight;
+  $: $viewPort.maxY = topHeight;
 
   $: $scaleX?.range([0, plotWidth]);
-  $: $scaleY?.range([0, plotHeight]);
+  $: $scaleY?.range([0, topHeight]);
 
   onMount(() => {
     setTimeout(async () => {
@@ -56,10 +59,18 @@
 
 <div id="pro-interest">
   <Header height={headerHeight} />
-  <MainView {plotWidth} {plotHeight} />
+
+	<SplitView isCollapsed={false}>
+		<div slot="top">
+			<MainView width={plotWidth} height={topHeight} />
+		</div>
+		<div slot="bottom" style="">
+			<SecondaryView width={plotWidth} height={bottomHeight} />
+		</div>
+	</SplitView>
+
   <ActiveDoiPanel />
   <ResizingOverlay x={mousePosition[0]} y={$isResizing?.startY} />
-  <ProgressionControls x={plotWidth - 240} y={plotHeight - 20} />
 </div>
 
 <svelte:window bind:innerWidth bind:innerHeight />
