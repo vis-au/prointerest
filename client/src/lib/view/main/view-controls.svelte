@@ -4,14 +4,12 @@
 	import { activeInteractionMode } from '$lib/state/active-interaction-mode';
   import { activeViewEncodings } from '$lib/state/active-view-encodings';
 	import { activeViewMode } from '$lib/state/active-view-mode';
-  import { updateInterestingItems } from '$lib/state/interesting-items';
   import { dimensions } from '$lib/state/processed-data';
 	import { suggestionModes } from '$lib/types/indicate-mode';
 	import { viewModes } from '$lib/types/view-modes';
 	import Alternatives from '$lib/widgets/alternatives.svelte';
   import Dropdown from '$lib/widgets/dropdown.svelte';
   import Row from '$lib/widgets/row.svelte';
-  import ControlButton from './control-button.svelte';
 </script>
 
 <Row id="view-controls">
@@ -37,13 +35,12 @@
     </Dropdown>
   </div>
   <div class="configuration">
-    <h2>Guidance</h2>
+    <h2>Suggestion</h2>
     <Alternatives
-      name="guidance-modes"
+      name="suggestion-modes"
       alternatives={suggestionModes}
       bind:activeAlternative={$activeSuggestionMode}
     />
-    <ControlButton className="show-me" on:click={ updateInterestingItems }>show me</ControlButton>
   </div>
   <div class="configuration">
     <h2>Interaction</h2>
