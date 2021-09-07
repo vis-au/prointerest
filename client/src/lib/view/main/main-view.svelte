@@ -33,7 +33,7 @@ import ProgressionControls from "./progression-controls.svelte";
     <ColorLegend
       id="color"
       left={width - 240}
-      top={height - 100}
+      top={height - 120}
       title=""
       blockSize={10}
       steps={10}
@@ -41,5 +41,5 @@ import ProgressionControls from "./progression-controls.svelte";
     />
   {/if}
   <UiOverlay {width} {height} visible={uiVisible} />
-  <ProgressionControls x={width - 240} y={height - 20} />
+  <ProgressionControls x={width - 240} y={height - 50} />
 </main>

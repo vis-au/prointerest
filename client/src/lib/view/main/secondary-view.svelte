@@ -1,13 +1,15 @@
 <script lang="typescript">
+  import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
   import { selectedDimensionsOfInterest } from "$lib/state/selected-dimensions-of-interest";
   import { selectedItems } from "$lib/state/selected-items";
   import { dataItemToRecord } from "$lib/util/item-transform";
-import Column from "$lib/widgets/column.svelte";
+  import Column from "$lib/widgets/column.svelte";
   import Histogram from "$lib/widgets/histogram.svelte";
   import Options from "$lib/widgets/options.svelte";
-import Row from "$lib/widgets/row.svelte";
-import { afterUpdate } from "svelte";
+  import Row from "$lib/widgets/row.svelte";
+  import { afterUpdate } from "svelte";
+  import ControlButton from "./control-button.svelte";
 
   export let width: number;
   export let height: number;
@@ -24,11 +26,15 @@ import { afterUpdate } from "svelte";
 </script>
 
 <Column id="secondary-view" style="max-width:{width}px;height:{height}px">
-  <Row style="margin-bottom: 25px">
-    <Options
-      options={$dimensions}
-      bind:activeOptions={selectedDimensions}
-    />
+  <Row id="secondary-header" style="margin-bottom: 25px">
+    <Row>
+      <Options
+        options={$dimensions}
+        bind:activeOptions={selectedDimensions}
+        showInactive={false}
+      />
+    </Row>
+    <ControlButton on:click={ () => $isSecondaryViewCollapsed = true }>close</ControlButton>
   </Row>
   <Row style="width:{width}px;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap">
     {#each $selectedDimensionsOfInterest as dim, i}
@@ -52,6 +58,14 @@ import { afterUpdate } from "svelte";
     padding: 10px 0;
     justify-content: space-between;
     flex-wrap: nowrap
+  }
+  :global(#secondary-header) {
+    min-width: 100%;
+    border-bottom: 1px solid #ccc;
+    padding: 0 5px;
+    padding-bottom: 10px;
+    justify-content: space-between;
+    flex-wrap: nowrap;
   }
   h3 {
     font-size: 10pt;

@@ -5,8 +5,8 @@
   export let style = "";
 </script>
 
-<label for={id} class="dropdown {className}">
-  <select name={id} {id} bind:value={selectedValue} {style}>
+<label for={id} class="dropdown {className}" {style}>
+  <select name={id} {id} bind:value={selectedValue}>
     <slot />
   </select>
 
