@@ -43,6 +43,5 @@ export const divergingSchemes = [
 	interpolateRdYlGn
 ];
 
-
-export type ColorScaleType = "log" | "linear";
-export const colorScaleTypes: ColorScaleType[] = ["log", "linear"];
+export type ColorScaleType = 'log' | 'linear';
+export const colorScaleTypes: ColorScaleType[] = ['log', 'linear'];

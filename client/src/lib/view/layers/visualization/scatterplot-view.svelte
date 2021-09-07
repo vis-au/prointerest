@@ -23,7 +23,7 @@
 		orthographic: true
 	};
 
-	let canvasElement;
+	let canvasElement: HTMLCanvasElement;
 
 	$: layers = [];
 	$: views = [];

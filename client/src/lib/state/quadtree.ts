@@ -20,7 +20,6 @@ const idIndex = 0;
 let xIndex = -1;
 let yIndex = -1;
 
-
 function createQuadtree() {
 	return d3_quadtree<DataItem>()
 		.x((d) => d.position.x)
@@ -60,12 +59,12 @@ setTimeout(() => {
 	});
 }, 0);
 
-scaleX.subscribe((newScale) => currentScaleX = newScale);
-scaleY.subscribe((newScale) => currentScaleY = newScale);
+scaleX.subscribe((newScale) => (currentScaleX = newScale));
+scaleY.subscribe((newScale) => (currentScaleY = newScale));
 
-dimensions.subscribe(newDims => currentDimensions = newDims);
+dimensions.subscribe((newDims) => (currentDimensions = newDims));
 
-activeViewEncodings.subscribe(newEncodings => {
+activeViewEncodings.subscribe((newEncodings) => {
 	xIndex = currentDimensions.indexOf(newEncodings.x);
 	yIndex = currentDimensions.indexOf(newEncodings.y);
 	resetProgression();

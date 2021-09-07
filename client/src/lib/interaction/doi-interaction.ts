@@ -6,7 +6,12 @@ export const interactionModes: InteractionMode[] = ['brush', 'inspect', 'zoom', 
 export const dragInteractionModes: InteractionMode[] = ['brush', 'zoom'];
 
 export const defaultDecay = (oldValue: number): number => 0.99 * oldValue;
-export const defaultItemInRegion = (...params: any): DataItem[] => [];
+export const defaultItemInRegion: (
+	x0: number,
+	y0: number,
+	x3: number,
+	y3: number
+) => DataItem[] = () => [];
 
 export interface DoiInteraction {
 	mode: InteractionMode;

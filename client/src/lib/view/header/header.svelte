@@ -8,24 +8,27 @@
 	import PosteriorWeights from './posterior-weights.svelte';
 	import PriorWeights from './prior-weights.svelte';
 
-	export let height;
+	export let height: number;
 
 	async function evaluateInterest() {
 		const doiValues = await getDoiValues($quadtree.data());
 		const map = new Map<number, number>();
-		doiValues.forEach(pair => map.set(pair[0], pair[1]));
+		doiValues.forEach((pair) => map.set(pair[0], pair[1]));
 		$activeDoiValues = map;
 	}
 </script>
 
 <header>
 	<div class="title">
-		<img src="static/logo.svg" alt="the ProInterest logo" height={height} />
+		<img src="static/logo.svg" alt="the ProInterest logo" {height} />
 	</div>
 	<Row id="doi-configuration" style="{height}px">
 		<PriorWeights />
 		<PosteriorWeights />
-		<ControlButton style="background:limegreen;margin:0 10px;padding:5px 10px" on:click={ evaluateInterest }>
+		<ControlButton
+			style="background:limegreen;margin:0 10px;padding:5px 10px"
+			on:click={evaluateInterest}
+		>
 			Compute
 		</ControlButton>
 	</Row>

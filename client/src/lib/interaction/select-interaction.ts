@@ -10,7 +10,12 @@ export default class Select implements DoiInteraction {
 	public std = 0;
 	public quadtree: Quadtree<DataItem> = d3_quadtree<DataItem>();
 	public timestamp = -1;
-	public getItemsInRegion = (x0: number, y0: number, x3: number, y3: number): DataItem[] => [];
+	public getItemsInRegion: (
+		x0: number,
+		y0: number,
+		x3: number,
+		y3: number
+	) => DataItem[] = () => [];
 
 	private distance2D(x0: number, y0: number, x1: number, y1: number) {
 		return Math.sqrt((x0 - x1) ** 2 + (y0 - y1) ** 2);

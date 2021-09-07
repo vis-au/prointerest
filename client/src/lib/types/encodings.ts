@@ -1,5 +1,5 @@
 export interface Encodings {
-  x: string,
-  y: string,
-  color: string
-};
+	x: string;
+	y: string;
+	color: string;
+}

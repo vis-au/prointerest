@@ -16,9 +16,7 @@
 	let uiVisible = true;
 </script>
 
-<main
-
->
+<main>
 	{#if $activeViewMode === 'scatter'}
 		<ScatterplotView width={plotWidth} height={plotHeight} />
 	{:else if $activeViewMode === 'binned'}
@@ -30,15 +28,15 @@
 	<BrushLayer width={plotWidth} height={plotHeight} />
 	<InteractionLayer width={plotWidth} height={plotHeight} />
 
-	{#if $activeViewMode === "binned"}
+	{#if $activeViewMode === 'binned'}
 		<ColorLegend
 			id="color"
-			left={ plotWidth - 240 }
-			top={ plotHeight - 100 }
+			left={plotWidth - 240}
+			top={plotHeight - 100}
 			title=""
-			blockSize={ 10 }
-			steps={ 10 }
-			bind:colorScale={ $colorScale }
+			blockSize={10}
+			steps={10}
+			bind:colorScale={$colorScale}
 		/>
 	{/if}
 	<UiOverlay width={plotWidth} height={plotHeight} visible={uiVisible} />

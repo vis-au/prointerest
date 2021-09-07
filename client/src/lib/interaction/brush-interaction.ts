@@ -18,7 +18,7 @@ export default class Brush implements DoiInteraction {
 	public timestamp = -1;
 	public getItemsInRegion: ItemsInRegionCallback = null;
 
-	public getAffectedItems() {
+	public getAffectedItems(): DataItem[] {
 		if (this.getItemsInRegion === null) {
 			return [];
 		}
@@ -29,7 +29,7 @@ export default class Brush implements DoiInteraction {
 		const y3 = this.y + this.height + this.maxDistance;
 
 		const affectedDataItems = this.getItemsInRegion(x0, y0, x3, y3);
-		affectedDataItems.forEach((item) => {
+		affectedDataItems.forEach(() => {
 			// TODO
 		});
 

@@ -25,9 +25,7 @@ function getBrushedItems() {
 }
 
 function getItemsInSelectedBins() {
-	return currentSelectedBins
-		.map(bin => getPointsInR(bin.x, bin.y, 10))
-		.flat();
+	return currentSelectedBins.map((bin) => getPointsInR(bin.x, bin.y, 10)).flat();
 }
 
 function getSelectedItems() {

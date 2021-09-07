@@ -11,8 +11,8 @@
 	id="{id}-progress-bar"
 	class="progress-bar"
 	style="width:{width}px;min-height:{height}px"
-	title="{current}/{total}">
-
+	title="{current}/{total}"
+>
 	<div class="progress" style="width:{progress * 100}%;height:{height}px" />
 </div>
 

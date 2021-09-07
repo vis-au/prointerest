@@ -54,7 +54,7 @@
 	}
 
 	afterUpdate(() => {
-		updateInterval = setTimeout(render, 0) as unknown as number;
+		updateInterval = (setTimeout(render, 0) as unknown) as number;
 	});
 	onMount(render);
 </script>

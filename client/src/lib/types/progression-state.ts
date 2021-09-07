@@ -1,1 +1,1 @@
-export type ProgressionState = "paused" | "running";
+export type ProgressionState = 'paused' | 'running';

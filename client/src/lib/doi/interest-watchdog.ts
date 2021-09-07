@@ -103,8 +103,8 @@ export default class InterestWatchDog {
 		// adapted from https://stackoverflow.com/a/11935263
 		const shuffled = this.processedDataspace.slice(0);
 		let i = this.processedDataspace.length;
-		let temp;
-		let index;
+		let temp: DataItem;
+		let index: number;
 
 		while (i--) {
 			index = Math.floor((i + 1) * Math.random());

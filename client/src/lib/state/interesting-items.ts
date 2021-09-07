@@ -12,21 +12,24 @@ export const interestingItems: Writable<DataItem[]> = writable([]);
 const doiWatchdog = new InterestWatchDog(getPointsInR);
 
 export function registerNewInteraction(interaction: DoiInteraction): void {
-  doiWatchdog.interactionLog.add(interaction);
+	doiWatchdog.interactionLog.add(interaction);
 }
 
 export function updateInterestingItems(): void {
-  const interesting = doiWatchdog.getDataOfInterest();
-  const items = Array.from(interesting.keys());
-  const values = Array.from(interesting.values());
-  interestingItems.set(items);
-  sendInterestingItems(items.map(d => d.id+""), values);
+	const interesting = doiWatchdog.getDataOfInterest();
+	const items = Array.from(interesting.keys());
+	const values = Array.from(interesting.values());
+	interestingItems.set(items);
+	sendInterestingItems(
+		items.map((d) => d.id + ''),
+		values
+	);
 }
 
 export function getLatestTimestamp(): number {
-  return doiWatchdog.interactionLog.getLatestTimestamp();
+	return doiWatchdog.interactionLog.getLatestTimestamp();
 }
 
-quadtree.subscribe(newTree => {
-  doiWatchdog.processedDataspace = newTree.data();
+quadtree.subscribe((newTree) => {
+	doiWatchdog.processedDataspace = newTree.data();
 });

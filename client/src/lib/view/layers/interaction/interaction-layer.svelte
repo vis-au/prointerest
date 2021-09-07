@@ -144,12 +144,12 @@
 		ctx.strokeStyle = color;
 		ctx.fillStyle = 'rgba(0, 0, 0, 0.0)';
 		ctx.lineWidth = lineWidth * 0.5;
-		ctx.setLineDash([2])
+		ctx.setLineDash([2]);
 		ctx.stroke(hexagonPath);
 		ctx.fill(hexagonPath);
 		ctx.translate(-hoveredBin.x, -hoveredBin.y);
 		ctx.closePath();
-		ctx.setLineDash([])
+		ctx.setLineDash([]);
 	}
 
 	function renderSelectedBins(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
@@ -203,7 +203,7 @@
 	});
 </script>
 
-<div class="interaction-canvas-container {$isZooming ? "zooming" : ""}">
+<div class="interaction-canvas-container {$isZooming ? 'zooming' : ''}">
 	<canvas
 		id="{id}-selection-canvas"
 		class="selection interaction-canvas"

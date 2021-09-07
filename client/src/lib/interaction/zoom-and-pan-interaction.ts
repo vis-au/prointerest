@@ -15,7 +15,12 @@ export default class ZoomAndPan implements DoiInteraction {
 	public maxDistance = 0;
 	public transform: ZoomTransform = zoomIdentity;
 	public timestamp = -1;
-	public getItemsInRegion = (x0: number, y0: number, x3: number, y3: number): DataItem[] => [];
+	public getItemsInRegion: (
+		x0: number,
+		y0: number,
+		x3: number,
+		y3: number
+	) => DataItem[] = () => [];
 
 	public getAffectedItems(): DataItem[] {
 		const t = this.transform;

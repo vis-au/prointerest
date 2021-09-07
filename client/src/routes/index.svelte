@@ -46,8 +46,8 @@
 			]);
 
 			$dimensions = await getDimensionNames();
-			$activeViewEncodings.x = "trip_distance";
-			$activeViewEncodings.y = "total_amount";
+			$activeViewEncodings.x = 'trip_distance';
+			$activeViewEncodings.y = 'total_amount';
 
 			$totalSize = await getTotalDatasize();
 		}, 0);
@@ -55,7 +55,7 @@
 </script>
 
 <div id="pro-interest">
-	<Header height={ headerHeight }/>
+	<Header height={headerHeight} />
 	<MainView {plotWidth} {plotHeight} />
 	<ActiveDoiPanel />
 	<ResizingOverlay x={mousePosition[0]} y={$isResizing?.startY} />
@@ -64,7 +64,7 @@
 
 <svelte:window bind:innerWidth bind:innerHeight />
 
-<svelte:body on:mousemove={ e => mousePosition = [e.clientX, e.clientY] } />
+<svelte:body on:mousemove={(e) => (mousePosition = [e.clientX, e.clientY])} />
 
 <style>
 	:global(body) {

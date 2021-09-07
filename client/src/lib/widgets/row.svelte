@@ -2,7 +2,7 @@
 	export let id = '';
 	export let width = -1;
 	export let height = -1;
-	export let style = "";
+	export let style = '';
 
 	const maxWidth = width === -1 ? '' : `max-width:${width}px;`;
 	const maxHeight = height === -1 ? '' : `max-height:${width}px;`;

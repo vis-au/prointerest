@@ -1,9 +1,9 @@
 <script lang="typescript">
-	import { createEventDispatcher } from "svelte";
-	import { isResizing } from "$lib/state/is-resizing";
-	import type { ResizeEvent } from "$lib/types/resize-event";
+	import { createEventDispatcher } from 'svelte';
+	import { isResizing } from '$lib/state/is-resizing';
+	import type { ResizeEvent } from '$lib/types/resize-event';
 
-	import Divider from "./divider.svelte";
+	import Divider from './divider.svelte';
 
 	export let group: string;
 	export let valueWeights: Map<string, number>;
@@ -30,9 +30,9 @@
 	function onResizingStarted(event: ResizeEvent) {
 		resize = event;
 		$isResizing = event;
-		document.addEventListener("mousemove", onResizing);
-		document.addEventListener("mouseup", onResizingEnded);
-		dispatch("start", resize);
+		document.addEventListener('mousemove', onResizing);
+		document.addEventListener('mouseup', onResizingEnded);
+		dispatch('start', resize);
 	}
 
 	function onResizing(event: MouseEvent) {
@@ -72,15 +72,15 @@
 		$isResizing.rightValue = newRightWeight;
 
 		valueWeights = new Map(valueWeights);
-		dispatch("resizing", resize);
+		dispatch('resizing', resize);
 	}
 
 	function onResizingEnded() {
 		resize = null;
 		$isResizing = null;
-		document.removeEventListener("mousemove", onResizing);
-		document.removeEventListener("mouseup", onResizingEnded);
-		dispatch("end", resize);
+		document.removeEventListener('mousemove', onResizing);
+		document.removeEventListener('mouseup', onResizingEnded);
+		dispatch('end', resize);
 	}
 </script>
 
@@ -110,12 +110,12 @@
 
 		{#if i !== Array.from(valueWeights.entries()).length - 1}
 			<Divider
-				left={ weights[i][0] }
-				right={ weights[i+1][0] }
-				isResizing={ resize && resize.leftId==weights[i][0] && resize.rightId==weights[i+1][0] }
-				{ group }
-				weights={ valueWeights }
-				on:resize-started={ (e) => onResizingStarted(e.detail) }
+				left={weights[i][0]}
+				right={weights[i + 1][0]}
+				isResizing={resize && resize.leftId == weights[i][0] && resize.rightId == weights[i + 1][0]}
+				{group}
+				weights={valueWeights}
+				on:resize-started={(e) => onResizingStarted(e.detail)}
 			/>
 		{/if}
 	{/each}

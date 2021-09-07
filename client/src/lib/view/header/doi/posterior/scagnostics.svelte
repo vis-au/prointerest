@@ -5,7 +5,7 @@
 	import DoiConfig from '$lib/widgets/doi-config.svelte';
 	import WeightedValues from '$lib/widgets/weighted-values.svelte';
 	import Column from '$lib/widgets/column.svelte';
-import { sendScagnosticWeights } from '$lib/util/requests';
+	import { sendScagnosticWeights } from '$lib/util/requests';
 
 	export let maxWidth: number;
 
@@ -16,7 +16,7 @@ import { sendScagnosticWeights } from '$lib/util/requests';
 	$selectedScagnostics.forEach((s) => (isSelected[s] = true));
 
 	$: $selectedScagnostics = scagnostics.filter((s) => isSelected[s]);
-	$: selectedWeights.forEach((value, key) => $scagnosticWeights.set(key, value))
+	$: selectedWeights.forEach((value, key) => $scagnosticWeights.set(key, value));
 
 	selectedScagnostics.subscribe((newSelection) => {
 		selectedWeights = new Map();
@@ -73,7 +73,7 @@ import { sendScagnosticWeights } from '$lib/util/requests';
 			group="selected-scagnostics"
 			totalSize={maxWidth}
 			bind:valueWeights={selectedWeights}
-			on:end={ () => sendScagnosticWeights($scagnosticWeights) }
+			on:end={() => sendScagnosticWeights($scagnosticWeights)}
 		/>
 		{#if selectedWeights.size === 0}
 			<p class="empty">Select interesting scagnostics above.</p>

@@ -4,8 +4,8 @@
 	import { viewPort as vp } from '$lib/state/visible-data';
 	import { afterUpdate } from 'svelte';
 
-	export let width;
-	export let height;
+	export let width: number;
+	export let height: number;
 
 	$: bins = $hexbinning($suggestedItems);
 	$: visibleBins = bins.filter((bin) => {

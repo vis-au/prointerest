@@ -19,7 +19,7 @@ export const suggestedItems: Writable<DataItem[]> = writable([]);
 function updateSuggestedItems() {
 	if (currentMode === 'explored') {
 		suggestedItems.set(currentlyInterestItems);
-	} else if (currentMode === "interesting") {
+	} else if (currentMode === 'interesting') {
 		console.log(currentTop100Ids);
 	} else if (currentMode === 'similar') {
 		suggestedItems.set(guide.getItemsSimilarToInterest(currentlyInterestItems));
