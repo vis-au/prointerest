@@ -18,9 +18,9 @@
   }
 </script>
 
-<header>
+<header style="height:{height}px">
   <div class="title">
-    <img src="static/logo.svg" alt="the ProInterest logo" {height} />
+    <img src="static/logo.svg" alt="the ProInterest logo" height={height*.8} />
   </div>
   <Row id="doi-configuration" style="align-items:stretch;">
     <PriorWeights />
@@ -46,6 +46,7 @@
   }
 
   header div.title {
+    margin-left: 2px;
     display: flex;
     flex-direction: row;
     align-items: center;
