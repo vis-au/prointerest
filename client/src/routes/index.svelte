@@ -60,12 +60,6 @@
 	<ActiveDoiPanel />
 	<ResizingOverlay x={mousePosition[0]} y={$isResizing?.startY} />
 	<ProgressionControls x={plotWidth - 240} y={plotHeight - 20} />
-
-	<svg id="sprites">
-		<symbol id="select-arrow-down" viewBox="0 0 10 6">
-			<polyline points="1 1 5 5 9 1"></polyline>
-		</symbol>
-	</svg>
 </div>
 
 <svelte:window bind:innerWidth bind:innerHeight />

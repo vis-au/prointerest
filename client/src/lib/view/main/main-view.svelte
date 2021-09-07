@@ -16,10 +16,8 @@
 	let uiVisible = true;
 </script>
 
-<div
-	class="main"
-	on:mouseenter={() => (uiVisible = true)}
-	on:mouseleave={() => (uiVisible = false)}
+<main
+
 >
 	{#if $activeViewMode === 'scatter'}
 		<ScatterplotView width={plotWidth} height={plotHeight} />
@@ -44,10 +42,4 @@
 		/>
 	{/if}
 	<UiOverlay width={plotWidth} height={plotHeight} visible={uiVisible} />
-</div>
-
-<style>
-	div.main {
-		box-sizing: border-box;
-	}
-</style>
+</main>

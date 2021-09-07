@@ -23,12 +23,12 @@
   </div>
   <div class="configuration">
     <h2>Axes</h2>
-    <Dropdown id="x-encoding" bind:selectedValue={$activeViewEncodings.x}>
+    <Dropdown id="x-encoding" className="encoding" bind:selectedValue={$activeViewEncodings.x}>
       { #each $dimensions as dim }
         <option>{dim}</option>
       { /each }
     </Dropdown>
-    <Dropdown id="y-encoding" bind:selectedValue={$activeViewEncodings.y}>
+    <Dropdown id="y-encoding" className="encoding" bind:selectedValue={$activeViewEncodings.y}>
       { #each $dimensions as dim }
         <option>{dim}</option>
       { /each }
@@ -59,6 +59,11 @@
 
   :global(.show-me) {
     margin-left: 10px;
+  }
+
+  :global(div.configuration .encoding) {
+    max-width: 150px;
+    margin: 0 5px;
   }
 
 	div.configuration {

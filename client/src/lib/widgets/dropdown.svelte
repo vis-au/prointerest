@@ -1,23 +1,31 @@
 <script lang="typescript">
   export let id: string;
+  export let className = "";
   export let selectedValue: string;
   export let style = "";
 </script>
 
-<label for={ id } class="dropdown">
+<label for={ id } class="dropdown {className}">
   <select name={ id } id={ id } bind:value={ selectedValue } style={ style }>
     <slot></slot>
   </select>
 
   <svg>
-    <use xlink-href="#select-arrow-down"></use>
+    <polyline points="1 1 5 5 9 1"></polyline>
   </svg>
 </label>
 
 <style>
+  label.dropdown {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
   label.dropdown select {
   -webkit-appearance: none;
-  padding: 7px 40px 7px 12px;
+  padding: 4px 40px 4px 12px;
   width: 100%;
   border: 1px solid #E8EAED;
   border-radius: 5px;
@@ -46,13 +54,5 @@ label.dropdown svg {
   stroke-linecap: round;
   stroke-linejoin: round;
   pointer-events: none;
-}
-
-:global(#sprites) {
-  position: absolute;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-  user-select: none;
 }
 </style>
