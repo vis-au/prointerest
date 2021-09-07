@@ -78,8 +78,10 @@ def send_axis_dimension():
   SCATTERPLOT_AXES[axis] = dimension
   return cors_response(True)
 
-@app.route("/outlierness_metric/<metric>", methods=["POST"])
-def send_outlierness_metric(metric: str):
+
+@app.route("/outlierness_metric", methods=["POST"])
+def send_outlierness_metric():
+  metric = request.args.get("metric")
   set_outlierness_metric(metric)
   return cors_response(True)
 

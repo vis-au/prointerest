@@ -70,7 +70,7 @@ export async function sendAxisDimension(axis: "x"|"y", dimension: string): Promi
 }
 
 export async function sendOutlierMetric(metric: OutliernessMeasure): Promise<void> {
-  return sendRequestToBaseURL(`/outlierness_metric?metric=${metric}`);
+  return sendRequestToBaseURL(`/outlierness_metric?metric=${metric}`, "POST");
 }
 
 export async function sendSelectedItems(items: DataItem[]): Promise<void> {
