@@ -7,6 +7,7 @@ import { scaleX, scaleY } from "./scales";
 import { activeViewEncodings } from "./active-view-encodings";
 import { dimensions } from "./processed-data";
 import { CHUNK_SIZE, resetProgression } from "./progression";
+import { isSecondaryViewCollapsed } from "./is-secondary-view-collapsed";
 
 let currentQuadtree = createQuadtree();
 export const quadtree = writable(currentQuadtree);
@@ -40,6 +41,11 @@ function arrayToDataItem(item: number[]) {
   return newItem;
 }
 
+function recreateQuadtree() {
+  const newTree = createQuadtree();
+  quadtree.set(newTree);
+}
+
 // is run asynchronously to ensure that the scales are set
 setTimeout(() => {
   processedData.subscribe((newData) => {
@@ -69,3 +75,5 @@ activeViewEncodings.subscribe((newEncodings) => {
   yIndex = currentDimensions.indexOf(newEncodings.y);
   resetProgression();
 });
+
+isSecondaryViewCollapsed.subscribe(recreateQuadtree);

@@ -16,7 +16,7 @@
 
   $: tabularData = $selectedItems.map(dataItemToRecord);
 
-  let selectedDimensions = {};
+  $: selectedDimensions = {};
   $: $selectedDimensionsOfInterest = Object.keys(selectedDimensions)
       .filter(d => selectedDimensions[d]);
 
@@ -40,9 +40,10 @@
     {#each $selectedDimensionsOfInterest as dim, i}
       <div class="dimension">
         <Histogram
-          id="secondary-selected-dim-{i}"
+          id="secondary-selected-dim-{dim}"
           data={tabularData}
-          dimension={i + ""}
+          dimension={i+""}
+          showTitle={false}
           width={310}
           height={50}
         />
