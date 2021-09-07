@@ -29,7 +29,7 @@
 			style="background:limegreen;margin:0 10px;padding:5px 10px"
 			on:click={evaluateInterest}
 		>
-			Compute
+			Update Interest
 		</ControlButton>
 	</Row>
 </header>

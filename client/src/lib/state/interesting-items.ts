@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import type DataItem from '$lib/types/data-item';
-import InterestWatchDog from '$lib/doi/interest-watchdog';
+import InteractionObserver from '$lib/doi/interaction-observer';
 import { getPointsInR } from '$lib/util/find-in-quadtree';
 import { quadtree } from './quadtree';
 import type { DoiInteraction } from '$lib/interaction/doi-interaction';
@@ -9,7 +9,7 @@ import { sendInterestingItems } from '$lib/util/requests';
 
 export const interestingItems: Writable<DataItem[]> = writable([]);
 
-const doiWatchdog = new InterestWatchDog(getPointsInR);
+const doiWatchdog = new InteractionObserver(getPointsInR);
 
 export function registerNewInteraction(interaction: DoiInteraction): void {
 	doiWatchdog.interactionLog.add(interaction);

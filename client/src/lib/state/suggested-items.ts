@@ -1,48 +1,50 @@
-import GuidanceProvider from '$lib/doi/guidance-provider';
-import type DataItem from '$lib/types/data-item';
-import type { SuggestionMode } from '$lib/types/indicate-mode';
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
-import { activeSuggestionMode } from './active-indicate-mode';
-import { interestingItems } from './interesting-items';
+import InteractionObserver from '$lib/doi/interaction-observer';
+import SuggestionProvider from '$lib/doi/suggestion-provider';
+import type DataItem from '$lib/types/data-item';
+import type { SuggestionInput, SuggestionOutput } from '$lib/types/suggestion-mode';
+import { getPointsInR } from '$lib/util/find-in-quadtree';
+import { activeSuggestionInput, activeSuggestionOutput } from './active-suggestion-modes';
 import { quadtree } from './quadtree';
-import { top100Ids } from './latest-doi-values';
 
-const guide = new GuidanceProvider();
+const interactionObserver = new InteractionObserver(getPointsInR);
+const suggestionProvider = new SuggestionProvider();
 
-let currentlyInterestItems: DataItem[] = [];
-let currentTop100Ids: number[];
-let currentMode: SuggestionMode = null;
+const currentlyInterestItems: DataItem[] = [];
+let currentInputMode: SuggestionInput = null;
+let currentOutputMode: SuggestionOutput = null;
 
 export const suggestedItems: Writable<DataItem[]> = writable([]);
 
 function updateSuggestedItems() {
-	if (currentMode === 'explored') {
-		suggestedItems.set(currentlyInterestItems);
-	} else if (currentMode === 'interesting') {
-		console.log(currentTop100Ids);
-	} else if (currentMode === 'similar') {
-		suggestedItems.set(guide.getItemsSimilarToInterest(currentlyInterestItems));
-	} else if (currentMode === 'dissimilar') {
-		suggestedItems.set(guide.getItemsDissimilarToInterest(currentlyInterestItems));
+	let inputData: DataItem[] = [];
+	if (currentInputMode === 'explored') {
+		inputData = Array.from(interactionObserver.getExploredData().keys());
+	} else if (currentInputMode === 'interesting') {
+		inputData = currentlyInterestItems;
 	}
+
+	let outputData: DataItem[] = [];
+	if (currentOutputMode === "similar") {
+		outputData = suggestionProvider.getSimilarSuggestions(inputData);
+	} else if (currentOutputMode === "dissimilar") {
+		outputData = suggestionProvider.getDissimilarSuggestions(inputData);
+	}
+
+	suggestedItems.set(outputData);
 }
 
-interestingItems.subscribe((newItems) => {
-	currentlyInterestItems = newItems;
+activeSuggestionInput.subscribe((newMode) => {
+	currentInputMode = newMode;
 	updateSuggestedItems();
 });
 
-activeSuggestionMode.subscribe((newMode) => {
-	currentMode = newMode;
+activeSuggestionOutput.subscribe((newMode) => {
+	currentOutputMode = newMode;
 	updateSuggestedItems();
-});
+})
 
 quadtree.subscribe((newTree) => {
-	guide.processedDataspace = newTree.data();
-});
-
-top100Ids.subscribe((items) => {
-	currentTop100Ids = items;
-	updateSuggestedItems();
+	suggestionProvider.processedDataspace = newTree.data();
 });

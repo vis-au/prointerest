@@ -1,11 +1,11 @@
 <script>
 	import { dragInteractionModes } from '$lib/interaction/doi-interaction';
-	import { activeSuggestionMode } from '$lib/state/active-indicate-mode';
 	import { activeInteractionMode } from '$lib/state/active-interaction-mode';
+	import { activeSuggestionInput, activeSuggestionOutput } from '$lib/state/active-suggestion-modes';
 	import { activeViewEncodings } from '$lib/state/active-view-encodings';
 	import { activeViewMode } from '$lib/state/active-view-mode';
 	import { dimensions } from '$lib/state/processed-data';
-	import { suggestionModes } from '$lib/types/indicate-mode';
+	import { suggestionInputs, suggestionOutputs } from '$lib/types/suggestion-mode';
 	import { viewModes } from '$lib/types/view-modes';
 	import Alternatives from '$lib/widgets/alternatives.svelte';
 	import Dropdown from '$lib/widgets/dropdown.svelte';
@@ -35,11 +35,17 @@
 		</Dropdown>
 	</div>
 	<div class="configuration">
-		<h2>Suggestion</h2>
+		<h2>Suggest</h2>
 		<Alternatives
-			name="suggestion-modes"
-			alternatives={suggestionModes}
-			bind:activeAlternative={$activeSuggestionMode}
+			name="suggestion-outputs"
+			alternatives={suggestionOutputs}
+			bind:activeAlternative={$activeSuggestionOutput}
+		/>
+		<h2>based on</h2>
+		<Alternatives
+			name="suggestion-inputs"
+			alternatives={suggestionInputs}
+			bind:activeAlternative={$activeSuggestionInput}
 		/>
 	</div>
 	<div class="configuration">
@@ -75,8 +81,7 @@
 
 	h2 {
 		font-weight: normal;
-		margin: 0;
-		margin-right: 0.2rem;
+		margin: 0 5px;
 		padding: 0;
 	}
 </style>

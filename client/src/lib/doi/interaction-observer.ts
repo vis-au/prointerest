@@ -6,7 +6,7 @@ import { interactionWeights } from '$lib/state/interaction-technique-weights';
 
 const DEFAULT_EPSILON = 100;
 
-export default class InterestWatchDog {
+export default class InteractionObserver {
 	private doiPerItem = new Map<DataItem, number>();
 	private affectedItemIdsPerTimestamp = new Map<number, number[]>();
 	private findPointsWithinRadius: (x: number, y: number, r: number) => DataItem[];
@@ -153,7 +153,7 @@ export default class InterestWatchDog {
 		expandedSample.forEach((item, i) => this.doiPerItem.set(item, interestPerExtenedItem[i]));
 	}
 
-	public getDataOfInterest(): Map<DataItem, number> {
+	public getExploredData(): Map<DataItem, number> {
 		this.update();
 
 		const dataOfInterest: Map<DataItem, number> = new Map();

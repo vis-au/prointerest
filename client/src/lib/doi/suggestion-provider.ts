@@ -65,11 +65,11 @@ export default class GuidanceProvider {
 		return suggestions;
 	}
 
-	public getItemsSimilarToInterest(itemsOfInterest: DataItem[]): DataItem[] {
+	public getSimilarSuggestions(itemsOfInterest: DataItem[]): DataItem[] {
 		return this.getSuggestions(itemsOfInterest, true);
 	}
 
-	public getItemsDissimilarToInterest(itemsOfInterest: DataItem[]): DataItem[] {
+	public getDissimilarSuggestions(itemsOfInterest: DataItem[]): DataItem[] {
 		return this.getSuggestions(itemsOfInterest, false);
 	}
 }
