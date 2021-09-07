@@ -1,4 +1,6 @@
 <script lang="typescript">
+import { active } from "d3-transition";
+
 import Dropdown from "./dropdown.svelte";
 
 
@@ -10,6 +12,7 @@ import Dropdown from "./dropdown.svelte";
   export let showInactive = true;
 
   $: inactiveOptions = options.filter(o => !activeOptions[o]);
+  $: activeOptionKeys = Object.keys(activeOptions).filter(o => activeOptions[o]);
 
   function select(option: string) {
     activeOptions[option] = true;
@@ -39,7 +42,7 @@ import Dropdown from "./dropdown.svelte";
       {/each}
     </Dropdown>
 
-    {#each Object.keys(activeOptions) as option}
+    {#each activeOptionKeys as option}
       <div class="option">
         <input
           id="options-list-{option}"

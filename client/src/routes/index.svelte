@@ -30,7 +30,7 @@
   $: plotWidth = innerWidth - margin.horizontal;
   $: plotHeight = innerHeight - margin.vertical;
 	$: topHeight = $isSecondaryViewCollapsed ? plotHeight : plotHeight * 0.73;
-	$: bottomHeight = plotHeight - topHeight - 1;
+	$: bottomHeight = plotHeight - topHeight;
   $: $viewPort.maxX = innerWidth;
   $: $viewPort.maxY = topHeight;
 
