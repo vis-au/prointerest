@@ -22,11 +22,11 @@
   <div class="title">
     <img src="static/logo.svg" alt="the ProInterest logo" {height} />
   </div>
-  <Row id="doi-configuration" style="{height}px">
+  <Row id="doi-configuration" style="align-items:stretch;">
     <PriorWeights />
     <PosteriorWeights />
     <ControlButton
-      style="background:limegreen;margin:0 10px;padding:5px 10px"
+      style="background:limegreen;margin:0 10px 0 20px;padding:5px 10px"
       on:click={evaluateInterest}
     >
       Update Interest

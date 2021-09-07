@@ -6,7 +6,7 @@
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
 </script>
 
-<Row>
+<Row style="align-items:stretch">
   <h2>Prior</h2>
   <WeightedValues
     group="doi-weights"
@@ -19,6 +19,8 @@
 
 <style>
   h2 {
+    display: flex;
+    align-items: center;
     margin: 0;
     font-size: 12pt;
     margin-right: 10px;

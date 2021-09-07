@@ -127,7 +127,7 @@
   div.entry label {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
   }
 
@@ -151,6 +151,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    align-items: center;
   }
   div.entry label .key {
     margin-right: 0.25rem;
