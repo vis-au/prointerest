@@ -1,15 +1,15 @@
-import type DataItem from '$lib/types/data-item';
+import type DataItem from "$lib/types/data-item";
 
 export function dataItemToRecord(dataItem: DataItem): Record<string, unknown> {
-	const item = {};
+  const item = {};
 
-	dataItem.values.forEach((val, i) => {
-		item['' + i] = val;
-	});
+  dataItem.values.forEach((val, i) => {
+    item["" + i] = val;
+  });
 
-	return item;
+  return item;
 }
 
 export function dataItemToList(dataItem: DataItem): number[] {
-	return dataItem.values;
+  return dataItem.values;
 }

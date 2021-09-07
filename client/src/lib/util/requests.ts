@@ -1,84 +1,84 @@
-import type DataItem from '$lib/types/data-item';
-import type { OutliernessMeasure } from '$lib/types/outlier-measures';
-import { scagnostics } from '$lib/types/scagnostics';
-import { dataItemToList } from './item-transform';
-import { mapToRecord } from './map-to-record';
+import type DataItem from "$lib/types/data-item";
+import type { OutliernessMeasure } from "$lib/types/outlier-measures";
+import { scagnostics } from "$lib/types/scagnostics";
+import { dataItemToList } from "./item-transform";
+import { mapToRecord } from "./map-to-record";
 
-const BASE_URL = 'http://127.0.0.1:5000';
+const BASE_URL = "http://127.0.0.1:5000";
 
-type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+type RequestMethod = "GET" | "POST" | "PUT" | "DELETE";
 
 async function sendRequestToBaseURL(
-	path: string,
-	method: RequestMethod = 'GET',
-	body?: Record<string, unknown>
+  path: string,
+  method: RequestMethod = "GET",
+  body?: Record<string, unknown>
 ) {
-	if (body === undefined) {
-		return fetch(`${BASE_URL}${path}`, { method }).then((d) => d.json());
-	} else {
-		return fetch(`${BASE_URL}${path}`, { method, body: JSON.stringify(body) }).then((d) =>
-			d.json()
-		);
-	}
+  if (body === undefined) {
+    return fetch(`${BASE_URL}${path}`, { method }).then((d) => d.json());
+  } else {
+    return fetch(`${BASE_URL}${path}`, { method, body: JSON.stringify(body) }).then((d) =>
+      d.json()
+    );
+  }
 }
 
 // DATA ACCESS
 export async function getTotalDatasize(): Promise<number> {
-	return sendRequestToBaseURL('/size');
+  return sendRequestToBaseURL("/size");
 }
 
 export async function getDimensionNames(): Promise<string[]> {
-	return sendRequestToBaseURL('/dimensions');
+  return sendRequestToBaseURL("/dimensions");
 }
 
 export async function getNextChunk(chunkSize: number): Promise<number[][]> {
-	return sendRequestToBaseURL(`/next_chunk?size=${chunkSize}`);
+  return sendRequestToBaseURL(`/next_chunk?size=${chunkSize}`);
 }
 
 export async function resetProgression(): Promise<void> {
-	return sendRequestToBaseURL('/reset');
+  return sendRequestToBaseURL("/reset");
 }
 
 // DOI FUNCTION
-type DoiComponent = 'prior' | 'posterior';
+type DoiComponent = "prior" | "posterior";
 export async function sendWeights(
-	component: DoiComponent,
-	weights: Map<string, number>
+  component: DoiComponent,
+  weights: Map<string, number>
 ): Promise<void> {
-	const record = mapToRecord(weights);
-	return sendRequestToBaseURL(`/weights/${component}`, 'POST', { weights: record });
+  const record = mapToRecord(weights);
+  return sendRequestToBaseURL(`/weights/${component}`, "POST", { weights: record });
 }
 
 export async function sendScagnosticWeights(weights: Map<string, number>): Promise<void> {
-	// make sure that every scagnostic is assigned a weight
-	const copy = new Map(weights);
-	scagnostics.forEach((s) => {
-		if (copy.get(s) === undefined) {
-			copy.set(s, 0);
-		}
-	});
-	const record = mapToRecord(copy);
-	return sendRequestToBaseURL('/weights/scagnostics', 'POST', { weights: record });
+  // make sure that every scagnostic is assigned a weight
+  const copy = new Map(weights);
+  scagnostics.forEach((s) => {
+    if (copy.get(s) === undefined) {
+      copy.set(s, 0);
+    }
+  });
+  const record = mapToRecord(copy);
+  return sendRequestToBaseURL("/weights/scagnostics", "POST", { weights: record });
 }
 
 export async function sendInterestingDimensions(dimensions: string[]): Promise<void> {
-	return sendRequestToBaseURL('/dimensions', 'POST', { dimensions });
+  return sendRequestToBaseURL("/dimensions", "POST", { dimensions });
 }
 
 export async function sendOutlierMetric(metric: OutliernessMeasure): Promise<void> {
-	return sendRequestToBaseURL(`/outlierness_metric?metric=${metric}`);
+  return sendRequestToBaseURL(`/outlierness_metric?metric=${metric}`);
 }
 
 export async function sendSelectedItems(items: DataItem[]): Promise<void> {
-	const values = items.map(dataItemToList);
-	return sendRequestToBaseURL('/selected_items', 'POST', { items: values });
+  const values = items.map(dataItemToList);
+  return sendRequestToBaseURL("/selected_items", "POST", { items: values });
 }
 
 export async function sendInterestingItems(ids: string[], doi: number[]): Promise<void> {
-	return sendRequestToBaseURL('/interesting_items', 'POST', { ids, doi });
+  return sendRequestToBaseURL("/interesting_items", "POST", { ids, doi });
 }
 
 export async function getDoiValues(items: DataItem[]): Promise<[number, number][]> {
-	const values = items.map(dataItemToList);
-	return sendRequestToBaseURL('/doi', 'POST', { items: values });
+  const values = items.map(dataItemToList);
+  return sendRequestToBaseURL("/doi", "POST", { items: values });
 }
