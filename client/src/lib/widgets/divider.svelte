@@ -34,7 +34,7 @@
   div.divider {
     min-width: 0.5rem;
     min-height: 12px;
-    cursor: w-resize;
+    cursor: col-resize;
   }
   div.divider:hover {
     background: #ccc;
