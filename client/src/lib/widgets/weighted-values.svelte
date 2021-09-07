@@ -10,6 +10,8 @@
   export let activeWeight: string = null;
   export let totalSize = 250;
   export let showValue = false;
+  export let useDarkmode = false;
+  export let backgroundColor = "";
 
   $: weights = Array.from(valueWeights.entries());
   let resize: ResizeEvent;
@@ -84,11 +86,11 @@
   }
 </script>
 
-<div id={group} class="weighted-values">
+<div id={group} class="weighted-values {useDarkmode?"dark":""}">
   {#each weights as entry, i}
     <div
       class="entry {activeWeight === entry[0] ? 'active' : ''}"
-      style="width:{entry[1] * totalSize}px"
+      style="width:{entry[1] * totalSize}px;{backgroundColor.length > 0?`background:${backgroundColor}"`:""}"
     >
       <label for={getId(entry[0])} title={`${entry[0]}: ${entry[1] * 100}%`}>
         <span class="key">{entry[0]}</span>
@@ -134,6 +136,8 @@
   div.entry {
     background: #efefef;
     border-radius: 4px;
+    color: black;
+    font-weight: bold;
     -moz-user-select: none;
     -webkit-user-select: none;
   }
@@ -143,6 +147,16 @@
   div.entry.active {
     background: black;
     color: white;
+  }
+  .dark div.entry {
+    background: #555;
+    color: #fff;
+  }
+  .dark div.entry:hover {
+    background: #777;
+  }
+  .dark div.entry.active {
+    background: #8f8f8f;
   }
 
   div.entry label {

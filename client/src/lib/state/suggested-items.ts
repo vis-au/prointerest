@@ -46,5 +46,7 @@ activeSuggestionOutput.subscribe((newMode) => {
 });
 
 quadtree.subscribe((newTree) => {
-  suggestionProvider.processedDataspace = newTree.data();
+  const dataspace = newTree.data();
+  interactionObserver.processedDataspace = dataspace;
+  suggestionProvider.processedDataspace = dataspace;
 });

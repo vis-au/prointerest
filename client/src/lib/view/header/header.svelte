@@ -40,7 +40,8 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    background: white;
+    background: #333;
+    color: #fff;
     border-bottom: 1px solid #ddd;
   }
 

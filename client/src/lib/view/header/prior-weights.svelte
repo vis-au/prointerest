@@ -11,6 +11,7 @@
   <WeightedValues
     group="doi-weights"
     totalSize={500}
+    useDarkmode={true}
     bind:valueWeights={$priorWeights}
     bind:activeWeight={$selectedDoiWeight}
     on:end={() => sendWeights("prior", $priorWeights)}
