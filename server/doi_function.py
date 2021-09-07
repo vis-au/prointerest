@@ -1,6 +1,8 @@
 # Prior interest components
-from typing import Any
+from typing import Any, Literal
 from database import *
+from pyscagnostics import scagnostics
+import numpy as np
 
 
 PRIOR_WEIGHTS = {
@@ -8,20 +10,21 @@ PRIOR_WEIGHTS = {
   "outlierness": .33,
   "selection": .33
 }
-DIMENSIONS_OF_INTEREST: list[str] = []
-OUTLIERNESS_METRIC: str = "scagnostic"
+dimensions_of_interest: list[str] = []
+outlierness_metric: Literal["scagnostic", "tukey", "clustering"] = "scagnostic"
+
 
 def set_prior_weights(weights: dict[str, float]):
   global PRIOR_WEIGHTS
   PRIOR_WEIGHTS = weights
 
 def set_dimensions_of_interest(dimensions: list[str]):
-  global DIMENSIONS_OF_INTEREST
-  DIMENSIONS_OF_INTEREST = dimensions
+  global dimensions_of_interest
+  dimensions_of_interest = dimensions
 
 def set_outlierness_metric(metric: str):
-  global OUTLIERNESS_METRIC
-  OUTLIERNESS_METRIC = metric
+  global outlierness_metric
+  outlierness_metric = metric
 
 def set_selected_item_ids(ids: list[any]):
   mark_ids_selected(ids)
@@ -43,6 +46,7 @@ SCAGNOSTIC_WEIGHTS = {
   "stringy": 0,
   "monotonic": 0
 }
+SCAGNOSTICS = ["Outlying", "Skewed", "Clumpy", "Sparse", "Striated", "Convex", "Skinny", "Stringy", "Monotonic"]
 SCATTERPLOT_AXES: dict[str, str] = {
   "x": None,
   "y": None
@@ -84,7 +88,15 @@ def get_selection_interest(item: any):
 
 def get_scagnostic_interest(item: any):
   # compute the impact on the different weighted scagnostic measures and return it.
-  return 0
+  x = np.array([random.random() for _ in range(1000)])
+  y = np.array([random.random() for _ in range(1000)])
+  measures_all, _ = scagnostics(x, y)
+  _x = x[1:]
+  _y = y[1:]
+  measures_item, _ = scagnostics(_x, _y)
+
+  diff = sum([(measures_all[type]-measures_item[type]) * 1000 for type in SCAGNOSTICS])
+  return diff
 
 
 def get_provenance_interest(item: any):
@@ -111,5 +123,5 @@ def compute_doi(item: list[Any]):
   provenance = get_provenance_interest(item)
 
   # compute combined interest
-  doi = selection * PRIOR_WEIGHTS["selection"] * provenance * POSTERIOR_WEIGHTS["provenance"]
+  doi = selection * PRIOR_WEIGHTS["selection"] * scagnostic * POSTERIOR_WEIGHTS["scagnostics"] * provenance * POSTERIOR_WEIGHTS["provenance"]
   return doi
