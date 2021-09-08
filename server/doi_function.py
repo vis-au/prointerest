@@ -11,16 +11,21 @@ PRIOR_WEIGHTS = {
   "selection": .33
 }
 dimensions_of_interest: list[str] = []
+ranges_of_interest: dict[str, float] = {}
 outlierness_metric: Literal["scagnostic", "tukey", "clustering"] = "scagnostic"
 
 
-def set_prior_weights(weights: dict[str, float]):
+def set_prior_weights(weights: dict[str, list[float]]):
   global PRIOR_WEIGHTS
   PRIOR_WEIGHTS = weights
 
 def set_dimensions_of_interest(dimensions: list[str]):
   global dimensions_of_interest
   dimensions_of_interest = dimensions
+
+def set_dimension_range_of_interest(dimension: str, min_value: float, max_value: float):
+  global ranges_of_interest
+  ranges_of_interest[dimension] = [min_value, max_value]
 
 def set_outlierness_metric(metric: str):
   global outlierness_metric

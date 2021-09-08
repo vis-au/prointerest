@@ -73,6 +73,16 @@ def send_interesting_dimensions():
   return cors_response(True)
 
 
+@app.route("/dimension_range", methods=["POST"])
+def send_interesting_range():
+  res = json.loads(request.data)
+  dimension = res["dimension"]
+  min_value = res["min"]
+  max_value = res["max"]
+
+  return cors_response(True)
+
+
 @app.route("/axis", methods=["GET"])
 def send_axis_dimension():
   axis = request.args.get("axis")

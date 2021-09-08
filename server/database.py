@@ -47,6 +47,8 @@ def mark_ids_plotted(ids: list):
 
 
 def mark_ids_selected(ids: list[str]):
+  if len(ids) == 0:
+    return
   query = f"DELETE FROM {SELECTED}"
   cursor.execute(query)
   values = "('"+"'),('".join(ids)+"')"
@@ -55,6 +57,8 @@ def mark_ids_selected(ids: list[str]):
 
 
 def mark_ids_provenance(ids: list[str], doi_values: list[float]):
+  if len(ids) == 0:
+    return
   query = f"DELETE FROM {PROVENANCE}"
   cursor.execute(query)
   values = ""
