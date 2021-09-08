@@ -75,4 +75,4 @@ import { createEventDispatcher } from "svelte";
   $: showTitle ? "" : (histogram.layer[0].encoding.x["title"] = false);
 </script>
 
-<VegaLitePlot {id} spec={histogram} on:brush-end={ (event) => dispatch("interval", event.detail) } />
+<VegaLitePlot {id} spec={histogram} on:brush={ (event) => dispatch("interval", event.detail.value) } />

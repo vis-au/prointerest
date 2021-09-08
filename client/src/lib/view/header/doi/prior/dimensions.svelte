@@ -32,7 +32,7 @@
           dimension={dim}
           width={300}
           height={50}
-          on:interval={(event) => setInterestingInterval(dim, event.detail.value[dim])}
+          on:interval={(event) => setInterestingInterval(dim, event.detail[dim])}
         />
       {/if}
     </Row>

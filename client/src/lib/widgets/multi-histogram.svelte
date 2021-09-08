@@ -1,5 +1,6 @@
 <script lang="typescript">
-  import VegaLitePlot from "./vega-lite-plot.svelte";
+  import { createEventDispatcher } from "svelte";
+import VegaLitePlot from "./vega-lite-plot.svelte";
 
   export let id: string;
   export let colors: string[] = [];
@@ -10,6 +11,8 @@
   export let dimensions: string[];
   export let groupDimension: string = null;
   export let showTitle = false;
+
+  let dispatch = createEventDispatcher();
 
   $: colorEncoding =
     groupDimension === null
@@ -74,4 +77,4 @@
   $: showTitle ? "" : (histogram.spec.layer[1].encoding.x["title"] = false);
 </script>
 
-<VegaLitePlot {id} spec={histogram} />
+<VegaLitePlot {id} spec={histogram} on:brush={ (event) => dispatch("interval", event.detail.value) } />
