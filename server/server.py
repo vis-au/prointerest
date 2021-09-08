@@ -79,6 +79,7 @@ def send_interesting_range():
   dimension = res["dimension"]
   min_value = res["min"]
   max_value = res["max"]
+  set_dimension_range_of_interest(dimension, min_value, max_value)
 
   return cors_response(True)
 
