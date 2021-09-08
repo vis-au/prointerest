@@ -5,6 +5,7 @@
   export let colors: string[] = [];
   export let width = 100;
   export let height = 100;
+  export let bins = 50;
   export let data: Record<string, unknown>[];
   export let dimension: string;
   export let groupDimension: string = null;
@@ -33,7 +34,7 @@
     mark: "bar",
     encoding: {
       x: {
-        bin: true,
+        bin: {maxbins: bins},
         field: dimension
       },
       y: {
