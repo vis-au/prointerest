@@ -1,7 +1,7 @@
 import { quantile } from "d3-array";
 import type DataItem from "../types/data-item";
 
-export default class GuidanceProvider {
+export default class SuggestionProvider {
   private distributionsOfInterest: Map<number, [number, number]> = new Map();
 
   public processedDataspace: DataItem[] = [];
