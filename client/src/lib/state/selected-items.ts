@@ -45,6 +45,10 @@ activeBrush.subscribe((newBrush) => {
 });
 
 selectedBins.subscribe((newBins) => {
+  // optimization to prevent updates of vega lite plots of selected data on zoom
+  if (newBins.length === currentSelectedBins.length) {
+    return;
+  }
   currentSelectedBins = newBins;
   selectedItems.set(getSelectedItems());
 });

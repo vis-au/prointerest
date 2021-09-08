@@ -34,8 +34,8 @@
   $: $viewPort.maxX = innerWidth;
   $: $viewPort.maxY = topHeight;
 
-  $: $scaleX?.range([0, plotWidth]);
-  $: $scaleY?.range([0, topHeight]);
+  $: $scaleX = $scaleX?.range([0, plotWidth]);
+  $: $scaleY = $scaleY?.range([0, topHeight]);
 
   onMount(() => {
     setTimeout(async () => {

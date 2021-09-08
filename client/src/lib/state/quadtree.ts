@@ -15,6 +15,7 @@ export const quadtree = writable(currentQuadtree);
 let currentScaleX: ScaleLinear<number, number> = null;
 let currentScaleY: ScaleLinear<number, number> = null;
 
+let currentlyProcessedData: number[][];
 let currentDimensions: string[] = [];
 
 const idIndex = 0;
@@ -25,6 +26,20 @@ function createQuadtree() {
   return d3_quadtree<DataItem>()
     .x((d) => d.position.x)
     .y((d) => d.position.y);
+}
+
+function insertIntoQuadtree(rawItems: number[][]) {
+  const dataItems = !rawItems ? [] : rawItems.map(arrayToDataItem);
+
+  if (dataItems.length === 0) {
+    // in case the progression was reset, clear the quadtree as well.
+    currentQuadtree = createQuadtree();
+  } else {
+    // otherwise just add the data to the quadtree
+    currentQuadtree.addAll(dataItems);
+  }
+
+  quadtree.set(currentQuadtree);
 }
 
 function arrayToDataItem(item: number[]) {
@@ -44,24 +59,18 @@ function arrayToDataItem(item: number[]) {
 function recreateQuadtree() {
   const newTree = createQuadtree();
   quadtree.set(newTree);
+  insertIntoQuadtree(currentlyProcessedData);
 }
 
 // is run asynchronously to ensure that the scales are set
 setTimeout(() => {
   processedData.subscribe((newData) => {
     const newItems = newData
-      .slice(newData.length - newData.length - CHUNK_SIZE, newData.length)
-      .map(arrayToDataItem);
+      .slice(newData.length - newData.length - CHUNK_SIZE, newData.length);
 
-    if (newData.length === 0) {
-      // in case the progression was reset, clear the quadtree as well.
-      currentQuadtree = createQuadtree();
-    } else {
-      // otherwise just add the data to the quadtree
-      currentQuadtree.addAll(newItems);
-    }
+    insertIntoQuadtree(newItems);
 
-    quadtree.set(currentQuadtree);
+    currentlyProcessedData = newData;
   });
 }, 0);
 
