@@ -15,6 +15,23 @@ ID_INDEX = 0
 
 cursor = duckdb.connect() # database connection
 
+DIMENSION_EXTENTS = {
+  "VendorID": {"min": 1, "max": 2 },
+  "passenger_count": {"min": 0, "max": 192 },
+  "trip_distance": {"min": 0, "max": 50 },
+  "RatecodeID": {"min": 1, "max": 6 },
+  "PULocationID": {"min": 1, "max": 265 },
+  "DOLocationID": {"min": 1, "max": 265 },
+  "payment_type": {"min": 1, "max": 5 },
+  "fare_amount": {"min": -800, "max": 907070.24 },
+  "extra": {"min": -80, "max": 96.64 },
+  "mta_tax": {"min": -80, "max": 150 },
+  "tip_amount": {"min": 0, "max": 1000 },
+  "toll_amount": {"min": -52.5, "max": 1650 },
+  "improvement_surcharge": {"min": -0.3, "max": 4000.3 },
+  "total_amount": {"min": 0, "max": 300 }
+}
+
 
 def initialize_db():
   cursor.execute(f"CREATE VIEW {TABLE} AS SELECT * FROM read_csv_auto('{PATH}')")
@@ -100,6 +117,10 @@ def get_random_sample(chunk_size: int):
 
 def get_random_dims(dimensions: int):
   return [f"dimension_{str(i)}" for i in range(dimensions)]
+
+
+def get_dimension_extent(dimension: str):
+  return DIMENSION_EXTENTS.get(dimension)
 
 
 def get_items_for_ids(ids: list[str]):

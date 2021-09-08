@@ -26,6 +26,12 @@ def get_dimensions():
   return cors_response(dims)
 
 
+@app.route("/extent/<dimension>", methods=["GET"])
+def get_dim_extent(dimension):
+  extent = get_dimension_extent(dimension)
+  return cors_response(extent)
+
+
 @app.route("/next_chunk", methods=["GET"])
 def get_next_chunk():
   chunk_size = int(request.args.get("size"))

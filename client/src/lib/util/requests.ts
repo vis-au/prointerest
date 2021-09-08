@@ -31,6 +31,10 @@ export async function getDimensionNames(): Promise<string[]> {
   return sendRequestToBaseURL("/dimensions");
 }
 
+export async function getDimensionExtent(dimension: string): Promise<{"min": number, "max": number}> {
+  return sendRequestToBaseURL(`/extent/${dimension}`)
+}
+
 export async function getNextChunk(chunkSize: number): Promise<number[][]> {
   return sendRequestToBaseURL(`/next_chunk?size=${chunkSize}`);
 }
