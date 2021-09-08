@@ -2,7 +2,7 @@ import type { ProgressionState } from "$lib/types/progression-state";
 import { getNextChunk } from "$lib/util/requests";
 import { writable } from "svelte/store";
 import { processedData } from "./processed-data";
-import { resetProgression as requestReset } from "../util/requests";
+import { sendReset } from "../util/requests";
 
 export const CHUNK_SIZE = 1000;
 
@@ -36,5 +36,5 @@ export function resetProgression(): void {
   processedData.update(() => {
     return [];
   });
-  requestReset();
+  sendReset();
 }

@@ -39,7 +39,7 @@ export async function getNextChunk(chunkSize: number): Promise<number[][]> {
   return sendRequestToBaseURL(`/next_chunk?size=${chunkSize}`);
 }
 
-export async function resetProgression(): Promise<void> {
+export async function sendReset(): Promise<void> {
   return sendRequestToBaseURL("/reset");
 }
 
