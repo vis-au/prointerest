@@ -6,12 +6,14 @@
   import DoiConfig from "$lib/widgets/doi-config.svelte";
   import Histogram from "$lib/widgets/histogram.svelte";
   import Row from "$lib/widgets/row.svelte";
+  import { sendInterestingDimensionRange } from "$lib/util/requests";
 
   $: tabularData = $quadtree.data().map(dataItemToRecord);
 
   function setInterestingInterval(dimension: string, interval: [number, number]) {
     console.log(dimension, interval);
     $interestingIntervals[dimension] = interval;
+    sendInterestingDimensionRange(dimension, interval);
   }
 </script>
 
