@@ -9,7 +9,7 @@
   import ControlButton from "./control-button.svelte";
   import { selectedItems } from "$lib/state/selected-items";
   import { quadtree } from "$lib/state/quadtree";
-  import Histogram from "$lib/widgets/histogram.svelte";
+  import MultiHistogram from "$lib/widgets/multi-histogram.svelte";
 
   export let width: number;
   export let height: number;
@@ -33,20 +33,15 @@
     <ControlButton on:click={ () => $isSecondaryViewCollapsed = true }>close</ControlButton>
   </Row>
   <Row id="selected-data-histograms"style="width:{width}px">
-    {#each Object.keys($interestingDimensions).filter(d => $interestingDimensions[d]) as dim, i}
-      <div class="dimension">
-        <Histogram
-          id="secondary-selected-dim-{dim}"
-          data={data}
-          dimension={$dimensions.indexOf(dim) + ""}
-          showTitle={false}
-          groupDimension="selected"
-          width={310}
-          height={height * .4}
-        />
-        <h3>{dim}</h3>
-      </div>
-    {/each}
+    <MultiHistogram
+      id="secondary-selected-dims"
+      data={data}
+      dimensions={Object.keys($interestingDimensions).filter(d => $interestingDimensions[d])}
+      showTitle={false}
+      groupDimension="selected"
+      width={310}
+      height={height * .5}
+    />
   </Row>
 </Column>
 
