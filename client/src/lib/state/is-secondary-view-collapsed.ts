@@ -1,3 +1,3 @@
 import { writable } from "svelte/store";
 
-export const isSecondaryViewCollapsed = writable(true);
+export const isSecondaryViewCollapsed = writable(false);

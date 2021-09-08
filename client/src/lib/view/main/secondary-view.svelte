@@ -10,20 +10,35 @@
   import { selectedItems } from "$lib/state/selected-items";
   import { quadtree } from "$lib/state/quadtree";
   import MultiHistogram from "$lib/widgets/multi-histogram.svelte";
+  import Alternatives from "$lib/widgets/alternatives.svelte";
 
   export let width: number;
   export let height: number;
 
-  $: data = $quadtree.data().map(d => {
+  let histogramMode: "selected"|"all" = "all";
+
+  function addSelectedDimension(d) {
     const record = dataItemToRecord(d);
     record.selected = $selectedItems.indexOf(d) > -1;
     return record;
-  });
+  }
+
+  $: data = histogramMode === "all"
+    ? $quadtree.data().map(addSelectedDimension)
+    : $selectedItems.map(dataItemToRecord);
 </script>
 
 <Column id="secondary-view" style="max-width:{width}px;height:{height}px">
   <Row id="secondary-header" style="margin-bottom: 25px">
     <Row>
+      <Row style="margin-right:20px;padding-bottom:3px">
+        <h2>Mode:</h2>
+        <Alternatives
+          name="active-histogram-mode"
+          alternatives={["selected", "all"]}
+          bind:activeAlternative={histogramMode}
+        />
+      </Row>
       <Options
         options={$dimensions}
         showInactive={false}
@@ -40,7 +55,7 @@
       showTitle={false}
       groupDimension="selected"
       width={310}
-      height={height * .5}
+      height={height * .4}
     />
   </Row>
 </Column>
@@ -65,9 +80,8 @@
     flex-wrap: nowrap;
     padding-bottom: 10px;
   }
-  h3 {
-    font-size: 10pt;
-    text-align: center;
+  h2 {
+    font-size: 12pt;
     margin: 0;
   }
 </style>
