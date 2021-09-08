@@ -3,8 +3,8 @@
 
   export let id: string;
   export let colors: string[] = [];
-  export let width = 100;
-  export let height = 100;
+  export let width: number;
+  export let height: number;
   export let bins = 50;
   export let data: Record<string, unknown>[];
   export let dimensions: string[];
@@ -31,24 +31,47 @@
     },
     repeat: dimensions,
     spec: {
-      mark: "bar",
       width: width,
       height: height,
-      encoding: {
-        x: {
-          bin: {maxbins: bins},
-          field: {repeat: "repeat"}
+      layer: [
+        {
+          params: [{
+            name: "brush",
+            select: {type: "interval", encodings: ["x"]}
+          }],
+          mark: "bar",
+          encoding: {
+            x: {
+              bin: {maxbins: bins},
+              field: {repeat: "repeat"}
+            },
+            y: {
+              aggregate: "count",
+              title: null
+            },
+            color: {value: "#ddd"}
+          }
         },
-        y: {
-          aggregate: "count",
-          title: null
-        },
-        color: colorEncoding
-      }
+        {
+          transform: [{filter: {param: "brush"}}],
+          mark: "bar",
+          encoding: {
+            x: {
+              bin: {maxbins: bins},
+              field: {repeat: "repeat"}
+            },
+            y: {
+              aggregate: "count",
+              title: null
+            },
+            color: colorEncoding
+          }
+        }
+      ]
     }
   };
 
-  $: showTitle ? "" : (histogram.spec.encoding.x["title"] = false);
+  $: showTitle ? "" : (histogram.spec.layer[1].encoding.x["title"] = false);
 </script>
 
 <VegaLitePlot {id} spec={histogram} />
