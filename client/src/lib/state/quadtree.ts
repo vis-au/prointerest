@@ -1,4 +1,5 @@
 import { quadtree as d3_quadtree } from "d3-quadtree";
+import type { Quadtree } from "d3-quadtree";
 import type { ScaleLinear } from "d3-scale";
 import type DataItem from "$lib/types/data-item";
 import { processedData } from "./processed-data";
@@ -6,10 +7,9 @@ import { writable } from "svelte/store";
 import { scaleX, scaleY } from "./scales";
 import { activeViewEncodings } from "./active-view-encodings";
 import { dimensions } from "./processed-data";
-import { CHUNK_SIZE, resetProgression } from "./progression";
-import { isSecondaryViewCollapsed } from "./is-secondary-view-collapsed";
+import { CHUNK_SIZE } from "./progression";
 
-let currentQuadtree = createQuadtree();
+const currentQuadtree = createQuadtree();
 export const quadtree = writable(currentQuadtree);
 
 let currentScaleX: ScaleLinear<number, number> = null;
@@ -28,18 +28,13 @@ function createQuadtree() {
     .y((d) => d.position.y);
 }
 
-function insertIntoQuadtree(rawItems: number[][]) {
+function insertIntoQuadtree(tree: Quadtree<DataItem>, rawItems: number[][]) {
   const dataItems = !rawItems ? [] : rawItems.map(arrayToDataItem);
 
-  if (dataItems.length === 0) {
-    // in case the progression was reset, clear the quadtree as well.
-    currentQuadtree = createQuadtree();
-  } else {
-    // otherwise just add the data to the quadtree
-    currentQuadtree.addAll(dataItems);
-  }
+  // otherwise just add the data to the quadtree
+  tree.addAll(dataItems);
 
-  quadtree.set(currentQuadtree);
+  return tree;
 }
 
 function arrayToDataItem(item: number[]) {
@@ -58,8 +53,8 @@ function arrayToDataItem(item: number[]) {
 
 function recreateQuadtree() {
   const newTree = createQuadtree();
+  insertIntoQuadtree(newTree, currentlyProcessedData);
   quadtree.set(newTree);
-  insertIntoQuadtree(currentlyProcessedData);
 }
 
 // is run asynchronously to ensure that the scales are set
@@ -68,21 +63,30 @@ setTimeout(() => {
     const newItems = newData
       .slice(newData.length - newData.length - CHUNK_SIZE, newData.length);
 
-    insertIntoQuadtree(newItems);
+    if (newItems.length === 0) {
+      recreateQuadtree();
+    } else {
+      insertIntoQuadtree(currentQuadtree, newItems);
+      quadtree.set(currentQuadtree);
+    }
 
     currentlyProcessedData = newData;
   });
 }, 0);
 
-scaleX.subscribe((newScale) => (currentScaleX = newScale));
-scaleY.subscribe((newScale) => (currentScaleY = newScale));
+scaleX.subscribe((newScale) => {
+  currentScaleX = newScale;
+  recreateQuadtree();
+});
+scaleY.subscribe((newScale) => {
+  currentScaleY = newScale;
+  recreateQuadtree();
+});
 
 dimensions.subscribe((newDims) => (currentDimensions = newDims));
 
 activeViewEncodings.subscribe((newEncodings) => {
   xIndex = currentDimensions.indexOf(newEncodings.x);
   yIndex = currentDimensions.indexOf(newEncodings.y);
-  resetProgression();
+  recreateQuadtree();
 });
-
-isSecondaryViewCollapsed.subscribe(recreateQuadtree);
