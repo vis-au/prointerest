@@ -6,6 +6,8 @@ import { getPointsInR, getPointsInRect } from "$lib/util/find-in-quadtree";
 import { activeBrush } from "./active-brush";
 import { quadtree } from "./quadtree";
 import { selectedBins } from "./selected-bins";
+import { scaleX, scaleY } from "./scales";
+import type { ScaleLinear } from "d3-scale";
 
 export const selectedItems = writable([] as DataItem[]);
 
@@ -14,14 +16,19 @@ let currentBrush: [[number, number], [number, number]] = [
   [-1, -1],
   [-1, -1]
 ];
+let x: ScaleLinear<number, number> = null;
+let y: ScaleLinear<number, number> = null;
 
 function getBrushedItems() {
+  if (x === null || y === null) {
+    return [];
+  }
   if (currentBrush === null || currentBrush[0] === null) {
     return [];
   }
 
   const [[x0, y0], [x1, y1]] = currentBrush;
-  return getPointsInRect(x0, y0, x1, y1);
+  return getPointsInRect(x(x0), y(y0), x(x1), y(y1));
 }
 
 function getItemsInSelectedBins() {
@@ -34,6 +41,15 @@ function getSelectedItems() {
 
   return brushedItems.concat(itemsInBins);
 }
+
+scaleX.subscribe((scale) => {
+  x = scale;
+  selectedItems.set(getSelectedItems());
+});
+scaleY.subscribe((scale) => {
+  y = scale;
+  selectedItems.set(getSelectedItems());
+});
 
 quadtree.subscribe(() => {
   selectedItems.set(getSelectedItems());

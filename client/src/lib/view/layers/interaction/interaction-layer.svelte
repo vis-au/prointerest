@@ -22,6 +22,7 @@
   import { getLatestTimestamp, registerNewInteraction } from "$lib/state/interesting-items";
   import { sendSelectedItems } from "$lib/util/requests";
   import { selectedItems } from "$lib/state/selected-items";
+  import { scaleX, scaleY } from "$lib/state/scales";
 
   export let id = "view-interaction-layer";
   export let width: number;
@@ -110,10 +111,10 @@
     }
 
     const [[x0, y0], [x1, y1]] = selection as [[number, number], [number, number]];
-    const _x0 = $currentTransform.invertX(x0);
-    const _y0 = $currentTransform.invertY(y0);
-    const _x1 = $currentTransform.invertX(x1);
-    const _y1 = $currentTransform.invertY(y1);
+    const _x0 = $scaleX.invert($currentTransform.invertX(x0));
+    const _y0 = $scaleY.invert($currentTransform.invertY(y0));
+    const _x1 = $scaleX.invert($currentTransform.invertX(x1));
+    const _y1 = $scaleY.invert($currentTransform.invertY(y1));
     $activeBrush = [
       [_x0, _y0],
       [_x1, _y1]
@@ -123,7 +124,7 @@
     // we can therefore hide it here
     select(brushCanvasElement).selectAll("rect.selection,rect.handle").style("display", "none");
 
-    const interaction = interactionFactory.createBrushInteraction(_x0, _y0, _x1, _y1);
+    const interaction = interactionFactory.createBrushInteraction($scaleX(_x0), $scaleY(_y0), $scaleX(_x1), $scaleY(_y1));
     onInteraction(interaction);
 
     sendSelectedItems($selectedItems);
