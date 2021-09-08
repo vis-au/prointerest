@@ -9,11 +9,14 @@ import { activeSuggestionInput, activeSuggestionOutput } from "./active-suggesti
 import { quadtree } from "./quadtree";
 import { interestingDimensions } from "./interesting-dimensions"
 import { dimensions } from "./processed-data";
+import { exploredItems } from "./explored-items";
+import { interestingItems } from "./interesting-items";
 
 const interactionObserver = new InteractionObserver(getPointsInR);
 const suggestionProvider = new SuggestionProvider();
 
-const currentlyInterestItems: DataItem[] = [];
+let currentlyInterestingItems: DataItem[] = [];
+let currentlyExploredItems: DataItem[] = [];
 let currentInputMode: SuggestionInput = null;
 let currentOutputMode: SuggestionOutput = null;
 
@@ -24,9 +27,9 @@ export const suggestedItems: Writable<DataItem[]> = writable([]);
 function updateSuggestedItems() {
   let inputData: DataItem[] = [];
   if (currentInputMode === "explored") {
-    inputData = Array.from(interactionObserver.getExploredData().keys());
+    inputData = currentlyExploredItems;
   } else if (currentInputMode === "interesting") {
-    inputData = currentlyInterestItems;
+    inputData = currentlyInterestingItems;
   }
 
   let outputData: DataItem[] = [];
@@ -62,3 +65,13 @@ interestingDimensions.subscribe((newRecord) => {
 
   suggestionProvider.dimensionOfInterestIndeces = indeces;
 });
+
+exploredItems.subscribe((items) => {
+  currentlyExploredItems = items;
+  updateSuggestedItems();
+});
+
+interestingItems.subscribe((items) => {
+  currentlyInterestingItems = items;
+  updateSuggestedItems();
+})

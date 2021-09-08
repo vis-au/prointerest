@@ -1,4 +1,5 @@
 <script lang="typescript">
+  import { updateExploredItems } from "$lib/state/explored-items";
   import { activeDoiValues } from "$lib/state/latest-doi-values";
   import { quadtree } from "$lib/state/quadtree";
   import { getDoiValues } from "$lib/util/requests";
@@ -11,6 +12,7 @@
   export let height: number;
 
   async function evaluateInterest() {
+    updateExploredItems();
     const doiValues = await getDoiValues($quadtree.data());
     const map = new Map<number, number>();
     doiValues.forEach((pair) => map.set(pair[0], pair[1]));

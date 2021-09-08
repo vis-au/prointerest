@@ -19,7 +19,7 @@
   import { quadtree } from "$lib/state/quadtree";
   import { getPointsInRect } from "$lib/util/find-in-quadtree";
   import type { DoiInteraction } from "$lib/interaction/doi-interaction";
-  import { getLatestTimestamp, registerNewInteraction } from "$lib/state/interesting-items";
+  import { getLatestTimestamp, registerNewInteraction } from "$lib/state/explored-items";
   import { sendSelectedItems } from "$lib/util/requests";
   import { selectedItems } from "$lib/state/selected-items";
   import { scaleX, scaleY } from "$lib/state/scales";
