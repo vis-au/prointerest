@@ -4,19 +4,21 @@
   import { interestingDimensions } from "$lib/state/interesting-dimensions";
   import { dataItemToRecord } from "$lib/util/item-transform";
   import Column from "$lib/widgets/column.svelte";
-  import Histogram from "$lib/widgets/histogram.svelte";
   import Options from "$lib/widgets/options.svelte";
   import Row from "$lib/widgets/row.svelte";
   import ControlButton from "./control-button.svelte";
   import { selectedItems } from "$lib/state/selected-items";
-  import { getDummyDataItem } from "$lib/util/dummy-data-item";
+  import { quadtree } from "$lib/state/quadtree";
+  import Histogram from "$lib/widgets/histogram.svelte";
 
   export let width: number;
   export let height: number;
 
-  $: selectedData = $selectedItems.length === 0
-    ? [dataItemToRecord(getDummyDataItem())]
-    : $selectedItems.map(dataItemToRecord);
+  $: data = $quadtree.data().map(d => {
+    const record = dataItemToRecord(d);
+    record.selected = $selectedItems.indexOf(d) > -1;
+    return record;
+  });
 </script>
 
 <Column id="secondary-view" style="max-width:{width}px;height:{height}px">
@@ -35,9 +37,10 @@
       <div class="dimension">
         <Histogram
           id="secondary-selected-dim-{dim}"
-          data={selectedData}
+          data={data}
           dimension={$dimensions.indexOf(dim) + ""}
           showTitle={false}
+          groupDimension="selected"
           width={310}
           height={height * .4}
         />
