@@ -1,13 +1,18 @@
 <script lang="typescript">
   import { dimensions } from "$lib/state/processed-data";
   import { quadtree } from "$lib/state/quadtree";
-  import { interestingDimensions } from "$lib/state/interesting-dimensions";
+  import { interestingDimensions, interestingIntervals } from "$lib/state/interesting-dimensions";
   import { dataItemToRecord } from "$lib/util/item-transform";
   import DoiConfig from "$lib/widgets/doi-config.svelte";
   import Histogram from "$lib/widgets/histogram.svelte";
   import Row from "$lib/widgets/row.svelte";
 
   $: tabularData = $quadtree.data().map(dataItemToRecord);
+
+  function setInterestingInterval(dimension: string, interval: [number, number]) {
+    console.log(dimension, interval);
+    $interestingIntervals[dimension] = interval;
+  }
 </script>
 
 <DoiConfig
@@ -27,6 +32,7 @@
           dimension={dim}
           width={300}
           height={50}
+          on:interval={(event) => setInterestingInterval(dim, event.detail.value[dim])}
         />
       {/if}
     </Row>

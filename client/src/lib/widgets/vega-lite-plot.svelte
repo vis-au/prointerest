@@ -1,8 +1,10 @@
 <script lang="typescript">
-  import { afterUpdate } from "svelte";
+  import { afterUpdate, createEventDispatcher } from "svelte";
 
   export let id: string;
   export let spec: Record<string, unknown>;
+
+  const dispatch = createEventDispatcher();
 
   let vegaEmbed;
 
@@ -13,8 +15,9 @@
       return;
     }
 
-    setTimeout(() => {
-      vegaEmbed.embed(`#${id}-vega-container`, spec, { actions: false });
+    setTimeout(async () => {
+      const res = await vegaEmbed.embed(`#${id}-vega-container`, spec, { actions: false });
+      res.view.addSignalListener("brush", (name, value) => dispatch("brush", { value }));
     }, 0);
   });
 </script>

@@ -1,4 +1,6 @@
 <script lang="typescript">
+import { createEventDispatcher } from "svelte";
+
   import VegaLitePlot from "./vega-lite-plot.svelte";
 
   export let id: string;
@@ -10,6 +12,8 @@
   export let dimension: string;
   export let groupDimension: string = null;
   export let showTitle = false;
+
+  const dispatch = createEventDispatcher();
 
   $: colorEncoding =
     groupDimension === null
@@ -31,21 +35,44 @@
     },
     width: width,
     height: height,
-    mark: "bar",
-    encoding: {
-      x: {
-        bin: {maxbins: bins},
-        field: dimension
+    layer: [
+      {
+        mark: "bar",
+        params: [{
+          name: "brush",
+          select: {type: "interval", encodings: ["x"]}
+        }],
+        encoding: {
+          x: {
+            bin: {maxbins: bins},
+            field: dimension
+          },
+          y: {
+            aggregate: "count",
+            title: null
+          },
+          color: colorEncoding
+        }
       },
-      y: {
-        aggregate: "count",
-        title: null
-      },
-      color: colorEncoding
-    }
+      {
+        mark: "bar",
+        transform: [{filter: {param: "brush"}}],
+        encoding: {
+          x: {
+            bin: {maxbins: bins},
+            field: dimension
+          },
+          y: {
+            aggregate: "count",
+            title: null
+          },
+          color: colorEncoding
+        }
+      }
+    ]
   };
 
-  $: showTitle ? "" : (histogram.encoding.x["title"] = false);
+  $: showTitle ? "" : (histogram.layer[0].encoding.x["title"] = false);
 </script>
 
-<VegaLitePlot {id} spec={histogram} />
+<VegaLitePlot {id} spec={histogram} on:brush-end={ (event) => dispatch("interval", event.detail) } />

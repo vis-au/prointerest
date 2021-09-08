@@ -4,6 +4,12 @@ import { dimensions } from "./processed-data";
 const currentSelection: Record<string, boolean> = {};
 export const interestingDimensions = writable(currentSelection);
 
+const currentIntervals: Record<string, [number, number]> = {};
+export const interestingIntervals = writable(currentIntervals);
+
 dimensions.subscribe(dims => {
-  dims.map(dim => currentSelection[dim] = false);
+  dims.forEach(dim => {
+    currentSelection[dim] = false;
+    currentIntervals[dim] = null;
+  });
 });
