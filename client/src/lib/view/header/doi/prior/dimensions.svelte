@@ -24,7 +24,7 @@
         <Histogram
           id="all-data-dim-{i}"
           data={tabularData}
-          dimension={i + ""}
+          dimension={dim}
           width={300}
           height={50}
         />
