@@ -1,7 +1,7 @@
 <script lang="typescript">
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
-  import { dimensionInterestRecord } from "$lib/state/selected-dimensions-of-interest";
+  import { interestingDimensions } from "$lib/state/interesting-dimensions";
   import { selectedItems } from "$lib/state/selected-items";
   import { dataItemToRecord } from "$lib/util/item-transform";
   import Column from "$lib/widgets/column.svelte";
@@ -22,13 +22,13 @@
       <Options
         options={$dimensions}
         showInactive={false}
-        bind:activeOptions={$dimensionInterestRecord}
+        bind:activeOptions={$interestingDimensions}
       />
     </Row>
     <ControlButton on:click={ () => $isSecondaryViewCollapsed = true }>close</ControlButton>
   </Row>
   <Row id="selected-data-histograms"style="width:{width}px">
-    {#each Object.keys($dimensionInterestRecord).filter(d => $dimensionInterestRecord[d]) as dim, i}
+    {#each Object.keys($interestingDimensions).filter(d => $interestingDimensions[d]) as dim, i}
       <div class="dimension">
         <Histogram
           id="secondary-selected-dim-{dim}"

@@ -5,6 +5,7 @@ export default class GuidanceProvider {
   private distributionsOfInterest: Map<number, [number, number]> = new Map();
 
   public processedDataspace: DataItem[] = [];
+  public dimensionOfInterestIndeces: number[] = [];
 
   private computeDistributionOfInterest(itemsOfInterest: DataItem[], dimension: number) {
     // extract quantiles from the interesting data
@@ -43,7 +44,7 @@ export default class GuidanceProvider {
     });
 
     // if item matches "most" distributions, it is considered similar.
-    return matchesDimensions > item.values.length * 0.85;
+    return matchesDimensions === this.dimensionOfInterestIndeces.length;
   }
 
   private getSuggestions(itemsOfInterest: DataItem[], getSimilarItems: boolean) {

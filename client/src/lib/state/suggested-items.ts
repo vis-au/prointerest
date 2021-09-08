@@ -7,6 +7,8 @@ import type { SuggestionInput, SuggestionOutput } from "$lib/types/suggestion-mo
 import { getPointsInR } from "$lib/util/find-in-quadtree";
 import { activeSuggestionInput, activeSuggestionOutput } from "./active-suggestion-modes";
 import { quadtree } from "./quadtree";
+import { interestingDimensions } from "./interesting-dimensions"
+import { dimensions } from "./processed-data";
 
 const interactionObserver = new InteractionObserver(getPointsInR);
 const suggestionProvider = new SuggestionProvider();
@@ -14,6 +16,8 @@ const suggestionProvider = new SuggestionProvider();
 const currentlyInterestItems: DataItem[] = [];
 let currentInputMode: SuggestionInput = null;
 let currentOutputMode: SuggestionOutput = null;
+
+let currenDimensions: string[] = [];
 
 export const suggestedItems: Writable<DataItem[]> = writable([]);
 
@@ -49,4 +53,12 @@ quadtree.subscribe((newTree) => {
   const dataspace = newTree.data();
   interactionObserver.processedDataspace = dataspace;
   suggestionProvider.processedDataspace = dataspace;
+});
+
+dimensions.subscribe(dims => currenDimensions = dims);
+interestingDimensions.subscribe((newRecord) => {
+  const intersetingDimensions = Object.keys(newRecord).filter(d => newRecord[d]);
+  const indeces = intersetingDimensions.map(d => currenDimensions.indexOf(d));
+
+  suggestionProvider.dimensionOfInterestIndeces = indeces;
 });
