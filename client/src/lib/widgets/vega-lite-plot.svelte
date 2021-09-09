@@ -17,15 +17,15 @@
 
     setTimeout(async () => {
       const res = await vegaEmbed.embed(`#${id}-vega-container`, spec, { actions: false });
-      res.view.addSignalListener("brush", (name, value) => dispatch("brush", { value }));
+      res.view.addSignalListener("brush", (name: string, value: Record<string, unknown>) => dispatch("brush", { value }));
     }, 0);
   });
 </script>
 
 <svelte:head>
-  <script src="https://cdn.jsdelivr.net/npm/vega"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vega-lite"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vega-embed"></script>
+  <script src="static/scripts/vega.js"></script>
+  <script src="static/scripts/vega-lite.js"></script>
+  <script src="static/scripts/vega-embed.js"></script>
 </svelte:head>
 
 <div id="{id}-vega-container" />
