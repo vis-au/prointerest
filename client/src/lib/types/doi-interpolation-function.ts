@@ -1,27 +1,29 @@
-export type DoiInterpolationFunction = (prior: number) => number;
+// given the current progress of the computation, get the appropriate prior weight
+export type DoiInterpolationFunction = (progress: number) => number;
 
 const alpha = 0.01;
 const beta = 2;
 
-export const linear: DoiInterpolationFunction = (prior) => {
-  return 1 - prior;
+export const linear: DoiInterpolationFunction = (progress) => {
+  return progress;
 };
-export const gaussian: DoiInterpolationFunction = (prior) => {
-  return 1 - Math.exp(-(prior - alpha) / beta);
+export const gaussian: DoiInterpolationFunction = (progress) => {
+  return Math.exp(-(progress - alpha) / beta);
 };
-export const logarithmic: DoiInterpolationFunction = (prior) => {
-  return 1 - Math.log10(prior);
+export const logarithmic: DoiInterpolationFunction = (progress) => {
+  return Math.log10(progress);
 };
-export const exponential: DoiInterpolationFunction = (prior) => {
-  return 1 - Math.exp(prior);
+export const exponential: DoiInterpolationFunction = (progress) => {
+  return Math.exp(progress);
 };
-export const sigmoid: DoiInterpolationFunction = (prior) => {
-  return 1 - 1 / (1 + Math.exp(-beta * (prior - alpha)));
+export const sigmoid: DoiInterpolationFunction = (progress) => {
+  return 1 / (1 + Math.exp(-beta * (progress - alpha)));
 };
 
 export const doiInterpolationFunctions: DoiInterpolationFunction[] = [
   linear, gaussian, logarithmic, exponential, sigmoid
 ];
-export const doiInterpolationFunctionNames = [
+export type DoiInterpolationFunctionName = "linear"|"gaussian"|"logarithmic"|"exponential"|"sigmoid";
+export const doiInterpolationFunctionNames: DoiInterpolationFunctionName[] = [
   "linear", "gaussian", "logarithmic", "exponential", "sigmoid"
 ];
