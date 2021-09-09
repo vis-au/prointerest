@@ -90,7 +90,7 @@
   {#each weights as entry, i}
     <div
       class="entry {activeWeight === entry[0] ? 'active' : ''}"
-      style="width:{entry[1] * totalSize}px;{backgroundColor.length > 0?`background:${backgroundColor}"`:""}"
+      style="width:{entry[1] * totalSize}px;{backgroundColor.length > 0?`background:${backgroundColor}`:""}"
     >
       <label for={getId(entry[0])} title={`${entry[0]}: ${entry[1] * 100}%`}>
         <span class="key">{entry[0]}</span>
@@ -142,21 +142,22 @@
     -webkit-user-select: none;
   }
   div.entry:hover {
-    background: #ddd;
+    filter: brightness(0.9);
   }
   div.entry.active {
-    background: black;
-    color: white;
+    filter: brightness(0.95);
+    border-bottom: 3px solid black;
   }
   .dark div.entry {
     background: #555;
     color: #fff;
   }
   .dark div.entry:hover {
-    background: #777;
+    filter: brightness(1.05);
   }
   .dark div.entry.active {
-    background: #8f8f8f;
+    filter: brightness(1.1);
+    border-bottom: 3px solid white;
   }
 
   div.entry label {

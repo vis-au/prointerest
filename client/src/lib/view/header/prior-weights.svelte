@@ -11,6 +11,7 @@
   <WeightedValues
     group="doi-weights"
     totalSize={500}
+    backgroundColor="#80b1d3"
     useDarkmode={true}
     bind:valueWeights={$priorWeights}
     bind:activeWeight={$selectedDoiWeight}

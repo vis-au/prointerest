@@ -28,10 +28,10 @@
     <PriorWeights />
     <PosteriorWeights />
     <ControlButton
-      style="background:limegreen;margin:0 10px 0 20px;padding:5px 10px"
+      style="background:#666;font-weight:bold;margin:0 10px 0 20px;padding:5px 10px"
       on:click={evaluateInterest}
     >
-      Update Interest
+      Compute Interest
     </ControlButton>
   </Row>
 </header>

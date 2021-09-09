@@ -12,6 +12,7 @@
     group="doi-weights"
     totalSize={350}
     useDarkmode={true}
+    backgroundColor="#fdb462"
     bind:valueWeights={$posteriorWeights}
     bind:activeWeight={$selectedDoiWeight}
     on:end={() => sendWeights("posterior", $posteriorWeights)}
