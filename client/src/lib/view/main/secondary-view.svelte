@@ -8,28 +8,20 @@
   import Row from "$lib/widgets/row.svelte";
   import ControlButton from "./control-button.svelte";
   import { selectedItems } from "$lib/state/selected-items";
-  import { quadtree } from "$lib/state/quadtree";
   import MultiHistogram from "$lib/widgets/multi-histogram.svelte";
   import Alternatives from "$lib/widgets/alternatives.svelte";
+  import { randomlySampledItems } from "$lib/state/randomly-sampled-items";
 
   export let width: number;
   export let height: number;
 
   let histogramMode: "selected"|"all" = "all";
 
-  const sampleSize = 10000;
-
-  // returns true with a probability such that "sampleSize" items will be retrieved from "items".
-  // This is done to ensure that the histograms render in acceptable time later in the progression.
-  function sample() {
-    return Math.random() < (sampleSize / items.length);
-  };
-
   $: items = histogramMode === "all"
-    ? $quadtree.data()
+    ? $randomlySampledItems
     : $selectedItems;
-  $: itemSample = items.filter(sample);
-  $: data = itemSample.map(dataItemToRecord);
+
+  $: data = items.map(dataItemToRecord);
 </script>
 
 <Column id="secondary-view" style="max-width:{width}px;height:{height}px">
