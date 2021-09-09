@@ -6,8 +6,8 @@
   import Row from "$lib/widgets/row.svelte";
 
   import ControlButton from "../main/control-button.svelte";
-  import PosteriorWeights from "./posterior-weights.svelte";
-  import PriorWeights from "./prior-weights.svelte";
+  import PosteriorComponentWeights from "./posterior-component-weights.svelte";
+  import PriorComponentWeights from "./prior-component-weights.svelte";
 
   export let height: number;
 
@@ -25,8 +25,8 @@
     <img src="static/logo.svg" alt="the ProInterest logo" height={height*.8} />
   </div>
   <Row id="doi-configuration" style="align-items:stretch;">
-    <PriorWeights />
-    <PosteriorWeights />
+    <PriorComponentWeights />
+    <PosteriorComponentWeights />
     <ControlButton
       style="background:#666;font-weight:bold;margin:0 10px 0 20px;padding:5px 10px"
       on:click={evaluateInterest}
