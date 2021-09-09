@@ -10,7 +10,7 @@
   <h2>Posterior</h2>
   <WeightedValues
     group="doi-weights"
-    totalSize={350}
+    totalSize={400}
     useDarkmode={true}
     backgroundColor="#fdb462"
     bind:valueWeights={$posteriorWeights}

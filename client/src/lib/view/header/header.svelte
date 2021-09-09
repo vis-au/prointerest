@@ -2,6 +2,7 @@
   import { updateExploredItems } from "$lib/state/explored-items";
   import { activeDoiValues } from "$lib/state/latest-doi-values";
   import { quadtree } from "$lib/state/quadtree";
+import { selectedDoiComponent } from "$lib/state/selected-doi-weight";
   import { getDoiValues } from "$lib/util/requests";
   import Row from "$lib/widgets/row.svelte";
 
@@ -25,11 +26,17 @@
   <div class="title">
     <img src="static/logo.svg" alt="the ProInterest logo" height={height*.8} />
   </div>
-  <InterpolationComponent />
+  <Row>
+    <InterpolationComponent />
 
-  <Row id="doi-configuration" style="align-items:stretch;">
-    <PriorComponentWeights />
-    <PosteriorComponentWeights />
+    <Row id="doi-configuration" style="align-items:stretch;height:{height*.8}px;width:700px">
+      {#if $selectedDoiComponent === "prior"}
+        <PriorComponentWeights />
+      {:else if $selectedDoiComponent === "posterior"}
+        <PosteriorComponentWeights />
+      {/if}
+    </Row>
+
     <ControlButton
       style="background:#666;font-weight:bold;margin:0 10px 0 20px;padding:5px 10px"
       on:click={evaluateInterest}

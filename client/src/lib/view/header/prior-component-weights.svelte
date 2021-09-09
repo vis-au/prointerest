@@ -10,7 +10,7 @@
   <h2>Prior</h2>
   <WeightedValues
     group="doi-weights"
-    totalSize={500}
+    totalSize={400}
     backgroundColor="#80b1d3"
     useDarkmode={true}
     bind:valueWeights={$priorWeights}
@@ -26,5 +26,6 @@
     margin: 0;
     font-size: 12pt;
     margin-right: 10px;
+    margin-left: 30px;
   }
 </style>

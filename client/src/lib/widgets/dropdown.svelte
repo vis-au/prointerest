@@ -3,10 +3,11 @@
   export let className = "";
   export let selectedValue: string;
   export let style = "";
+  export let useDarkMode = false;
 </script>
 
-<label for={id} class="dropdown {className}" {style}>
-  <select name={id} {id} bind:value={selectedValue}>
+<label for={id} class="dropdown {useDarkMode?"dark":""} {className}">
+  <select name={id} {id} bind:value={selectedValue} {style}>
     <slot />
   </select>
 
@@ -39,9 +40,6 @@
   label.dropdown select:required:invalid {
     color: #5a667f;
   }
-  label.dropdown select:hover + svg {
-    stroke: black;
-  }
   label.dropdown svg {
     position: absolute;
     right: 10px;
@@ -54,5 +52,28 @@
     stroke-linecap: round;
     stroke-linejoin: round;
     pointer-events: none;
+  }
+  label.dropdown select:hover + svg,
+  label.dropdown select:focus + svg {
+    stroke: black;
+  }
+  label.dropdown.dark select {
+    border: 1px solid transparent;
+    background: #555;
+    color: #fff;
+    box-shadow: 0 1px 3px -2px #333;
+  }
+  label.dropdown.dark select:required:invalid {
+    color: #888;
+  }
+  label.dropdown.dark svg {
+    color: #ccc;
+  }
+  label.dropdown.dark select:hover + svg,
+  label.dropdown.dark select:focus + svg {
+    stroke: #fff;
+  }
+  label.dropdown.dark select:focus {
+    border-color: #fff;
   }
 </style>

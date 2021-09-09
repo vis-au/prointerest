@@ -1,26 +1,31 @@
 <script lang="typescript">
   import { componentWeights } from "$lib/state/active-doi-weights";
-import { selectedDoiInterpolationFunction } from "$lib/state/selected-doi-interpolation-function";
-import { functionNames } from "$lib/types/doi-interpolation-function";
-  import { getInterpolatedDoiValue } from "$lib/util/get-interpolated-doi-value";
+  import { selectedDoiInterpolationFunction } from "$lib/state/selected-doi-interpolation-function";
+  import { selectedDoiComponent } from "$lib/state/selected-doi-weight";
+  import { functionNames } from "$lib/types/doi-interpolation-function";
   import Dropdown from "$lib/widgets/dropdown.svelte";
   import Row from "$lib/widgets/row.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
 
   // let useProgression = true;
-
-  $: console.log(selectedDoiInterpolationFunction, getInterpolatedDoiValue($componentWeights.get("prior")));
 </script>
 
 <Row id="component-weights" style="align-items:stretch">
+  <h2>Configure DOI Components</h2>
   <WeightedValues
     group="doi-interpolation"
-    totalSize={200}
+    totalSize={400}
     useDarkmode={true}
+    bind:activeWeight={$selectedDoiComponent}
     bind:valueWeights={$componentWeights}
   />
 
-  <Dropdown id="doi-interpolation-function" bind:selectedValue={$selectedDoiInterpolationFunction} style="margin-right: 10px">
+  <Dropdown
+    id="doi-interpolation-function"
+    style="width:125px"
+    useDarkMode={true}
+    bind:selectedValue={$selectedDoiInterpolationFunction}>
+
     {#each functionNames as name}
       <option value={name} selected={name === $selectedDoiInterpolationFunction}>{name}</option>
     {/each}
@@ -41,5 +46,12 @@ import { functionNames } from "$lib/types/doi-interpolation-function";
   :global(#doi-interpolation-function) {
     width: 100px;
     margin-left: 20px;
+  }
+  h2 {
+    font-size: 12pt;
+    margin: 0;
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
   }
 </style>

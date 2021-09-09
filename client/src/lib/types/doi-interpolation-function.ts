@@ -20,12 +20,13 @@ export const sigmoid: DoiInterpolationFunction = (progress) => {
   return 1 / (1 + Math.exp(-beta * (progress - alpha)));
 };
 
-export type FunctionName = "linear"|"gaussian"|"logarithmic"|"exponential"|"sigmoid";
+export type FunctionName = "none"|"linear"|"gaussian"|"logarithmic"|"exponential"|"sigmoid";
 export const functionNames: FunctionName[] = [
-  "linear", "gaussian", "logarithmic", "exponential", "sigmoid"
+  "none", "linear", "gaussian", "logarithmic", "exponential", "sigmoid"
 ];
 
 export const doiInterpolationFunctions: Map<FunctionName, DoiInterpolationFunction> = new Map();
+doiInterpolationFunctions.set("none", null);
 doiInterpolationFunctions.set("linear", linear);
 doiInterpolationFunctions.set("gaussian", gaussian);
 doiInterpolationFunctions.set("logarithmic", logarithmic);
