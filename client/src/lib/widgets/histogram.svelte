@@ -37,7 +37,7 @@ import { createEventDispatcher } from "svelte";
     height: height,
     layer: [
       {
-        mark: "bar",
+        mark: {type: "bar", tooltip: true},
         params: [{
           name: "brush",
           select: {type: "interval", encodings: ["x"]}
@@ -55,7 +55,7 @@ import { createEventDispatcher } from "svelte";
         }
       },
       {
-        mark: "bar",
+        mark: {type: "bar", tooltip: true},
         transform: [{filter: {param: "brush"}}],
         encoding: {
           x: {

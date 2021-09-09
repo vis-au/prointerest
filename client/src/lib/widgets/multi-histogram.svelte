@@ -42,7 +42,7 @@ import VegaLitePlot from "./vega-lite-plot.svelte";
             name: "brush",
             select: {type: "interval", encodings: ["x"]}
           }],
-          mark: "bar",
+          mark: {type: "bar", tooltip: true},
           encoding: {
             x: {
               bin: {maxbins: bins},
@@ -57,7 +57,7 @@ import VegaLitePlot from "./vega-lite-plot.svelte";
         },
         {
           transform: [{filter: {param: "brush"}}],
-          mark: "bar",
+          mark: {type: "bar", tooltip: true},
           encoding: {
             x: {
               bin: {maxbins: bins},
