@@ -3,6 +3,7 @@
   import { scaleX, scaleY } from "$lib/state/scales";
 import { selectedItems } from "$lib/state/selected-items";
   import { currentTransform } from "$lib/state/zoom";
+import { separateThousands } from "$lib/util/number-transform";
 
   import { afterUpdate } from "svelte";
 
@@ -33,7 +34,7 @@ import { selectedItems } from "$lib/state/selected-items";
 
     // draw label
     ctx.font = "13px sans-serif";
-    ctx.fillText(`${$selectedItems.length} points`, x0, y1 + 15);
+    ctx.fillText(`${separateThousands($selectedItems.length)} points`, x0, y1 + 15);
 
     ctx.closePath();
   }
