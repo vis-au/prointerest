@@ -74,7 +74,7 @@
     overflow-x: auto;
     overflow-y: hidden;
     flex-wrap: nowrap;
-    padding-bottom: 10px;
+    padding-bottom: 20px;
   }
   h2 {
     font-size: 12pt;
