@@ -22,10 +22,4 @@
   });
 </script>
 
-<svelte:head>
-  <script src="static/scripts/vega.js"></script>
-  <script src="static/scripts/vega-lite.js"></script>
-  <script src="static/scripts/vega-embed.js"></script>
-</svelte:head>
-
 <div id="{id}-vega-container" />

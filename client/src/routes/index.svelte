@@ -78,6 +78,12 @@
 
 <svelte:body on:mousemove={(e) => (mousePosition = [e.clientX, e.clientY])} />
 
+<svelte:head>
+  <script src="../../static/scripts/vega.js"></script>
+  <script src="../../static/scripts/vega-lite.js"></script>
+  <script src="../../static/scripts/vega-embed.js"></script>
+</svelte:head>
+
 <style>
   :global(body) {
     margin: 0;
