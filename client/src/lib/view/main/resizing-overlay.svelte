@@ -49,6 +49,7 @@
     padding: 15px 20px;
     border: 1px solid #ccc;
     border-radius: 3px;
+    z-index: 1000;
   }
   div.resizing-overlay.hidden {
     display: none;

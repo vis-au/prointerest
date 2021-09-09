@@ -1,14 +1,13 @@
 <script lang="typescript">
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { selectedItems } from "$lib/state/selected-items";
-import ControlButton from "$lib/view/main/control-button.svelte";
+  import ControlButton from "$lib/view/main/control-button.svelte";
   import BigNumber from "$lib/widgets/big-number.svelte";
-  import DoiConfig from "$lib/widgets/doi-config.svelte";
+  import DoiConfig from "$lib/view/header/doi/doi-config.svelte";
 </script>
 
 <DoiConfig
   title="Selected Data Items"
-  width={400}
   message="Investigate the distributions in the data items selected as interesting using the brush across all dimensions in the data."
 >
   <p class="selected">

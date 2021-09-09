@@ -3,7 +3,7 @@
   import { quadtree } from "$lib/state/quadtree";
   import { interestingDimensions, interestingIntervals } from "$lib/state/interesting-dimensions";
   import { dataItemToRecord } from "$lib/util/item-transform";
-  import DoiConfig from "$lib/widgets/doi-config.svelte";
+  import DoiConfig from "$lib/view/header/doi/doi-config.svelte";
   import Histogram from "$lib/widgets/histogram.svelte";
   import Row from "$lib/widgets/row.svelte";
   import { sendInterestingDimensionRange } from "$lib/util/requests";
@@ -11,14 +11,12 @@
   $: tabularData = $quadtree.data().map(dataItemToRecord);
 
   function setInterestingInterval(dimension: string, interval: [number, number]) {
-    console.log(dimension, interval);
     $interestingIntervals[dimension] = interval;
     sendInterestingDimensionRange(dimension, interval);
   }
 </script>
 
 <DoiConfig
-  width={400}
   title="Select Dimension of Interest"
   message="Visualizes overall distributions in the dataset, allows defining regions of interest."
 >

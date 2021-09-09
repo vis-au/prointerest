@@ -9,7 +9,7 @@
   import Axes from "../layers/visualization/axes.svelte";
   import UiOverlay from "./ui-overlay.svelte";
   import ColorLegend from "./color-legend.svelte";
-import ProgressionControls from "./progression-controls.svelte";
+  import ProgressionControls from "./progression-controls.svelte";
 
   export let width: number;
   export let height: number;

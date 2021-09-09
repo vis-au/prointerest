@@ -2,14 +2,13 @@
   import { scagnosticWeights, selectedScagnostics } from "$lib/state/selected-scagnostics";
   import { scagnostics } from "$lib/types/scagnostics";
   import type { Scagnostic } from "$lib/types/scagnostics";
-  import DoiConfig from "$lib/widgets/doi-config.svelte";
+  import DoiConfig from "$lib/view/header/doi/doi-config.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
   import Column from "$lib/widgets/column.svelte";
   import { sendScagnosticWeights } from "$lib/util/requests";
   import Options from "$lib/widgets/options.svelte";
 
-  export let maxWidth: number;
-
+  const maxWidth = 700;
   let selectedWeights = new Map<Scagnostic, number>();
 
   let isSelected = {};
@@ -40,7 +39,6 @@
 <DoiConfig
   title="Configure Scagnostics"
   message="Define the scatterplot diagnostics that interest you and set their weights."
-  width={500}
 >
   <Column>
     <div class="top-row">
@@ -57,19 +55,6 @@
       options={scagnostics}
       bind:activeOptions={isSelected}
     />
-    <!-- <div class="scagnostic-checklist" style="max-width:{maxWidth}px">
-      {#each scagnostics as scagnostic}
-        <div class="item">
-          <input
-            id={scagnostic}
-            type="checkbox"
-            value={scagnostic}
-            bind:checked={isSelected[scagnostic]}
-          />
-          <label for={scagnostic}>{scagnostic}</label>
-        </div>
-      {/each}
-    </div> -->
   </Column>
 
   <Column>
