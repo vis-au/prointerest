@@ -45,7 +45,22 @@
     .on("zoom", onZoom)
     .on("end", onZoomEnd);
 
-  const brushBehavior = brush().on("end", onBrushEnd);
+  const brushBehavior = brush()
+    .keyModifiers(false)
+    .filter((event) => (event.ctrlKey || event.shiftKey) && !event.button)
+    .on("end", onBrushEnd);
+
+  function buttonPressed(event: KeyboardEvent) {
+    if (event.key === "Control") {
+      $activeInteractionMode = "brush";
+    }
+  }
+
+  function buttonReleased(event: KeyboardEvent) {
+    if (event.key === "Control") {
+      $activeInteractionMode = "zoom";
+    }
+  }
 
   function onInteraction(interaction: DoiInteraction) {
     registerNewInteraction(interaction);
@@ -231,6 +246,8 @@
     bind:this={brushCanvasElement}
   />
 </div>
+
+<svelte:window on:keydown={buttonPressed} on:keyup={buttonReleased}></svelte:window>
 
 <style>
   div.interaction-canvas-container {
