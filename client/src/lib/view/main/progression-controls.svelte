@@ -6,6 +6,7 @@
     resetProgression,
     startProgression
   } from "$lib/state/progression";
+import { abbreviate } from "$lib/util/number-transform";
   import BigNumber from "$lib/widgets/big-number.svelte";
   import Column from "$lib/widgets/column.svelte";
   import ProgressBar from "$lib/widgets/progress-bar.svelte";
@@ -24,7 +25,7 @@
   <Column>
     <div id="progression-text">
       <span>Processed:</span>
-      <span><BigNumber>{$processedData.length}</BigNumber></span>
+      <span><BigNumber>{abbreviate($processedData.length)}</BigNumber></span>
     </div>
     <ProgressBar
       id={"progression"}
