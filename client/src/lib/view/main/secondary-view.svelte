@@ -17,9 +17,19 @@
 
   let histogramMode: "selected"|"all" = "all";
 
-  $: data = histogramMode === "all"
-    ? $quadtree.data().map(dataItemToRecord)
-    : $selectedItems.map(dataItemToRecord);
+  const sampleSize = 10000;
+
+  // returns true with a probability such that "sampleSize" items will be retrieved from "items".
+  // This is done to ensure that the histograms render in acceptable time later in the progression.
+  function sample() {
+    return Math.random() < (sampleSize / items.length);
+  };
+
+  $: items = histogramMode === "all"
+    ? $quadtree.data()
+    : $selectedItems;
+  $: itemSample = items.filter(sample);
+  $: data = itemSample.map(dataItemToRecord);
 </script>
 
 <Column id="secondary-view" style="max-width:{width}px;height:{height}px">
