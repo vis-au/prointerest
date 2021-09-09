@@ -23,6 +23,7 @@
   import { sendSelectedItems } from "$lib/util/requests";
   import { selectedItems } from "$lib/state/selected-items";
   import { scaleX, scaleY } from "$lib/state/scales";
+  import { hoveredBin } from "$lib/state/hovered-bin";
 
   export let id = "view-interaction-layer";
   export let width: number;
@@ -146,24 +147,19 @@
   }
 
   function renderHoveredBin(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
-    const dummyItem = getDummyDataItem();
-    dummyItem.position.x = $hoveredPosition[0];
-    dummyItem.position.y = $hoveredPosition[1];
-    const hoveredBin = $hexbinning([dummyItem])[0];
-
-    if (!hoveredBin) {
+    if (!$hoveredBin) {
       return;
     }
 
     ctx.beginPath();
-    ctx.translate(hoveredBin.x, hoveredBin.y);
+    ctx.translate($hoveredBin.x, $hoveredBin.y);
     ctx.strokeStyle = color;
     ctx.fillStyle = "rgba(0, 0, 0, 0.0)";
     ctx.lineWidth = lineWidth * 0.5;
     ctx.setLineDash([2]);
     ctx.stroke(hexagonPath);
     ctx.fill(hexagonPath);
-    ctx.translate(-hoveredBin.x, -hoveredBin.y);
+    ctx.translate(-$hoveredBin.x, -$hoveredBin.y);
     ctx.closePath();
     ctx.setLineDash([]);
   }
