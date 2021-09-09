@@ -9,7 +9,7 @@
   let vegaEmbed;
 
   afterUpdate(() => {
-    vegaEmbed = (window as any).vegaEmbed;
+    vegaEmbed = (window as Window)["vegaEmbed"];
     if (vegaEmbed === undefined) {
       console.error("vega embed is undefined");
       return;
@@ -18,7 +18,7 @@
     setTimeout(async () => {
       const res = await vegaEmbed.embed(`#${id}-vega-container`, spec, { actions: false });
       res.view.addSignalListener("brush", (name: string, value: Record<string, unknown>) => dispatch("brush", { value }));
-    }, 0);
+    }, 10);
   });
 </script>
 
