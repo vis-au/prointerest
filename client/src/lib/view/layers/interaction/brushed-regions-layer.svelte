@@ -1,6 +1,7 @@
 <script lang="typescript">
   import { activeBrush } from "$lib/state/active-brush";
   import { scaleX, scaleY } from "$lib/state/scales";
+import { selectedItems } from "$lib/state/selected-items";
   import { currentTransform } from "$lib/state/zoom";
 
   import { afterUpdate } from "svelte";
@@ -24,9 +25,16 @@
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
+
+    // draw brush
     ctx.strokeStyle = "rgba(0,0,0,0.73)";
     ctx.rect(x0, y0, Math.abs(x0 - x1), Math.abs(y0 - y1));
     ctx.stroke();
+
+    // draw label
+    ctx.font = "13px sans-serif";
+    ctx.fillText(`${$selectedItems.length} points`, x0, y1 + 15);
+
     ctx.closePath();
   }
 </script>
