@@ -6,6 +6,7 @@
   import Row from "$lib/widgets/row.svelte";
 
   import ControlButton from "../main/control-button.svelte";
+  import InterpolationComponent from "./interpolation-component.svelte";
   import PosteriorComponentWeights from "./posterior-component-weights.svelte";
   import PriorComponentWeights from "./prior-component-weights.svelte";
 
@@ -24,6 +25,8 @@
   <div class="title">
     <img src="static/logo.svg" alt="the ProInterest logo" height={height*.8} />
   </div>
+  <InterpolationComponent />
+
   <Row id="doi-configuration" style="align-items:stretch;">
     <PriorComponentWeights />
     <PosteriorComponentWeights />

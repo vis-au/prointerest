@@ -1,6 +1,11 @@
 import type { PosteriorEntry, PriorEntry } from "$lib/types/doi-weights";
 import { writable } from "svelte/store";
 
+const weights = new Map<"prior"|"posterior", number>();
+weights.set("prior", 0.5);
+weights.set("posterior", 0.5);
+export const componentWeights = writable(weights);
+
 const prior = new Map<PriorEntry, number>();
 prior.set("dimensions", 0.15);
 prior.set("outlierness", 0.7);

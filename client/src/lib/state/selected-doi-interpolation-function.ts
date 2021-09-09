@@ -1,4 +1,4 @@
-import { linear } from "$lib/types/doi-interpolation-function";
+import type { FunctionName } from "$lib/types/doi-interpolation-function";
 import { writable } from "svelte/store";
 
-export const selectedDoiInterpolationFunction = writable(linear);
+export const selectedDoiInterpolationFunction = writable("linear" as FunctionName);
