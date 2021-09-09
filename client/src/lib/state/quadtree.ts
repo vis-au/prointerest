@@ -44,6 +44,7 @@ function arrayToDataItem(item: number[]) {
       x: currentScaleX(item[xIndex]),
       y: currentScaleY(item[yIndex])
     },
+    selected: false,
     iteration: 0,
     values: item
   };

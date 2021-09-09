@@ -17,14 +17,8 @@
 
   let histogramMode: "selected"|"all" = "all";
 
-  function addSelectedDimension(d) {
-    const record = dataItemToRecord(d);
-    record.selected = $selectedItems.indexOf(d) > -1;
-    return record;
-  }
-
   $: data = histogramMode === "all"
-    ? $quadtree.data().map(addSelectedDimension)
+    ? $quadtree.data().map(dataItemToRecord)
     : $selectedItems.map(dataItemToRecord);
 </script>
 

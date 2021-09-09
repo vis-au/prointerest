@@ -11,6 +11,8 @@ export function dataItemToRecord(dataItem: DataItem): Record<string, unknown> {
     item[currentDimensions[i]] = val;
   });
 
+  item["selected"] = dataItem.selected;
+
   return item;
 }
 

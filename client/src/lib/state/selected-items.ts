@@ -9,7 +9,8 @@ import { selectedBins } from "./selected-bins";
 import { scaleX, scaleY } from "./scales";
 import type { ScaleLinear } from "d3-scale";
 
-export const selectedItems = writable([] as DataItem[]);
+let currentlySelected: DataItem[] = [];
+export const selectedItems = writable(currentlySelected);
 
 let currentSelectedBins: HexbinBin<DataItem>[] = [];
 let currentBrush: [[number, number], [number, number]] = [
@@ -35,29 +36,42 @@ function getItemsInSelectedBins() {
   return currentSelectedBins.map((bin) => getPointsInR(bin.x, bin.y, 10)).flat();
 }
 
+function deselectItems() {
+  currentlySelected.forEach(item => item.selected = false);
+}
+
 function getSelectedItems() {
+  deselectItems();
   const brushedItems = getBrushedItems();
   const itemsInBins = getItemsInSelectedBins();
 
-  return brushedItems.concat(itemsInBins);
+  const selected = brushedItems.concat(itemsInBins);
+  selected.forEach(d => d.selected = true);
+  return selected;
+}
+
+function updateSelectedItems() {
+  currentlySelected = getSelectedItems();
+  selectedItems.set(currentlySelected);
 }
 
 scaleX.subscribe((scale) => {
   x = scale;
-  selectedItems.set(getSelectedItems());
+  currentlySelected = getSelectedItems();
+  updateSelectedItems();
 });
 scaleY.subscribe((scale) => {
   y = scale;
-  selectedItems.set(getSelectedItems());
+  updateSelectedItems();
 });
 
 quadtree.subscribe(() => {
-  selectedItems.set(getSelectedItems());
+  updateSelectedItems();
 });
 
 activeBrush.subscribe((newBrush) => {
   currentBrush = newBrush;
-  selectedItems.set(getSelectedItems());
+  updateSelectedItems();
 });
 
 selectedBins.subscribe((newBins) => {
@@ -66,5 +80,5 @@ selectedBins.subscribe((newBins) => {
     return;
   }
   currentSelectedBins = newBins;
-  selectedItems.set(getSelectedItems());
+  updateSelectedItems();
 });

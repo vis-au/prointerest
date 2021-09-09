@@ -8,6 +8,7 @@ export function getDummyDataItem(): DataItem {
     id: -1,
     position: { x: -1, y: -1 },
     iteration: -1,
+    selected: false,
     values: currentDimensions.map(() => null)
   };
 }
