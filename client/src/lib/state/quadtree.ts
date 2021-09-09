@@ -9,7 +9,7 @@ import { activeViewEncodings } from "./active-view-encodings";
 import { dimensions } from "./processed-data";
 import { CHUNK_SIZE } from "./progression";
 
-const currentQuadtree = createQuadtree();
+let currentQuadtree = createQuadtree();
 export const quadtree = writable(currentQuadtree);
 
 let currentScaleX: ScaleLinear<number, number> = null;
@@ -31,7 +31,6 @@ function createQuadtree() {
 function insertIntoQuadtree(tree: Quadtree<DataItem>, rawItems: number[][]) {
   const dataItems = !rawItems ? [] : rawItems.map(arrayToDataItem);
 
-  // otherwise just add the data to the quadtree
   tree.addAll(dataItems);
 
   return tree;
@@ -55,6 +54,7 @@ function arrayToDataItem(item: number[]) {
 function recreateQuadtree() {
   const newTree = createQuadtree();
   insertIntoQuadtree(newTree, currentlyProcessedData);
+  currentQuadtree = newTree;
   quadtree.set(newTree);
 }
 
@@ -64,7 +64,7 @@ setTimeout(() => {
     const newItems = newData
       .slice(newData.length - newData.length - CHUNK_SIZE, newData.length);
 
-    if (newItems.length === 0) {
+    if (newData.length === 0) {
       recreateQuadtree();
     } else {
       insertIntoQuadtree(currentQuadtree, newItems);
