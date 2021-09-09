@@ -1,6 +1,4 @@
 <script>
-  import { dragInteractionModes } from "$lib/interaction/doi-interaction";
-  import { activeInteractionMode } from "$lib/state/active-interaction-mode";
   import {
     activeSuggestionInput,
     activeSuggestionOutput
@@ -49,14 +47,6 @@
       name="suggestion-inputs"
       alternatives={suggestionInputs}
       bind:activeAlternative={$activeSuggestionInput}
-    />
-  </div>
-  <div class="configuration">
-    <h2>Interaction</h2>
-    <Alternatives
-      name="interaction-modes"
-      alternatives={dragInteractionModes}
-      bind:activeAlternative={$activeInteractionMode}
     />
   </div>
 </Row>
