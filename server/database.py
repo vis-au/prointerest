@@ -29,7 +29,10 @@ DIMENSION_EXTENTS = {
   "tip_amount": {"min": 0, "max": 1000 },
   "toll_amount": {"min": -52.5, "max": 1650 },
   "improvement_surcharge": {"min": -0.3, "max": 4000.3 },
-  "total_amount": {"min": 0, "max": 300 }
+  "total_amount": {"min": 0, "max": 300 },
+  # computed dimensions
+  "trip_duration": {"min": 0, "max": 6000},
+  "tip_ratio": {"min": 0, "max": 1}
 }
 
 
@@ -91,9 +94,23 @@ def is_id_in_provenance(id: str):
   return len(result) > 0
 
 
+def process_chunk(chunk: list[tuple[float]]):
+  extended_chunk = []
+  for tuple in chunk:
+    pickup_datetime = tuple[2]
+    dropoff_datetime = tuple[3]
+    duration = (dropoff_datetime-pickup_datetime).total_seconds()
+    tuple = tuple + (duration, )
+    ratio = tuple[15] / tuple[17]
+    tuple = tuple + (ratio, )
+    extended_chunk.append(tuple)
+  return extended_chunk
+
+
 def get_next_chunk_from_db(chunk_size: int):
   query = f"SELECT * FROM {TABLE} WHERE {ID} NOT IN (SELECT {ID} FROM {PROCESSED}) LIMIT {chunk_size}"
   next_chunk = cursor.execute(query).fetchall()
+  next_chunk = process_chunk(next_chunk)
   ids = [str(item[ID_INDEX]) for item in next_chunk]
   mark_ids_plotted(ids)
 
@@ -104,6 +121,7 @@ def get_dimensions_in_data():
   query = f"SELECT * FROM {TABLE} LIMIT 1"
   item = cursor.execute(query).fetchdf()
   dimensions = list(item.columns)
+  dimensions = dimensions + ["trip_duration", "tip_ratio"]
   return dimensions
 
 
