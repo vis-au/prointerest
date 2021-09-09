@@ -7,8 +7,14 @@ import { visibleData } from "./visible-data";
 export const bins = writable([] as HexbinBin<DataItem>[]);
 
 let currentHexbinning = null as Hexbin<DataItem>;
-hexbinning.subscribe(h => currentHexbinning = h);
+let currentlyVisibleData = [] as DataItem[];
+
+hexbinning.subscribe(h => {
+  currentHexbinning = h;
+  bins.set(currentHexbinning(currentlyVisibleData));
+});
 
 visibleData.subscribe(data => {
+  currentlyVisibleData = data;
   bins.set(currentHexbinning(data));
 });
