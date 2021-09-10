@@ -9,6 +9,10 @@
   let vegaEmbed;
 
   afterUpdate(() => {
+    // can happen on load
+    if (Window === undefined) {
+      return;
+    }
     vegaEmbed = (window as Window)["vegaEmbed"];
     if (vegaEmbed === undefined) {
       console.error("vega embed is undefined");
