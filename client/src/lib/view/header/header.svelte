@@ -2,11 +2,11 @@
   import { updateExploredItems } from "$lib/state/explored-items";
   import { activeDoiValues } from "$lib/state/latest-doi-values";
   import { quadtree } from "$lib/state/quadtree";
-import { selectedDoiComponent } from "$lib/state/selected-doi-weight";
+  import { selectedDoiComponent } from "$lib/state/selected-doi-weight";
   import { getDoiValues } from "$lib/util/requests";
   import Row from "$lib/widgets/row.svelte";
 
-  import ControlButton from "../main/control-button.svelte";
+  import ControlButton from "../../widgets/control-button.svelte";
   import InterpolationComponent from "./interpolation-component.svelte";
   import PosteriorComponentWeights from "./posterior-component-weights.svelte";
   import PriorComponentWeights from "./prior-component-weights.svelte";

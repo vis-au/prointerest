@@ -1,7 +1,6 @@
 <script lang="typescript">
-import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
-
-  import ControlButton from "$lib/view/main/control-button.svelte";
+  import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
+  import ControlButton from "$lib/widgets/control-button.svelte";
 
   export let title: string;
   export let message = "";

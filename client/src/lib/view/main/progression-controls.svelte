@@ -6,12 +6,12 @@
     resetProgression,
     startProgression
   } from "$lib/state/progression";
-import { abbreviate } from "$lib/util/number-transform";
+  import { abbreviate } from "$lib/util/number-transform";
   import BigNumber from "$lib/widgets/big-number.svelte";
   import Column from "$lib/widgets/column.svelte";
   import ProgressBar from "$lib/widgets/progress-bar.svelte";
   import Row from "$lib/widgets/row.svelte";
-  import ControlButton from "./control-button.svelte";
+  import ControlButton from "../../widgets/control-button.svelte";
 
   export let x: number;
   export let y: number;

@@ -6,7 +6,7 @@
   import Column from "$lib/widgets/column.svelte";
   import Options from "$lib/widgets/options.svelte";
   import Row from "$lib/widgets/row.svelte";
-  import ControlButton from "./control-button.svelte";
+  import ControlButton from "../../widgets/control-button.svelte";
   import { selectedItems } from "$lib/state/selected-items";
   import MultiHistogram from "$lib/widgets/multi-histogram.svelte";
   import Alternatives from "$lib/widgets/alternatives.svelte";

@@ -1,6 +1,6 @@
 <script lang="typescript">
   import Column from "$lib/widgets/column.svelte";
-  import ControlButton from "./control-button.svelte";
+  import ControlButton from "../../widgets/control-button.svelte";
 
   export let isCollapsed: boolean;
 </script>
