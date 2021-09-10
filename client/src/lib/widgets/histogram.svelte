@@ -1,6 +1,5 @@
 <script lang="typescript">
-import { createEventDispatcher } from "svelte";
-
+  import { createEventDispatcher } from "svelte";
   import VegaLitePlot from "./vega-lite-plot.svelte";
 
   export let id: string;
@@ -11,10 +10,17 @@ import { createEventDispatcher } from "svelte";
   export let data: Record<string, unknown>[];
   export let dimension: string;
   export let domain: [number, number] = null;
+  export let selectedValues: [number, number] = null;
   export let groupDimension: string = null;
   export let showTitle = false;
 
   const dispatch = createEventDispatcher();
+  let usePresetSelection = true;
+
+  function onBrush(event) {
+    usePresetSelection = false;
+    dispatch("interval", event.detail.value);
+  }
 
   $: colorEncoding =
     groupDimension === null
@@ -73,8 +79,15 @@ import { createEventDispatcher } from "svelte";
     ]
   };
 
-  $: showTitle ? "" : (histogram.layer[0].encoding.x["title"] = false);
-  $: domain !== null ? (histogram.layer.forEach(l => l.encoding.x["scale"] = { domain })) : "";
+  $: if (!showTitle) {
+    histogram.layer[0].encoding.x["title"] = false;
+  }
+  $: if (domain !== null) {
+    histogram.layer.forEach(l => l.encoding.x["scale"] = { domain });
+  }
+  $: if (usePresetSelection && selectedValues !== null) {
+    histogram.layer[0].params[0]["value"] = {x: selectedValues};
+  }
 </script>
 
-<VegaLitePlot {id} spec={histogram} on:brush={ (event) => dispatch("interval", event.detail.value) } />
+<VegaLitePlot {id} spec={histogram} on:brush={ onBrush } />

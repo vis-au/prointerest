@@ -9,7 +9,7 @@
   import Histogram from "$lib/widgets/histogram.svelte";
   import Row from "$lib/widgets/row.svelte";
   import { afterUpdate } from "svelte";
-import { truncateFloat } from "$lib/util/number-transform";
+  import { truncateFloat } from "$lib/util/number-transform";
 
   let tabularData = $randomlySampledItems.map(dataItemToRecord);
 
@@ -24,19 +24,22 @@ import { truncateFloat } from "$lib/util/number-transform";
     sendInterestingDimensionRange(dimension, interval);
   }
 
-  function updateExtents() {
+  function getSelectedDimensionExtents() {
     Object.keys($interestingDimensions)
       .filter(d => $interestingDimensions[d])
       .forEach(d => {
         if (extents[d] === undefined) {
-          getDimensionExtent(d).then(extent => {
-            extents[d] = [extent.min, extent.max];
-          });
+          getDimensionExtent(d)
+            .then(extent => {
+              extents[d] = [extent.min, extent.max];
+            });
         }
       });
   }
 
-  afterUpdate(updateExtents);
+  afterUpdate(() => {
+    getSelectedDimensionExtents();
+  });
 </script>
 
 <DoiConfig
@@ -50,7 +53,7 @@ import { truncateFloat } from "$lib/util/number-transform";
         <input id={dim} type="checkbox" value={dim} bind:checked={$interestingDimensions[dim]} />
 
         <span class="interesting-range">
-          {#if $interestingIntervals[dim] !== null}
+          {#if $interestingDimensions[dim] && $interestingIntervals[dim] !== null}
             [
               {truncateFloat($interestingIntervals[dim][0])},
               {truncateFloat($interestingIntervals[dim][1])}
@@ -65,6 +68,7 @@ import { truncateFloat } from "$lib/util/number-transform";
           data={tabularData}
           dimension={dim}
           domain={extents[dim]}
+          selectedValues={$interestingIntervals[dim]}
           bins={100}
           width={550}
           height={50}
