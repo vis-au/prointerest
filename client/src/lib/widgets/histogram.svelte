@@ -10,6 +10,7 @@ import { createEventDispatcher } from "svelte";
   export let bins = 50;
   export let data: Record<string, unknown>[];
   export let dimension: string;
+  export let domain: [number, number] = null;
   export let groupDimension: string = null;
   export let showTitle = false;
 
@@ -73,6 +74,7 @@ import { createEventDispatcher } from "svelte";
   };
 
   $: showTitle ? "" : (histogram.layer[0].encoding.x["title"] = false);
+  $: domain !== null ? (histogram.layer.forEach(l => l.encoding.x["scale"] = { domain })) : "";
 </script>
 
 <VegaLitePlot {id} spec={histogram} on:brush={ (event) => dispatch("interval", event.detail.value) } />

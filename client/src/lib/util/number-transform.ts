@@ -14,3 +14,7 @@ export function abbreviate(x: number): string {
     return `${Math.floor(x / 100000000)/10}B`;
   }
 }
+
+export function truncateFloat(floatValue: number, places=2): number {
+  return Math.round(floatValue * 10 ** places) / 10 ** places;
+}

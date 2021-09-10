@@ -1,5 +1,6 @@
 <script lang="typescript">
   export let id = "";
+  export let className = "";
   export let width = -1;
   export let height = -1;
   export let style = "";
@@ -8,7 +9,7 @@
   const maxHeight = height === -1 ? "" : `max-height:${width}px;`;
 </script>
 
-<div {id} class="column" style="{maxWidth}{maxHeight}{style}">
+<div {id} class="column {className}" style="{maxWidth}{maxHeight}{style}">
   <slot />
 </div>
 
