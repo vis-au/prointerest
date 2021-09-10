@@ -17,7 +17,6 @@
 
     setTimeout(async () => {
       const res = await vegaEmbed.embed(`#${id}-vega-container`, spec, { actions: false });
-      console.log(spec);
       res.view.addSignalListener("brush", (name: string, value: Record<string, unknown>) => dispatch("brush", { value }));
     }, 10);
   });
