@@ -7,14 +7,12 @@
   import ScatterplotView from "../layers/visualization/scatterplot-view.svelte";
   import BinnedScatterplotView from "../layers/visualization/binned-scatterplot-view.svelte";
   import Axes from "../layers/visualization/axes.svelte";
-  import UiOverlay from "./ui-overlay.svelte";
   import ColorLegend from "./color-legend.svelte";
   import ProgressionControls from "./progression-controls.svelte";
+  import ViewControls from "./view-controls.svelte";
 
   export let width: number;
   export let height: number;
-
-  let uiVisible = true;
 </script>
 
 <main style="height:{height}px">
@@ -40,6 +38,6 @@
       bind:colorScale={$colorScale}
     />
   {/if}
-  <UiOverlay {width} {height} visible={uiVisible} />
+  <ViewControls />
   <ProgressionControls x={width - 240} y={height - 50} />
 </main>

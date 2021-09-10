@@ -52,6 +52,17 @@
 </Row>
 
 <style>
+  :global(div#view-controls) {
+    position: absolute;
+    box-sizing: border-box;
+    justify-content: center;
+    padding-top: 20px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.73);
+    padding: 5px 30px;
+    border-radius: 4px;
+  }
+
   :global(#view-controls *) {
     font-size: 12pt;
   }
