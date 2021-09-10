@@ -9,7 +9,7 @@
 
   const dispatch = createEventDispatcher();
 
-  $: display = `display:${visible ? "none" : "flex"}`;
+  $: display = `display:${visible ? "flex" : "none"}`;
   $: left = `left:${x}px`;
   $: top = `top:${y}px`;
   $: w = `width:${width}px`;
