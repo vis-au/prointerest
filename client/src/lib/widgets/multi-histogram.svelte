@@ -28,7 +28,7 @@ import VegaLitePlot from "./vega-lite-plot.svelte";
         };
 
   $: histogram = {
-    $schema: "https://vega.github.io/schema/vega-lite/v5.1.0.json",
+    $schema: "https://vega.github.io/schema/vega-lite/v5.1.1.json",
     data: {
       values: data
     },
