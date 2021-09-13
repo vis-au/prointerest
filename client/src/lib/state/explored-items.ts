@@ -8,7 +8,7 @@ import { sendInterestingItems } from "$lib/util/requests";
 import type { InteractionLog } from "$lib/provenance/interaction-log";
 import { interactionWeights } from "./interaction-technique-weights";
 
-const interactionObserver = new InteractionObserver(getPointsInR);
+export const interactionObserver = new InteractionObserver(getPointsInR);
 
 let currentInteractedThreshold = 0.25;
 export const interactionThreshold = writable(currentInteractedThreshold);
@@ -64,5 +64,5 @@ provenanceLogSize.subscribe((size) => {
 });
 
 quadtree.subscribe((newTree) => {
-  interactionObserver.processedDataspace = newTree.data();
+  interactionObserver.data = newTree.data();
 });

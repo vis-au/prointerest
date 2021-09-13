@@ -10,7 +10,7 @@ export default class InteractionObserver {
   private affectedItemIdsPerTimestamp = new Map<number, number[]>();
   private findPointsWithinRadius: (x: number, y: number, r: number) => DataItem[];
 
-  public processedDataspace: DataItem[] = [];
+  public data: DataItem[] = [];
   public interactionLog: InteractionLog = getInteractionLog();
   public recentSteps = 10;
   public interestThreshold = 0.23;
@@ -96,23 +96,6 @@ export default class InteractionObserver {
   //   return [];
   // }
 
-  private getRandomSample(n: number): DataItem[] {
-    // adapted from https://stackoverflow.com/a/11935263
-    const shuffled = this.processedDataspace.slice(0);
-    let i = this.processedDataspace.length;
-    let temp: DataItem;
-    let index: number;
-
-    while (i--) {
-      index = Math.floor((i + 1) * Math.random());
-      temp = shuffled[index];
-      shuffled[index] = shuffled[i];
-      shuffled[i] = temp;
-    }
-
-    return shuffled.slice(0, n);
-  }
-
   private precomputeAffectedItemsPerInteraction() {
     this.affectedItemIdsPerTimestamp = new Map();
     this.interactionLog.getNRecentSteps(this.recentSteps).forEach((interaction) => {
@@ -141,11 +124,10 @@ export default class InteractionObserver {
   private update() {
     this.precomputeAffectedItemsPerInteraction();
 
-    const subspaceSample = this.getRandomSample(100);
-    const interestPerItem = this.getWeightedDoiSum(subspaceSample);
-    subspaceSample.forEach((item, i) => this.doiPerItem.set(item, interestPerItem[i]));
+    const interestPerItem = this.getWeightedDoiSum(this.data);
+    this.data.forEach((item, i) => this.doiPerItem.set(item, interestPerItem[i]));
 
-    const expandedSample = this.getEpsilonExpansion(subspaceSample);
+    const expandedSample = this.getEpsilonExpansion(this.data);
     const interestPerExtenedItem = this.getWeightedDoiSum(expandedSample);
     expandedSample.forEach((item, i) => this.doiPerItem.set(item, interestPerExtenedItem[i]));
   }
