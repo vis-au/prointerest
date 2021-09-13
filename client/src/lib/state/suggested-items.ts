@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 import type { Writable } from "svelte/store";
-import InteractionObserver from "$lib/doi/interaction-observer";
-import SuggestionProvider from "$lib/doi/suggestion-provider";
+import InteractionObserver from "$lib/provenance/interaction-observer";
+import SuggestionProvider from "$lib/provenance/suggestion-provider";
 import type DataItem from "$lib/types/data-item";
 import type { SuggestionInput, SuggestionOutput } from "$lib/types/suggestion-mode";
 import { getPointsInR } from "$lib/util/find-in-quadtree";

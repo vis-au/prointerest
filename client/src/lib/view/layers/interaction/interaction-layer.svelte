@@ -13,12 +13,12 @@
   import { hexbinning } from "$lib/state/hexbinning";
   import { activeBrush } from "$lib/state/active-brush";
   import { activeInteractionMode } from "$lib/state/active-interaction-mode";
-  import InteractionFactory from "$lib/interaction/doi-interaction-factory";
+  import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import type DataItem from "$lib/types/data-item";
   import { getDummyDataItem } from "$lib/util/dummy-data-item";
   import { quadtree } from "$lib/state/quadtree";
   import { getPointsInRect } from "$lib/util/find-in-quadtree";
-  import type { DoiInteraction } from "$lib/interaction/doi-interaction";
+  import type { DoiInteraction } from "$lib/provenance/doi-interaction";
   import { getLatestTimestamp, registerNewInteraction } from "$lib/state/explored-items";
   import { sendSelectedItems } from "$lib/util/requests";
   import { selectedItems } from "$lib/state/selected-items";

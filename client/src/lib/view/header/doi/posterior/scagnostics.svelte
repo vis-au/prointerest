@@ -2,7 +2,7 @@
   import { scagnosticWeights, selectedScagnostics } from "$lib/state/selected-scagnostics";
   import { scagnostics } from "$lib/types/scagnostics";
   import type { Scagnostic } from "$lib/types/scagnostics";
-  import DoiConfig from "$lib/view/header/doi/doi-config.svelte";
+  import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
   import Column from "$lib/widgets/column.svelte";
   import { sendScagnosticWeights } from "$lib/util/requests";

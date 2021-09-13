@@ -6,10 +6,6 @@ const FLUSH_INTERVAL = 5000;
 export class InteractionLog {
   public log: DoiInteraction[] = [];
 
-  constructor() {
-    this.startAutomatedFlush();
-  }
-
   public startAutomatedFlush(): void {
     if (window !== undefined) {
       window.setInterval(this.flush.bind(this), FLUSH_INTERVAL);

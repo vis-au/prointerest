@@ -1,10 +1,10 @@
 import { writable } from "svelte/store";
 import type { Writable } from "svelte/store";
 import type DataItem from "$lib/types/data-item";
-import InteractionObserver from "$lib/doi/interaction-observer";
+import InteractionObserver from "$lib/provenance/interaction-observer";
 import { getPointsInR } from "$lib/util/find-in-quadtree";
 import { quadtree } from "./quadtree";
-import type { DoiInteraction } from "$lib/interaction/doi-interaction";
+import type { DoiInteraction } from "$lib/provenance/doi-interaction";
 import { sendInterestingItems } from "$lib/util/requests";
 
 export const exploredItems: Writable<DataItem[]> = writable([]);

@@ -3,7 +3,7 @@
   import { outliernessMeasures } from "$lib/types/outlier-measures";
   import Alternatives from "$lib/widgets/alternatives.svelte";
   import BigNumber from "$lib/widgets/big-number.svelte";
-  import DoiConfig from "$lib/view/header/doi/doi-config.svelte";
+  import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
 </script>
 
 <DoiConfig

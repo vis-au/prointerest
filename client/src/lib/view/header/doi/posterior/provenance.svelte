@@ -1,7 +1,7 @@
 <script>
   import { interactionWeights } from "$lib/state/interaction-technique-weights";
   import Column from "$lib/widgets/column.svelte";
-  import DoiConfig from "$lib/view/header/doi/doi-config.svelte";
+  import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
 
   // TODO: widget to define, how long the interaction log should be

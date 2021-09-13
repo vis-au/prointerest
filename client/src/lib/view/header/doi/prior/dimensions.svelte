@@ -3,7 +3,7 @@
   import { dimensions } from "$lib/state/processed-data";
   import { randomlySampledItems } from "$lib/state/randomly-sampled-items";
   import { dataItemToRecord } from "$lib/util/item-transform";
-  import DoiConfig from "$lib/view/header/doi/doi-config.svelte";
+  import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
   import { getDimensionExtent, sendInterestingDimensionRange } from "$lib/util/requests";
   import Column from "$lib/widgets/column.svelte";
   import Histogram from "$lib/widgets/histogram.svelte";

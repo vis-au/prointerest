@@ -1,8 +1,8 @@
-import type DataItem from "../types/data-item";
-import type { DoiInteraction, InteractionMode } from "../interaction/doi-interaction";
-import { interactionModes } from "../interaction/doi-interaction";
-import { InteractionLog, getInteractionLog } from "../interaction/interaction-log";
 import { interactionWeights } from "$lib/state/interaction-technique-weights";
+import type DataItem from "../types/data-item";
+import { interactionModes } from "./doi-interaction";
+import type { DoiInteraction, InteractionMode } from "./doi-interaction";
+import { getInteractionLog, InteractionLog } from "./interaction-log";
 
 const DEFAULT_EPSILON = 100;
 
