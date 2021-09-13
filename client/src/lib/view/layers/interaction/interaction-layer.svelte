@@ -20,8 +20,6 @@
   import { getPointsInRect } from "$lib/util/find-in-quadtree";
   import type { DoiInteraction } from "$lib/provenance/doi-interaction";
   import { getLatestTimestamp, registerNewInteraction } from "$lib/state/explored-items";
-  import { sendSelectedItems } from "$lib/util/requests";
-  import { selectedItems } from "$lib/state/selected-items";
   import { scaleX, scaleY } from "$lib/state/scales";
   import { hoveredBin } from "$lib/state/hovered-bin";
 
@@ -142,8 +140,6 @@
 
     const interaction = interactionFactory.createBrushInteraction($scaleX(_x0), $scaleY(_y0), $scaleX(_x1), $scaleY(_y1));
     onInteraction(interaction);
-
-    sendSelectedItems($selectedItems);
   }
 
   function renderHoveredBin(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
