@@ -11,13 +11,15 @@
   import type DataItem from "$lib/types/data-item";
   import { separateThousands } from "$lib/util/number-transform";
   import List from "$lib/widgets/list.svelte";
+  import Toggle from "$lib/widgets/toggle.svelte";
 
   // TODO: suggest similar/dissimlar data based on prior/posterior/both
 
   $: provenanceInterestValues = exploredItemsToRecord($exploredItemInterest);
+  $: start = Math.max($provenanceLog.log.length - $provenanceLogSize, 0)
   $: console.log(provenanceInterestValues);
   $: consideredLog = $provenanceLog.log
-    .slice($provenanceLog.log.length - $provenanceLogSize, $provenanceLog.log.length)
+    .slice(start, $provenanceLog.log.length)
     .map(d => d.mode)
     .reverse();
 
@@ -28,6 +30,7 @@
   }
 
   const histogramSize = 700;
+  let showAggregateInteractionCount = true;
 </script>
 
 <DoiConfig
@@ -71,9 +74,21 @@
       />
     </Column>
 
-    <Column>
-      <h3>Provenance Log (newest first)</h3>
-      <List values={consideredLog} isOrdered={true} style="width:{histogramSize}px" />
+    <Column style="width:{histogramSize - 20}px">
+      <h3>
+        <span>Provenance Log (newest first)</span>
+        <Toggle
+          style="font-weight:normal"
+          bind:active={showAggregateInteractionCount}>
+          summerize
+        </Toggle>
+      </h3>
+      <List
+        values={consideredLog}
+        isOrdered={true}
+        count={showAggregateInteractionCount}
+        style="width:{histogramSize}px"
+      />
       <Row style="margin:20px 0">
         <Slider
           id="log-size"
