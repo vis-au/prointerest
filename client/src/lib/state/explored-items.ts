@@ -1,15 +1,24 @@
-import { writable } from "svelte/store";
-import type { Writable } from "svelte/store";
+import { readable, writable } from "svelte/store";
 import type DataItem from "$lib/types/data-item";
 import InteractionObserver from "$lib/provenance/interaction-observer";
 import { getPointsInR } from "$lib/util/find-in-quadtree";
 import { quadtree } from "./quadtree";
 import type { DoiInteraction } from "$lib/provenance/doi-interaction";
 import { sendInterestingItems } from "$lib/util/requests";
+import type { InteractionLog } from "$lib/provenance/interaction-log";
 
-export const exploredItems: Writable<DataItem[]> = writable([]);
 
 const interactionObserver = new InteractionObserver(getPointsInR);
+
+let currentInteractedThreshold = 0.25;
+export const interactionThreshold = writable(currentInteractedThreshold);
+let currentProvenanceLogSize = 100;
+export const provenanceLogSize = writable(currentProvenanceLogSize);
+
+export const exploredItems = writable([] as DataItem[]);
+export const exploredItemInterest = writable(new Map<DataItem, number>());
+
+export const provenanceLog = readable(interactionObserver.interactionLog as InteractionLog);
 
 export function registerNewInteraction(interaction: DoiInteraction): void {
   interactionObserver.interactionLog.add(interaction);
@@ -20,17 +29,36 @@ export function getLatestTimestamp(): number {
 }
 
 export function updateExploredItems(): void {
-  const explored = interactionObserver.getExploredData();
-  const items = Array.from(explored.keys());
-  const values = Array.from(explored.values());
+  setTimeout(() => {
+    interactionObserver.interestThreshold = currentInteractedThreshold;
+    interactionObserver.recentSteps = currentProvenanceLogSize;
 
-  exploredItems.set(items);
+    const explored = interactionObserver.getExploredData();
+    exploredItemInterest.set(explored);
 
-  sendInterestingItems(
-    items.map((d) => d.id + ""),
-    values
-  );
+    const items = Array.from(explored.keys());
+    const values = Array.from(explored.values());
+    exploredItems.set(items);
+
+    sendInterestingItems(
+      items.map((d) => d.id + ""),
+      values
+    );
+
+    return items;
+  }, 0);
 }
+
+
+interactionThreshold.subscribe(threshold => {
+  currentInteractedThreshold = threshold;
+  updateExploredItems();
+});
+
+provenanceLogSize.subscribe(size => {
+  currentProvenanceLogSize = size;
+  updateExploredItems();
+});
 
 quadtree.subscribe((newTree) => {
   interactionObserver.processedDataspace = newTree.data();
