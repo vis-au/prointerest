@@ -37,7 +37,7 @@ function getItemsInSelectedBins() {
 }
 
 function deselectItems() {
-  currentlySelected.forEach(item => item.selected = false);
+  currentlySelected.forEach((item) => (item.selected = false));
 }
 
 function getSelectedItems() {
@@ -46,7 +46,7 @@ function getSelectedItems() {
   const itemsInBins = getItemsInSelectedBins();
 
   const selected = brushedItems.concat(itemsInBins);
-  selected.forEach(d => d.selected = true);
+  selected.forEach((d) => (d.selected = true));
   return selected;
 }
 

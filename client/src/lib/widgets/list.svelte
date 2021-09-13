@@ -1,5 +1,5 @@
 <script lang="typescript">
-import BigNumber from "./big-number.svelte";
+  import BigNumber from "./big-number.svelte";
 
   export let values: string[];
   export let isOrdered = false;
@@ -9,10 +9,10 @@ import BigNumber from "./big-number.svelte";
   let countMap = new Map<string, number>();
   $: if (count) {
     countMap = new Map();
-    values.forEach(value => countMap.has(value)
-      ? countMap.set(value, countMap.get(value)+1)
-      : countMap.set(value, 1));
-  };
+    values.forEach((value) =>
+      countMap.has(value) ? countMap.set(value, countMap.get(value) + 1) : countMap.set(value, 1)
+    );
+  }
 </script>
 
 {#if isOrdered}

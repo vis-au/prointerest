@@ -15,11 +15,9 @@
   export let width: number;
   export let height: number;
 
-  let histogramMode: "selected"|"all" = "all";
+  let histogramMode: "selected" | "all" = "all";
 
-  $: items = histogramMode === "all"
-    ? $randomlySampledItems
-    : $selectedItems;
+  $: items = histogramMode === "all" ? $randomlySampledItems : $selectedItems;
 
   $: data = items.map(dataItemToRecord);
 </script>
@@ -41,17 +39,17 @@
         bind:activeOptions={$interestingDimensions}
       />
     </Row>
-    <ControlButton on:click={ () => $isSecondaryViewCollapsed = true }>close</ControlButton>
+    <ControlButton on:click={() => ($isSecondaryViewCollapsed = true)}>close</ControlButton>
   </Row>
-  <Row id="selected-data-histograms"style="width:{width}px">
+  <Row id="selected-data-histograms" style="width:{width}px">
     <MultiHistogram
       id="secondary-selected-dims"
-      data={data}
-      dimensions={Object.keys($interestingDimensions).filter(d => $interestingDimensions[d])}
+      {data}
+      dimensions={Object.keys($interestingDimensions).filter((d) => $interestingDimensions[d])}
       showTitle={false}
       groupDimension="selected"
       width={310}
-      height={height * .4}
+      height={height * 0.4}
     />
   </Row>
 </Column>
@@ -60,7 +58,7 @@
   :global(#secondary-view) {
     overflow: hidden;
     justify-content: space-between;
-    flex-wrap: nowrap
+    flex-wrap: nowrap;
   }
   :global(#secondary-header) {
     min-width: 100%;

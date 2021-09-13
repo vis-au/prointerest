@@ -51,10 +51,7 @@
         {/if}
       </button>
     </div>
-    <Options
-      options={scagnostics}
-      bind:activeOptions={isSelected}
-    />
+    <Options options={scagnostics} bind:activeOptions={isSelected} />
   </Column>
 
   <Column>

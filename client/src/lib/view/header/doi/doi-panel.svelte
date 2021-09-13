@@ -9,13 +9,13 @@
 <div class="doi-config">
   <h2>
     <span>{title}</span>
-    <ControlButton on:click={ () => $selectedDoiWeight = null }>close</ControlButton>
+    <ControlButton on:click={() => ($selectedDoiWeight = null)}>close</ControlButton>
   </h2>
   {#if message.length > 0}
     <p class="message">{message}</p>
   {/if}
   <div class="content">
-    <slot></slot>
+    <slot />
   </div>
 </div>
 

@@ -24,7 +24,6 @@
     .filter((event) => (event.ctrlKey || event.shiftKey) && !event.button)
     .on("end", onBrushEnd);
 
-
   function onBrushEnd(event: D3BrushEvent<DataItem>) {
     const selection = event.selection;
 

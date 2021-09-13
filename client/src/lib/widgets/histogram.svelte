@@ -44,14 +44,16 @@
     height: height,
     layer: [
       {
-        mark: {type: "bar", tooltip: true},
-        params: [{
-          name: "brush",
-          select: {type: "interval", encodings: ["x"]}
-        }],
+        mark: { type: "bar", tooltip: true },
+        params: [
+          {
+            name: "brush",
+            select: { type: "interval", encodings: ["x"] }
+          }
+        ],
         encoding: {
           x: {
-            bin: {maxbins: bins},
+            bin: { maxbins: bins },
             field: dimension
           },
           y: {
@@ -62,11 +64,11 @@
         }
       },
       {
-        mark: {type: "bar", tooltip: true},
-        transform: [{filter: {param: "brush"}}],
+        mark: { type: "bar", tooltip: true },
+        transform: [{ filter: { param: "brush" } }],
         encoding: {
           x: {
-            bin: {maxbins: bins},
+            bin: { maxbins: bins },
             field: dimension
           },
           y: {
@@ -83,11 +85,11 @@
     histogram.layer[0].encoding.x["title"] = false;
   }
   $: if (domain !== null) {
-    histogram.layer.forEach(l => l.encoding.x["scale"] = { domain });
+    histogram.layer.forEach((l) => (l.encoding.x["scale"] = { domain }));
   }
   $: if (usePresetSelection && selectedValues !== null) {
-    histogram.layer[0].params[0]["value"] = {x: selectedValues};
+    histogram.layer[0].params[0]["value"] = { x: selectedValues };
   }
 </script>
 
-<VegaLitePlot {id} spec={histogram} on:brush={ onBrush } />
+<VegaLitePlot {id} spec={histogram} on:brush={onBrush} />

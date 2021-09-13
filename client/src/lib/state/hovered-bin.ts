@@ -11,13 +11,12 @@ export const hoveredBin = writable(null as HexbinBin<DataItem>);
 let currentHexbinning = null as Hexbin<DataItem>;
 let currentlyHoveredPosition = null as [number, number];
 
-
 setTimeout(() => {
-  hoveredPosition.subscribe(position => {
+  hoveredPosition.subscribe((position) => {
     currentlyHoveredPosition = position;
     updateHoveredBin();
   });
-  hexbinning.subscribe(h => currentHexbinning = h);
+  hexbinning.subscribe((h) => (currentHexbinning = h));
 }, 0);
 
 function updateHoveredBin() {

@@ -13,4 +13,4 @@ export function getDummyDataItem(): DataItem {
   };
 }
 
-dimensions.subscribe((dims) => currentDimensions = dims);
+dimensions.subscribe((dims) => (currentDimensions = dims));

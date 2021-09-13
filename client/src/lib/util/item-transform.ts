@@ -2,7 +2,7 @@ import { dimensions } from "$lib/state/processed-data";
 import type DataItem from "$lib/types/data-item";
 
 let currentDimensions: string[] = [];
-dimensions.subscribe(dims => currentDimensions = dims);
+dimensions.subscribe((dims) => (currentDimensions = dims));
 
 export function dataItemToRecord(dataItem: DataItem): Record<string, unknown> {
   const item = {};

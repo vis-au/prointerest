@@ -24,12 +24,12 @@
 
 <header style="height:{height}px">
   <div class="title">
-    <img src="static/logo.svg" alt="the ProInterest logo" height={height*.8} />
+    <img src="static/logo.svg" alt="the ProInterest logo" height={height * 0.8} />
   </div>
   <Row>
     <InterpolationComponent />
 
-    <Row id="doi-configuration" style="align-items:stretch;height:{height*.8}px;width:700px">
+    <Row id="doi-configuration" style="align-items:stretch;height:{height * 0.8}px;width:700px">
       {#if $selectedDoiComponent === "prior"}
         <PriorComponentWeights />
       {:else if $selectedDoiComponent === "posterior"}

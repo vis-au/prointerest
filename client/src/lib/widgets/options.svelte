@@ -1,8 +1,7 @@
 <script lang="typescript">
-import { active } from "d3-transition";
+  import { active } from "d3-transition";
 
-import Dropdown from "./dropdown.svelte";
-
+  import Dropdown from "./dropdown.svelte";
 
   export let id = "";
   export let className = "";
@@ -11,8 +10,8 @@ import Dropdown from "./dropdown.svelte";
   export let activeOptions: Record<string, boolean>;
   export let showInactive = true;
 
-  $: inactiveOptions = options.filter(o => !activeOptions[o]);
-  $: activeOptionKeys = Object.keys(activeOptions).filter(o => activeOptions[o]);
+  $: inactiveOptions = options.filter((o) => !activeOptions[o]);
+  $: activeOptionKeys = Object.keys(activeOptions).filter((o) => activeOptions[o]);
 
   function select(option: string) {
     activeOptions[option] = true;
@@ -28,17 +27,16 @@ import Dropdown from "./dropdown.svelte";
           id="options-list-{option}"
           type="checkbox"
           value={option}
-          bind:checked={ activeOptions[option] }
+          bind:checked={activeOptions[option]}
         />
         <label for="options-list-{option}">{option}</label>
       </div>
     {/each}
-
   {:else}
-    <Dropdown id="inactive-options" selectedValue=null style="margin-right:20px">
-      <option disabled value=null>add histogram</option>
+    <Dropdown id="inactive-options" selectedValue="null" style="margin-right:20px">
+      <option disabled value="null">add histogram</option>
       {#each inactiveOptions as option}
-        <option value={option} on:click={ () => select(option) }>{option}</option>
+        <option value={option} on:click={() => select(option)}>{option}</option>
       {/each}
     </Dropdown>
 
@@ -48,7 +46,7 @@ import Dropdown from "./dropdown.svelte";
           id="options-list-{option}"
           type="checkbox"
           value={option}
-          bind:checked={ activeOptions[option] }
+          bind:checked={activeOptions[option]}
         />
         <label for="options-list-{option}">{option}</label>
       </div>

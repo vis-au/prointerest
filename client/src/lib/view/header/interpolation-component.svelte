@@ -24,8 +24,8 @@
     id="doi-interpolation-function"
     style="width:125px"
     useDarkMode={true}
-    bind:selectedValue={$selectedDoiInterpolationFunction}>
-
+    bind:selectedValue={$selectedDoiInterpolationFunction}
+  >
     {#each functionNames as name}
       <option value={name} selected={name === $selectedDoiInterpolationFunction}>{name}</option>
     {/each}

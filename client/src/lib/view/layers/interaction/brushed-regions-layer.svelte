@@ -1,9 +1,9 @@
 <script lang="typescript">
   import { activeBrush } from "$lib/state/active-brush";
   import { scaleX, scaleY } from "$lib/state/scales";
-import { selectedItems } from "$lib/state/selected-items";
+  import { selectedItems } from "$lib/state/selected-items";
   import { currentTransform } from "$lib/state/zoom";
-import { separateThousands } from "$lib/util/number-transform";
+  import { separateThousands } from "$lib/util/number-transform";
 
   import { afterUpdate } from "svelte";
 

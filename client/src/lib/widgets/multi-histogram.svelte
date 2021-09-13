@@ -1,6 +1,6 @@
 <script lang="typescript">
   import { createEventDispatcher } from "svelte";
-import VegaLitePlot from "./vega-lite-plot.svelte";
+  import VegaLitePlot from "./vega-lite-plot.svelte";
 
   export let id: string;
   export let colors: string[] = [];
@@ -38,30 +38,32 @@ import VegaLitePlot from "./vega-lite-plot.svelte";
       height: height,
       layer: [
         {
-          params: [{
-            name: "brush",
-            select: {type: "interval", encodings: ["x"]}
-          }],
-          mark: {type: "bar", tooltip: true},
+          params: [
+            {
+              name: "brush",
+              select: { type: "interval", encodings: ["x"] }
+            }
+          ],
+          mark: { type: "bar", tooltip: true },
           encoding: {
             x: {
-              bin: {maxbins: bins},
-              field: {repeat: "repeat"}
+              bin: { maxbins: bins },
+              field: { repeat: "repeat" }
             },
             y: {
               aggregate: "count",
               title: null
             },
-            color: {value: "#ddd"}
+            color: { value: "#ddd" }
           }
         },
         {
-          transform: [{filter: {param: "brush"}}],
-          mark: {type: "bar", tooltip: true},
+          transform: [{ filter: { param: "brush" } }],
+          mark: { type: "bar", tooltip: true },
           encoding: {
             x: {
-              bin: {maxbins: bins},
-              field: {repeat: "repeat"}
+              bin: { maxbins: bins },
+              field: { repeat: "repeat" }
             },
             y: {
               aggregate: "count",
@@ -77,4 +79,8 @@ import VegaLitePlot from "./vega-lite-plot.svelte";
   $: showTitle ? "" : (histogram.spec.layer[1].encoding.x["title"] = false);
 </script>
 
-<VegaLitePlot {id} spec={histogram} on:brush={ (event) => dispatch("interval", event.detail.value) } />
+<VegaLitePlot
+  {id}
+  spec={histogram}
+  on:brush={(event) => dispatch("interval", event.detail.value)}
+/>

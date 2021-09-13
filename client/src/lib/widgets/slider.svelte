@@ -19,26 +19,19 @@
 </script>
 
 <div class="slider" style="width:{width}px;{style}">
-  <label class="before" for="{id}-slider">{ label }</label>
+  <label class="before" for="{id}-slider">{label}</label>
   {#if showValue}
     {#if updateLive}
-    <BigNumber style="margin:0 10px 0 5px;">{value}</BigNumber>
+      <BigNumber style="margin:0 10px 0 5px;">{value}</BigNumber>
     {:else}
-    <BigNumber style="margin:0 10px 0 5px;">{sliderValue}</BigNumber>
+      <BigNumber style="margin:0 10px 0 5px;">{sliderValue}</BigNumber>
     {/if}
   {/if}
   {#if showDomain}
     <label class="min" for="{id}-slider">{min}</label>
   {/if}
   {#if updateLive}
-    <input
-      type="range"
-      id="{id}-slider"
-      {min}
-      {max}
-      {step}
-      bind:value={value}
-    />
+    <input type="range" id="{id}-slider" {min} {max} {step} bind:value />
   {:else}
     <input
       type="range"
@@ -47,7 +40,7 @@
       {max}
       {step}
       bind:value={sliderValue}
-      on:mouseup={() => value = sliderValue}
+      on:mouseup={() => (value = sliderValue)}
     />
   {/if}
   {#if showDomain}
@@ -62,7 +55,7 @@
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.3);
   }
   div.slider label.min,
   div.slider label.max {

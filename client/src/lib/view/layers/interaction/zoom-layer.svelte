@@ -22,7 +22,6 @@
     .on("zoom", onZoom)
     .on("end", onZoomEnd);
 
-
   function onZoom(event: D3ZoomEvent<Element, void>) {
     if (event.sourceEvent === null) {
       return;

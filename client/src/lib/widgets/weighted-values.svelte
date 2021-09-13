@@ -86,11 +86,13 @@
   }
 </script>
 
-<div id={group} class="weighted-values {useDarkmode?"dark":""}">
+<div id={group} class="weighted-values {useDarkmode ? 'dark' : ''}">
   {#each weights as entry, i}
     <div
       class="entry {activeWeight === entry[0] ? 'active' : ''}"
-      style="width:{entry[1] * totalSize}px;{backgroundColor.length > 0?`background:${backgroundColor}`:""}"
+      style="width:{entry[1] * totalSize}px;{backgroundColor.length > 0
+        ? `background:${backgroundColor}`
+        : ''}"
     >
       <label for={getId(entry[0])} title={`${entry[0]}: ${entry[1] * 100}%`}>
         <span class="key">{entry[0]}</span>

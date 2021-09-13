@@ -10,11 +10,11 @@ let currentBins = [] as HexbinBin<DataItem>[];
 let currentlyHoveredBin = null as HexbinBin<DataItem>;
 
 setTimeout(() => {
-  bins.subscribe(b => {
+  bins.subscribe((b) => {
     currentBins = b;
     updateHoveredItems();
   });
-  hoveredBin.subscribe(bin => {
+  hoveredBin.subscribe((bin) => {
     currentlyHoveredBin = bin;
     updateHoveredItems();
   });
@@ -26,7 +26,7 @@ function updateHoveredItems() {
     return;
   }
 
-  const existingBin = currentBins.find(bin => {
+  const existingBin = currentBins.find((bin) => {
     return currentlyHoveredBin.x === bin.x && currentlyHoveredBin.y === bin.y;
   });
 

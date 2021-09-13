@@ -4,7 +4,6 @@ import type { Writable } from "svelte/store";
 import { writable } from "svelte/store";
 import { interestingDimensions } from "./interesting-dimensions";
 
-
 export const activeViewEncodings: Writable<Encodings> = writable({
   x: null,
   y: null,

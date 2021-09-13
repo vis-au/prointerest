@@ -3,7 +3,13 @@
   import Column from "$lib/widgets/column.svelte";
   import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
-  import { exploredItemInterest, exploredItems, interactionThreshold, provenanceLog, provenanceLogSize } from "$lib/state/explored-items";
+  import {
+    exploredItemInterest,
+    exploredItems,
+    interactionThreshold,
+    provenanceLog,
+    provenanceLogSize
+  } from "$lib/state/explored-items";
   import Row from "$lib/widgets/row.svelte";
   import BigNumber from "$lib/widgets/big-number.svelte";
   import Slider from "$lib/widgets/slider.svelte";
@@ -16,16 +22,16 @@
   // TODO: suggest similar/dissimlar data based on prior/posterior/both
 
   $: provenanceInterestValues = exploredItemsToRecord($exploredItemInterest);
-  $: start = Math.max($provenanceLog.log.length - $provenanceLogSize, 0)
+  $: start = Math.max($provenanceLog.log.length - $provenanceLogSize, 0);
   $: console.log(provenanceInterestValues);
   $: consideredLog = $provenanceLog.log
     .slice(start, $provenanceLog.log.length)
-    .map(d => d.mode)
+    .map((d) => d.mode)
     .reverse();
 
   function exploredItemsToRecord(items: Map<DataItem, number>): Record<"interest", number>[] {
-    return Array.from(items.values()).map(value => {
-      return {"interest": value}
+    return Array.from(items.values()).map((value) => {
+      return { interest: value };
     });
   }
 
@@ -77,9 +83,7 @@
     <Column style="width:{histogramSize - 20}px">
       <h3>
         <span>Provenance Log (newest first)</span>
-        <Toggle
-          style="font-weight:normal"
-          bind:active={showAggregateInteractionCount}>
+        <Toggle style="font-weight:normal" bind:active={showAggregateInteractionCount}>
           summerize
         </Toggle>
       </h3>

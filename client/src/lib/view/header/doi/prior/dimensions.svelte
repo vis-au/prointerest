@@ -26,13 +26,12 @@
 
   function getSelectedDimensionExtents() {
     Object.keys($interestingDimensions)
-      .filter(d => $interestingDimensions[d])
-      .forEach(d => {
+      .filter((d) => $interestingDimensions[d])
+      .forEach((d) => {
         if (extents[d] === undefined) {
-          getDimensionExtent(d)
-            .then(extent => {
-              extents[d] = [extent.min, extent.max];
-            });
+          getDimensionExtent(d).then((extent) => {
+            extents[d] = [extent.min, extent.max];
+          });
         }
       });
   }
@@ -55,8 +54,8 @@
         <span class="interesting-range">
           {#if $interestingDimensions[dim] && $interestingIntervals[dim] !== null}
             [
-              {truncateFloat($interestingIntervals[dim][0])},
-              {truncateFloat($interestingIntervals[dim][1])}
+            {truncateFloat($interestingIntervals[dim][0])},
+            {truncateFloat($interestingIntervals[dim][1])}
             ]
           {/if}
         </span>

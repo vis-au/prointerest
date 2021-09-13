@@ -61,8 +61,7 @@ function recreateQuadtree() {
 // is run asynchronously to ensure that the scales are set
 setTimeout(() => {
   processedData.subscribe((newData) => {
-    const newItems = newData
-      .slice(newData.length - newData.length - CHUNK_SIZE, newData.length);
+    const newItems = newData.slice(newData.length - newData.length - CHUNK_SIZE, newData.length);
 
     if (newData.length === 0) {
       recreateQuadtree();

@@ -31,8 +31,8 @@ export async function getDimensionNames(): Promise<string[]> {
   return sendRequestToBaseURL("/dimensions");
 }
 
-export async function getDimensionExtent(dimension: string): Promise<{"min": number, "max": number}> {
-  return sendRequestToBaseURL(`/extent/${dimension}`)
+export async function getDimensionExtent(dimension: string): Promise<{ min: number; max: number }> {
+  return sendRequestToBaseURL(`/extent/${dimension}`);
 }
 
 export async function getNextChunk(chunkSize: number): Promise<number[][]> {
@@ -69,11 +69,18 @@ export async function sendInterestingDimensions(dimensions: string[]): Promise<v
   return sendRequestToBaseURL("/dimensions", "POST", { dimensions });
 }
 
-export async function sendInterestingDimensionRange(dimension: string, range: [number, number]): Promise<void> {
-  return sendRequestToBaseURL("/dimension_range", "POST", { dimension, min: range[0], max: range[1] });
+export async function sendInterestingDimensionRange(
+  dimension: string,
+  range: [number, number]
+): Promise<void> {
+  return sendRequestToBaseURL("/dimension_range", "POST", {
+    dimension,
+    min: range[0],
+    max: range[1]
+  });
 }
 
-export async function sendAxisDimension(axis: "x"|"y", dimension: string): Promise<void> {
+export async function sendAxisDimension(axis: "x" | "y", dimension: string): Promise<void> {
   return sendRequestToBaseURL(`/axis?axis=${axis}&dimension=${dimension}`);
 }
 

@@ -9,13 +9,15 @@
 </script>
 
 <label {id} class="toggle" for="{id}-toggle" {style}>
-  <input id="{id}-toggle"
+  <input
+    id="{id}-toggle"
     type="checkbox"
     bind:checked={active}
-    on:change={() => dispatch("changed", active)} />
+    on:change={() => dispatch("changed", active)}
+  />
 
   <span>
-    <slot></slot>
+    <slot />
   </span>
 </label>
 
@@ -35,7 +37,7 @@
     -moz-user-select: none;
     -webkit-user-select: none;
   }
-  label.toggle input:checked+span {
+  label.toggle input:checked + span {
     background: #555;
     color: #fff;
   }

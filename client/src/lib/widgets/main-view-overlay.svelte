@@ -18,16 +18,11 @@
   function close() {
     dispatch("close");
   }
-
 </script>
 
-<div
-  class="main-view-overlay-container"
-  style="{display};{left};{top};{w};{h}"
-  on:click={ close }>
-
-  <div class="main-view-overlay" on:click={ (event) => event.stopPropagation() }>
-    <slot></slot>
+<div class="main-view-overlay-container" style="{display};{left};{top};{w};{h}" on:click={close}>
+  <div class="main-view-overlay" on:click={(event) => event.stopPropagation()}>
+    <slot />
   </div>
 </div>
 

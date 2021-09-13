@@ -16,7 +16,7 @@
   }
 </script>
 
-<MainViewOverlay {x} {y} {width} {height} visible={$selectedDoiWeight !== null} on:close={ close }>
+<MainViewOverlay {x} {y} {width} {height} visible={$selectedDoiWeight !== null} on:close={close}>
   {#if $selectedDoiWeight === "outlierness"}
     <Outlierness />
   {:else if $selectedDoiWeight === "dimensions"}

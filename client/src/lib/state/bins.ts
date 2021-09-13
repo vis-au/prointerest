@@ -9,12 +9,12 @@ export const bins = writable([] as HexbinBin<DataItem>[]);
 let currentHexbinning = null as Hexbin<DataItem>;
 let currentlyVisibleData = [] as DataItem[];
 
-hexbinning.subscribe(h => {
+hexbinning.subscribe((h) => {
   currentHexbinning = h;
   bins.set(currentHexbinning(currentlyVisibleData));
 });
 
-visibleData.subscribe(data => {
+visibleData.subscribe((data) => {
   currentlyVisibleData = data;
   bins.set(currentHexbinning(data));
 });

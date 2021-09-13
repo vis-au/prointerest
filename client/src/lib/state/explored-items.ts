@@ -8,7 +8,6 @@ import { sendInterestingItems } from "$lib/util/requests";
 import type { InteractionLog } from "$lib/provenance/interaction-log";
 import { interactionWeights } from "./interaction-technique-weights";
 
-
 const interactionObserver = new InteractionObserver(getPointsInR);
 
 let currentInteractedThreshold = 0.25;
@@ -50,16 +49,16 @@ export function updateExploredItems(): void {
   }, 0);
 }
 
-interactionWeights.subscribe(weights => {
+interactionWeights.subscribe((weights) => {
   interactionObserver.doiWeights = weights;
 });
 
-interactionThreshold.subscribe(threshold => {
+interactionThreshold.subscribe((threshold) => {
   currentInteractedThreshold = threshold;
   updateExploredItems();
 });
 
-provenanceLogSize.subscribe(size => {
+provenanceLogSize.subscribe((size) => {
   currentProvenanceLogSize = size;
   updateExploredItems();
 });

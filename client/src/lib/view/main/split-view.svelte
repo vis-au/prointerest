@@ -8,13 +8,13 @@
 <Column id="split-view">
   <div class="top">
     {#if isCollapsed}
-      <ControlButton id="open-button" on:click={() => isCollapsed = false }>open</ControlButton>
+      <ControlButton id="open-button" on:click={() => (isCollapsed = false)}>open</ControlButton>
     {/if}
-    <slot name="top"></slot>
+    <slot name="top" />
   </div>
   {#if !isCollapsed}
     <div class="bottom">
-      <slot name="bottom"></slot>
+      <slot name="bottom" />
     </div>
   {/if}
 </Column>
@@ -27,7 +27,7 @@
     z-index: 1000;
   }
   div.top {
-    flex-grow: 8
+    flex-grow: 8;
   }
   div.bottom {
     flex-grow: 2;

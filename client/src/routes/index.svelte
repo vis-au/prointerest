@@ -13,9 +13,9 @@
   import { getDimensionNames, getTotalDatasize } from "$lib/util/requests";
   import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { viewPort } from "$lib/state/visible-data";
-	import SplitView from "$lib/view/main/split-view.svelte";
-	import SecondaryView from "$lib/view/main/secondary-view.svelte";
-	import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
+  import SplitView from "$lib/view/main/split-view.svelte";
+  import SecondaryView from "$lib/view/main/secondary-view.svelte";
+  import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
 
   let innerWidth = 0;
   let innerHeight = 0;
@@ -29,8 +29,8 @@
 
   $: plotWidth = innerWidth - margin.horizontal;
   $: plotHeight = innerHeight - margin.vertical;
-	$: topHeight = $isSecondaryViewCollapsed ? plotHeight : plotHeight * 0.73;
-	$: bottomHeight = plotHeight - topHeight;
+  $: topHeight = $isSecondaryViewCollapsed ? plotHeight : plotHeight * 0.73;
+  $: bottomHeight = plotHeight - topHeight;
   $: $viewPort.maxX = innerWidth;
   $: $viewPort.maxY = topHeight;
 
@@ -61,14 +61,14 @@
 <div id="pro-interest">
   <Header height={headerHeight} />
 
-	<SplitView bind:isCollapsed={$isSecondaryViewCollapsed}>
-		<div slot="top">
-			<MainView width={plotWidth} height={topHeight} />
-		</div>
-		<div slot="bottom" style="">
-			<SecondaryView width={plotWidth} height={bottomHeight} />
-		</div>
-	</SplitView>
+  <SplitView bind:isCollapsed={$isSecondaryViewCollapsed}>
+    <div slot="top">
+      <MainView width={plotWidth} height={topHeight} />
+    </div>
+    <div slot="bottom" style="">
+      <SecondaryView width={plotWidth} height={bottomHeight} />
+    </div>
+  </SplitView>
 
   <ActiveDoiPanel x={0} y={headerHeight} width={plotWidth} height={topHeight} />
   <ResizingOverlay x={mousePosition[0]} y={$isResizing?.startY} />

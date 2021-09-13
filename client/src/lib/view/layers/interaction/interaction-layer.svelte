@@ -15,8 +15,8 @@
   import { hoveredBin } from "$lib/state/hovered-bin";
   import BrushLayer from "./brush-layer.svelte";
   import ZoomLayer from "./zoom-layer.svelte";
-import { bins } from "$lib/state/bins";
-import { activeBrush } from "$lib/state/active-brush";
+  import { bins } from "$lib/state/bins";
+  import { activeBrush } from "$lib/state/active-brush";
 
   export let id = "view-interaction-layer";
   export let width: number;
@@ -30,7 +30,6 @@ import { activeBrush } from "$lib/state/active-brush";
   const interactionFactory = new InteractionFactory(width, height, $quadtree);
   interactionFactory.getItemsInRegion = getPointsInRect;
   interactionFactory.getTimestamp = getLatestTimestamp;
-
 
   function buttonPressed(event: KeyboardEvent) {
     if (event.key === "Control") {
@@ -75,9 +74,7 @@ import { activeBrush } from "$lib/state/active-brush";
     const dummyItem = getDummyDataItem();
     dummyItem.position = { x, y };
     const clickedBin = $hexbinning([dummyItem])[0];
-    const actualBin = $bins.find(
-      (bin) => bin.x === clickedBin.x && bin.y === clickedBin.y
-    );
+    const actualBin = $bins.find((bin) => bin.x === clickedBin.x && bin.y === clickedBin.y);
 
     // does bin contain data?
     if (actualBin === undefined) {
@@ -168,7 +165,7 @@ import { activeBrush } from "$lib/state/active-brush";
     id="zoom-layer"
     {width}
     {height}
-    className={$activeInteractionMode !== 'zoom' ? 'hidden' : ''}
+    className={$activeInteractionMode !== "zoom" ? "hidden" : ""}
     on:click={onClick}
     on:hover={onHover}
     on:end={onZoomEnd}
@@ -177,14 +174,14 @@ import { activeBrush } from "$lib/state/active-brush";
     id="brush-layer"
     {width}
     {height}
-    className={$activeInteractionMode !== 'brush' ? 'hidden' : ''}
+    className={$activeInteractionMode !== "brush" ? "hidden" : ""}
     on:click={onClick}
     on:hover={onHover}
     on:end={onBrushEnd}
   />
 </div>
 
-<svelte:window on:keydown={buttonPressed} on:keyup={buttonReleased}></svelte:window>
+<svelte:window on:keydown={buttonPressed} on:keyup={buttonReleased} />
 
 <style>
   :global(canvas.interaction-canvas, svg.interaction-canvas) {

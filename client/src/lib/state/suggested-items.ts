@@ -7,7 +7,7 @@ import type { SuggestionInput, SuggestionOutput } from "$lib/types/suggestion-mo
 import { getPointsInR } from "$lib/util/find-in-quadtree";
 import { activeSuggestionInput, activeSuggestionOutput } from "./active-suggestion-modes";
 import { quadtree } from "./quadtree";
-import { interestingDimensions } from "./interesting-dimensions"
+import { interestingDimensions } from "./interesting-dimensions";
 import { dimensions } from "./processed-data";
 import { exploredItems } from "./explored-items";
 import { interestingItems } from "./interesting-items";
@@ -58,10 +58,10 @@ quadtree.subscribe((newTree) => {
   suggestionProvider.processedDataspace = dataspace;
 });
 
-dimensions.subscribe(dims => currenDimensions = dims);
+dimensions.subscribe((dims) => (currenDimensions = dims));
 interestingDimensions.subscribe((newRecord) => {
-  const intersetingDimensions = Object.keys(newRecord).filter(d => newRecord[d]);
-  const indeces = intersetingDimensions.map(d => currenDimensions.indexOf(d));
+  const intersetingDimensions = Object.keys(newRecord).filter((d) => newRecord[d]);
+  const indeces = intersetingDimensions.map((d) => currenDimensions.indexOf(d));
 
   suggestionProvider.dimensionOfInterestIndeces = indeces;
 });
@@ -74,4 +74,4 @@ exploredItems.subscribe((items) => {
 interestingItems.subscribe((items) => {
   currentlyInterestingItems = items;
   updateSuggestedItems();
-})
+});
