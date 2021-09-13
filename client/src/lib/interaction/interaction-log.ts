@@ -7,7 +7,13 @@ export class InteractionLog {
   public log: DoiInteraction[] = [];
 
   constructor() {
-    window.setInterval(this.flush.bind(this), FLUSH_INTERVAL);
+    this.startAutomatedFlush();
+  }
+
+  public startAutomatedFlush(): void {
+    if (window !== undefined) {
+      window.setInterval(this.flush.bind(this), FLUSH_INTERVAL);
+    }
   }
 
   private flush() {
