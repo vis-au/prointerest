@@ -1,27 +1,22 @@
 <script lang="typescript">
-  import { afterUpdate, onMount } from "svelte";
-  import { brush } from "d3-brush";
-  import type { D3BrushEvent } from "d3-brush";
-  import { select } from "d3-selection";
-  import type { Selection } from "d3-selection";
-  import { zoom, zoomTransform } from "d3-zoom";
-  import type { D3ZoomEvent } from "d3-zoom";
+  import { afterUpdate } from "svelte";
 
   import { hoveredPosition } from "$lib/state/hovered-position";
   import { selectedBins } from "$lib/state/selected-bins";
   import { currentTransform, isZooming } from "$lib/state/zoom";
   import { hexbinning } from "$lib/state/hexbinning";
-  import { activeBrush } from "$lib/state/active-brush";
   import { activeInteractionMode } from "$lib/state/active-interaction-mode";
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
-  import type DataItem from "$lib/types/data-item";
   import { getDummyDataItem } from "$lib/util/dummy-data-item";
   import { quadtree } from "$lib/state/quadtree";
   import { getPointsInRect } from "$lib/util/find-in-quadtree";
   import type { DoiInteraction } from "$lib/provenance/doi-interaction";
   import { getLatestTimestamp, registerNewInteraction } from "$lib/state/explored-items";
-  import { scaleX, scaleY } from "$lib/state/scales";
   import { hoveredBin } from "$lib/state/hovered-bin";
+  import BrushLayer from "./brush-layer.svelte";
+  import ZoomLayer from "./zoom-layer.svelte";
+import { bins } from "$lib/state/bins";
+import { activeBrush } from "$lib/state/active-brush";
 
   export let id = "view-interaction-layer";
   export let width: number;
@@ -29,8 +24,6 @@
   export let lineWidth = 4;
 
   let selectionCanvas: HTMLCanvasElement;
-  let zoomCanvasElement: HTMLCanvasElement;
-  let brushCanvasElement: SVGElement;
 
   const color = "rgba(255,69,0,.7)";
 
@@ -38,16 +31,6 @@
   interactionFactory.getItemsInRegion = getPointsInRect;
   interactionFactory.getTimestamp = getLatestTimestamp;
 
-  const zoomBehavior = zoom()
-    .scaleExtent([0.75, 10])
-    .on("start", () => ($isZooming = true))
-    .on("zoom", onZoom)
-    .on("end", onZoomEnd);
-
-  const brushBehavior = brush()
-    .keyModifiers(false)
-    .filter((event) => (event.ctrlKey || event.shiftKey) && !event.button)
-    .on("end", onBrushEnd);
 
   function buttonPressed(event: KeyboardEvent) {
     if (event.key === "Control") {
@@ -65,36 +48,43 @@
     registerNewInteraction(interaction);
   }
 
-  function onZoom(event: D3ZoomEvent<Element, void>) {
-    if (event.sourceEvent === null) {
-      return;
-    }
-
-    $currentTransform = event.transform;
+  function onBrushEnd() {
+    const [[x0, y0], [x1, y1]] = $activeBrush;
+    const interaction = interactionFactory.createBrushInteraction(x0, y0, x1, y1);
+    onInteraction(interaction);
   }
 
   function onZoomEnd() {
-    $isZooming = false;
     const interaction = interactionFactory.createZoomInteraction($currentTransform);
     onInteraction(interaction);
   }
 
-  function onHover(event) {
-    const rect = event.target.getBoundingClientRect();
-    const x = $currentTransform.invertX(event.clientX - rect.left);
-    const y = $currentTransform.invertY(event.clientY - rect.top);
+  function onHover(event: CustomEvent) {
+    const rect = event.detail.target.getBoundingClientRect();
+    const x = $currentTransform.invertX(event.detail.clientX - rect.left);
+    const y = $currentTransform.invertY(event.detail.clientY - rect.top);
 
     hoveredPosition.set([x, y]);
   }
 
-  function onClick(event) {
-    const rect = event.target.getBoundingClientRect();
-    const x = $currentTransform.invertX(event.clientX - rect.left);
-    const y = $currentTransform.invertY(event.clientY - rect.top);
+  function onClick(event: CustomEvent) {
+    const rect = event.detail.target.getBoundingClientRect();
+    const x = $currentTransform.invertX(event.detail.clientX - rect.left);
+    const y = $currentTransform.invertY(event.detail.clientY - rect.top);
 
     const dummyItem = getDummyDataItem();
     dummyItem.position = { x, y };
     const clickedBin = $hexbinning([dummyItem])[0];
+    const actualBin = $bins.find(
+      (bin) => bin.x === clickedBin.x && bin.y === clickedBin.y
+    );
+
+    // does bin contain data?
+    if (actualBin === undefined) {
+      return;
+    }
+
+    // is bin already selected?
     const selectedBin = $selectedBins.find(
       (bin) => bin.x === clickedBin.x && bin.y === clickedBin.y
     );
@@ -102,43 +92,16 @@
 
     selectedBins.update((currentlySelectedBins) => {
       if (selectedIndex > 0) {
+        // deselect
         currentlySelectedBins.splice(selectedIndex, 1);
         return currentlySelectedBins;
       } else {
-        return (currentlySelectedBins = currentlySelectedBins.concat([clickedBin]));
+        // select
+        return (currentlySelectedBins = currentlySelectedBins.concat([actualBin]));
       }
     });
 
     const interaction = interactionFactory.createSelectInteraction(x, y);
-    onInteraction(interaction);
-  }
-
-  function onBrushEnd(event: D3BrushEvent<DataItem>) {
-    const selection = event.selection;
-
-    if (selection === null || selection === undefined) {
-      $activeBrush = [
-        [null, null],
-        [null, null]
-      ];
-      return;
-    }
-
-    const [[x0, y0], [x1, y1]] = selection as [[number, number], [number, number]];
-    const _x0 = $scaleX.invert($currentTransform.invertX(x0));
-    const _y0 = $scaleY.invert($currentTransform.invertY(y0));
-    const _x1 = $scaleX.invert($currentTransform.invertX(x1));
-    const _y1 = $scaleY.invert($currentTransform.invertY(y1));
-    $activeBrush = [
-      [_x0, _y0],
-      [_x1, _y1]
-    ];
-
-    // the brush is drawn by the brush-layer component to make the brushed region persist zoom+pan
-    // we can therefore hide it here
-    select(brushCanvasElement).selectAll("rect.selection,rect.handle").style("display", "none");
-
-    const interaction = interactionFactory.createBrushInteraction($scaleX(_x0), $scaleY(_y0), $scaleX(_x1), $scaleY(_y1));
     onInteraction(interaction);
   }
 
@@ -147,15 +110,18 @@
       return;
     }
 
+    const x = $hoveredBin.x;
+    const y = $hoveredBin.y;
+
     ctx.beginPath();
-    ctx.translate($hoveredBin.x, $hoveredBin.y);
+    ctx.translate(x, y);
     ctx.strokeStyle = color;
     ctx.fillStyle = "rgba(0, 0, 0, 0.0)";
     ctx.lineWidth = lineWidth * 0.5;
     ctx.setLineDash([2]);
     ctx.stroke(hexagonPath);
     ctx.fill(hexagonPath);
-    ctx.translate(-$hoveredBin.x, -$hoveredBin.y);
+    ctx.translate(-x, -y);
     ctx.closePath();
     ctx.setLineDash([]);
   }
@@ -187,28 +153,7 @@
     renderSelectedBins(ctx, hexagonPath);
   }
 
-  onMount(() => {
-    // use a timeout to ensure that the brush canvas has the right size when calling the brush
-    // behavior
-    setTimeout(() => {
-      const brushSvg = select(brushCanvasElement);
-      brushSvg.call(brushBehavior);
-      const zoomCanvas = select(zoomCanvasElement);
-      zoomCanvas.call(zoomBehavior);
-    }, 10);
-  });
-
-  afterUpdate(() => {
-    const canvas = select(zoomCanvasElement) as Selection<Element, unknown, null, null>;
-    const myZoom = zoomTransform(zoomCanvasElement);
-
-    // check if the zoom transform has changed
-    if (JSON.stringify(myZoom) !== JSON.stringify($currentTransform)) {
-      zoomBehavior.transform(canvas, $currentTransform);
-    }
-
-    render();
-  });
+  afterUpdate(render);
 </script>
 
 <div class="interaction-canvas-container {$isZooming ? 'zooming' : ''}">
@@ -219,41 +164,39 @@
     {height}
     bind:this={selectionCanvas}
   />
-  <canvas
-    id="{id}-zoom-canvas"
-    class="zoom interaction-canvas {$activeInteractionMode !== 'zoom' ? 'hidden' : ''}"
+  <ZoomLayer
+    id="zoom-layer"
     {width}
     {height}
-    on:mousemove={onHover}
+    className={$activeInteractionMode !== 'zoom' ? 'hidden' : ''}
     on:click={onClick}
-    bind:this={zoomCanvasElement}
+    on:hover={onHover}
+    on:end={onZoomEnd}
   />
-  <svg
-    id="{id}-brush-canvas"
-    class="brush interaction-canvas {$activeInteractionMode !== 'brush' ? 'hidden' : ''}"
+  <BrushLayer
+    id="brush-layer"
     {width}
     {height}
-    on:mousemove={onHover}
+    className={$activeInteractionMode !== 'brush' ? 'hidden' : ''}
     on:click={onClick}
-    bind:this={brushCanvasElement}
+    on:hover={onHover}
+    on:end={onBrushEnd}
   />
 </div>
 
 <svelte:window on:keydown={buttonPressed} on:keyup={buttonReleased}></svelte:window>
 
 <style>
+  :global(canvas.interaction-canvas, svg.interaction-canvas) {
+    position: absolute;
+  }
+  :global(canvas.interaction-canvas.hidden, svg.interaction-canvas.hidden) {
+    display: none;
+  }
   div.interaction-canvas-container {
     position: relative;
   }
   div.interaction-canvas-container.zooming {
     cursor: all-scroll;
-  }
-  canvas.interaction-canvas,
-  svg.interaction-canvas {
-    position: absolute;
-  }
-  canvas.interaction-canvas.hidden,
-  svg.interaction-canvas.hidden {
-    display: none;
   }
 </style>

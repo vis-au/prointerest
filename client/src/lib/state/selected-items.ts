@@ -1,13 +1,13 @@
 import type { HexbinBin } from "d3-hexbin";
+import type { ScaleLinear } from "d3-scale";
 import { writable } from "svelte/store";
 
 import type DataItem from "$lib/types/data-item";
-import { getPointsInR, getPointsInRect } from "$lib/util/find-in-quadtree";
+import { getPointsInRect } from "$lib/util/find-in-quadtree";
 import { activeBrush } from "./active-brush";
 import { quadtree } from "./quadtree";
 import { selectedBins } from "./selected-bins";
 import { scaleX, scaleY } from "./scales";
-import type { ScaleLinear } from "d3-scale";
 
 let currentlySelected: DataItem[] = [];
 export const selectedItems = writable(currentlySelected);
@@ -33,7 +33,7 @@ function getBrushedItems() {
 }
 
 function getItemsInSelectedBins() {
-  return currentSelectedBins.map((bin) => getPointsInR(bin.x, bin.y, 10)).flat();
+  return currentSelectedBins.map((bin) => bin.slice(0)).flat();
 }
 
 function deselectItems() {
