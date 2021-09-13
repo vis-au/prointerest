@@ -9,7 +9,7 @@
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import { getDummyDataItem } from "$lib/util/dummy-data-item";
   import { quadtree } from "$lib/state/quadtree";
-  import { getUntransformedPointsInRect } from "$lib/util/find-in-quadtree";
+  import { getPointsInRect } from "$lib/util/find-in-quadtree";
   import type { DoiInteraction } from "$lib/provenance/doi-interaction";
   import { getLatestTimestamp, registerNewInteraction } from "$lib/state/explored-items";
   import { hoveredBin } from "$lib/state/hovered-bin";
@@ -17,6 +17,7 @@
   import ZoomLayer from "./zoom-layer.svelte";
   import { bins } from "$lib/state/bins";
   import { activeBrush } from "$lib/state/active-brush";
+  import { scaleX, scaleY } from "$lib/state/scales";
 
   export let id = "view-interaction-layer";
   export let width: number;
@@ -28,7 +29,7 @@
   const color = "rgba(255,69,0,.7)";
 
   const interactionFactory = new InteractionFactory(width, height, $quadtree);
-  interactionFactory.getItemsInRegion = getUntransformedPointsInRect;
+  interactionFactory.getItemsInRegion = getPointsInRect;
   interactionFactory.getTimestamp = getLatestTimestamp;
   $: interactionFactory.width = width;
   $: interactionFactory.height = height;
@@ -51,7 +52,11 @@
 
   function onBrushEnd() {
     const [[x0, y0], [x1, y1]] = $activeBrush;
-    const interaction = interactionFactory.createBrushInteraction(x0, y0, x1, y1);
+    const x0_ = $scaleX(x0);
+    const x1_ = $scaleX(x1);
+    const y0_ = $scaleY(y0);
+    const y1_ = $scaleY(y1);
+    const interaction = interactionFactory.createBrushInteraction(x0_, y0_, x1_, y1_);
     onInteraction(interaction);
   }
 

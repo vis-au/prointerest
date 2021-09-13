@@ -24,9 +24,8 @@ export default class Brush implements DoiInteraction {
 
     const x0 = this.x - this.maxDistance;
     const x3 = this.x + this.width + this.maxDistance;
-    // y0 is expected to be bigger than y3 because of the way that the y scale is set up
-    const y0 = this.y + this.height + this.maxDistance;
-    const y3 = this.y - this.maxDistance;
+    const y0 = this.y - this.maxDistance;
+    const y3 = this.y + this.height + this.maxDistance;
 
     const affectedDataItems = this.getItemsInRegion(x0, y0, x3, y3);
 
