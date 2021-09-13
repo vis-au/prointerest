@@ -8,7 +8,8 @@
     exploredItems,
     interactionThreshold,
     provenanceLog,
-    provenanceLogSize
+    provenanceLogSize,
+    updateExploredItems
   } from "$lib/state/explored-items";
   import Row from "$lib/widgets/row.svelte";
   import BigNumber from "$lib/widgets/big-number.svelte";
@@ -18,12 +19,13 @@
   import { separateThousands } from "$lib/util/number-transform";
   import List from "$lib/widgets/list.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
+  import { onMount } from "svelte";
 
   // TODO: suggest similar/dissimlar data based on prior/posterior/both
 
   $: provenanceInterestValues = exploredItemsToRecord($exploredItemInterest);
   $: start = Math.max($provenanceLog.log.length - $provenanceLogSize, 0);
-  $: console.log(provenanceInterestValues);
+  $: console.log($exploredItemInterest);
   $: consideredLog = $provenanceLog.log
     .slice(start, $provenanceLog.log.length)
     .map((d) => d.mode)
@@ -37,6 +39,10 @@
 
   const histogramSize = 700;
   let showAggregateInteractionCount = true;
+
+  onMount(() => {
+    updateExploredItems();
+  });
 </script>
 
 <DoiConfig
@@ -65,6 +71,7 @@
         data={provenanceInterestValues}
         dimension={"interest"}
         bins={20}
+        domain={[0, 1]}
         width={histogramSize - 50}
         height={100}
       />
