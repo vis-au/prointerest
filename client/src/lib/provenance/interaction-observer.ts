@@ -1,4 +1,3 @@
-import { interactionWeights } from "$lib/state/interaction-technique-weights";
 import type DataItem from "../types/data-item";
 import { interactionModes } from "./doi-interaction";
 import type { DoiInteraction, InteractionMode } from "./doi-interaction";
@@ -15,12 +14,10 @@ export default class InteractionObserver {
   public interactionLog: InteractionLog = getInteractionLog();
   public recentSteps = 10;
   public interestThreshold = 0.23;
-  private doiWeights: Map<InteractionMode, number>;
+  public doiWeights: Map<InteractionMode, number>;
 
   constructor(findPointsWithinRadius: (x: number, y: number, r: number) => DataItem[]) {
     this.findPointsWithinRadius = findPointsWithinRadius;
-
-    interactionWeights.subscribe((newWeights) => (this.doiWeights = newWeights));
   }
 
   private isItemAffectedByInteraction(item: DataItem, interaction: DoiInteraction) {

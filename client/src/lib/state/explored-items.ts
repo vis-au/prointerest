@@ -6,6 +6,7 @@ import { quadtree } from "./quadtree";
 import type { DoiInteraction } from "$lib/provenance/doi-interaction";
 import { sendInterestingItems } from "$lib/util/requests";
 import type { InteractionLog } from "$lib/provenance/interaction-log";
+import { interactionWeights } from "./interaction-technique-weights";
 
 
 const interactionObserver = new InteractionObserver(getPointsInR);
@@ -49,6 +50,9 @@ export function updateExploredItems(): void {
   }, 0);
 }
 
+interactionWeights.subscribe(weights => {
+  interactionObserver.doiWeights = weights;
+});
 
 interactionThreshold.subscribe(threshold => {
   currentInteractedThreshold = threshold;
