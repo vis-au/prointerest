@@ -1,11 +1,17 @@
 import type DataItem from "$lib/types/data-item";
 import type { Quadtree, QuadtreeLeaf } from "d3-quadtree";
 import { quadtree } from "$lib/state/quadtree";
+import type { ScaleLinear } from "d3-scale";
+import { scaleX, scaleY } from "$lib/state/scales";
 
 let currentQuadtree: Quadtree<DataItem>;
+let x: ScaleLinear<number, number>;
+let y: ScaleLinear<number, number>;
 
 // this is async to avoid error when loading page caused by access to lexical declaration of quadtr.
 setTimeout(() => quadtree.subscribe((newQuadtree) => (currentQuadtree = newQuadtree)), 0);
+scaleX.subscribe((s) => (x = s));
+scaleY.subscribe((s) => (y = s));
 
 // uses UNTRANSFORMED screen positions!
 export function getPointsInR(x: number, y: number, r: number): DataItem[] {
@@ -34,7 +40,7 @@ export function getPointsInR(x: number, y: number, r: number): DataItem[] {
   return pointsInR;
 }
 
-// uses UNTRANSFORMED screen positions!
+// uses UNTRANSFORMED, BUT TRANSFORMED screen positions!
 export function getPointsInRect(x0: number, y0: number, x3: number, y3: number): DataItem[] {
   if (currentQuadtree === undefined) {
     return [];
@@ -60,4 +66,14 @@ export function getPointsInRect(x0: number, y0: number, x3: number, y3: number):
   });
 
   return pointsInRect;
+}
+
+// uses UNTRANSFORMED, UNSCALED DATA positions!
+export function getUntransformedPointsInRect(
+  x0: number,
+  y0: number,
+  x3: number,
+  y3: number
+): DataItem[] {
+  return getPointsInRect(x(x0), y(y0), x(x3), y(y3));
 }
