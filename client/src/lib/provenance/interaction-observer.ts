@@ -30,6 +30,15 @@ export default class InteractionObserver {
     return affected.indexOf(item.id) > -1;
   }
 
+  private getInteractionCount(type: InteractionMode) {
+    let count = 0;
+    this.interactionLog
+      .getNRecentSteps(this.recentSteps)
+      .filter((interaction) => interaction.mode === type)
+      .forEach(() => count++);
+    return count;
+  }
+
   private getItemBasedInteractionFrequency(item: DataItem, type: InteractionMode) {
     let interactionFrequency = 0;
 
@@ -66,7 +75,7 @@ export default class InteractionObserver {
   private getWeightedDoiSum(subspace: DataItem[]) {
     const interestPerItem: number[] = [];
     const values = Array.from(this.doiWeights.values());
-    const weightSum = Object.values(values).reduce((a, b) => a + b, 0);
+    const weightSum = Object.values(values).reduce((a, b) => a + b, 0); // should always be 1?
     let totalDoiSum = 0;
     let weightedDoiSum = 0;
 
@@ -74,11 +83,14 @@ export default class InteractionObserver {
       totalDoiSum = 0;
 
       interactionModes.forEach((type) => {
-        // how frequently did user interact with that subspace?
+        const count = this.getInteractionCount(type);
+        // how frequently did user interact<type> with that item?
         const absoluteFrequency = this.getItemBasedInteractionFrequency(item, type);
-        // how recently did user interact with that subspace?
-        const adjustedFrequency = this.applyDecay(absoluteFrequency, type);
-        // how expressively did user interact with that subspace?
+        // how many of the last interact<type> interactions included this item?
+        const relativeFrequency = absoluteFrequency / count;
+        // how recently did user interact<type> with that item?
+        const adjustedFrequency = this.applyDecay(relativeFrequency, type);
+        // what's the weight of that interaction?
         const weightedDoi = adjustedFrequency * this.doiWeights.get(type);
 
         totalDoiSum += weightedDoi;
