@@ -77,4 +77,12 @@ export default class InteractionFactory {
 
     return selectInteraction;
   }
+
+  public set width(w: number) {
+    this.screenWidth = w;
+  }
+
+  public set height(h: number) {
+    this.screenHeight = h;
+  }
 }

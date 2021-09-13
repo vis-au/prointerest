@@ -9,7 +9,7 @@
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import { getDummyDataItem } from "$lib/util/dummy-data-item";
   import { quadtree } from "$lib/state/quadtree";
-  import { getPointsInRect } from "$lib/util/find-in-quadtree";
+  import { getUntransformedPointsInRect } from "$lib/util/find-in-quadtree";
   import type { DoiInteraction } from "$lib/provenance/doi-interaction";
   import { getLatestTimestamp, registerNewInteraction } from "$lib/state/explored-items";
   import { hoveredBin } from "$lib/state/hovered-bin";
@@ -28,8 +28,10 @@
   const color = "rgba(255,69,0,.7)";
 
   const interactionFactory = new InteractionFactory(width, height, $quadtree);
-  interactionFactory.getItemsInRegion = getPointsInRect;
+  interactionFactory.getItemsInRegion = getUntransformedPointsInRect;
   interactionFactory.getTimestamp = getLatestTimestamp;
+  $: interactionFactory.width = width;
+  $: interactionFactory.height = height;
 
   function buttonPressed(event: KeyboardEvent) {
     if (event.key === "Control") {
