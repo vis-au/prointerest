@@ -1,20 +1,43 @@
 <script lang="typescript">
+import BigNumber from "./big-number.svelte";
+
   export let values: string[];
   export let isOrdered = false;
+  export let count = false;
   export let style = "";
+
+  let countMap = new Map<string, number>();
+  $: if (count) {
+    countMap = new Map();
+    values.forEach(value => countMap.has(value)
+      ? countMap.set(value, countMap.get(value)+1)
+      : countMap.set(value, 1));
+  };
 </script>
 
 {#if isOrdered}
   <ol class="list" {style}>
-    {#each values as value}
-      <li>{value}</li>
-    {/each}
+    {#if count}
+      {#each Array.from(countMap.keys()) as key}
+        <li>{key}: <BigNumber>{countMap.get(key)}</BigNumber></li>
+      {/each}
+    {:else}
+      {#each values as value}
+        <li>{value}</li>
+      {/each}
+    {/if}
   </ol>
 {:else}
   <ul class="list" {style}>
-    {#each values as value}
-      <li>{value}</li>
-    {/each}
+    {#if count}
+      {#each Array.from(countMap.keys()) as key}
+        <li>{key}: {countMap.get(key)}</li>
+      {/each}
+    {:else}
+      {#each values as value}
+        <li>{value}</li>
+      {/each}
+    {/if}
   </ul>
 {/if}
 
