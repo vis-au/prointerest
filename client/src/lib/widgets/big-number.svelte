@@ -8,6 +8,7 @@
 
 <style>
   span.big-number {
+    text-align: center;
     background: red;
     padding: 2px 5px;
     background: #efefef;

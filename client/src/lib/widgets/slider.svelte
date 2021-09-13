@@ -22,9 +22,9 @@
   <label class="before" for="{id}-slider">{label}</label>
   {#if showValue}
     {#if updateLive}
-      <BigNumber style="margin:0 10px 0 5px;">{value}</BigNumber>
+      <BigNumber style="margin:0 10px 0 5px;width:60px">{value}</BigNumber>
     {:else}
-      <BigNumber style="margin:0 10px 0 5px;">{sliderValue}</BigNumber>
+      <BigNumber style="margin:0 10px 0 5px;width:60px">{sliderValue}</BigNumber>
     {/if}
   {/if}
   {#if showDomain}
