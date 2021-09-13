@@ -1,4 +1,8 @@
-<span class="big-number">
+<script>
+  export let style = "";
+</script>
+
+<span class="big-number" {style}>
   <slot />
 </span>
 
