@@ -7,19 +7,33 @@
   import Options from "$lib/widgets/options.svelte";
   import Row from "$lib/widgets/row.svelte";
   import ControlButton from "../../widgets/control-button.svelte";
+  import { registerNewInteraction } from "$lib/state/explored-items";
+  import { quadtree } from "$lib/state/quadtree";
   import { selectedItems } from "$lib/state/selected-items";
   import MultiHistogram from "$lib/widgets/multi-histogram.svelte";
   import Alternatives from "$lib/widgets/alternatives.svelte";
   import { randomlySampledItems } from "$lib/state/randomly-sampled-items";
+  import InteractionFactory from "$lib/provenance/doi-interaction-factory";
 
   export let width: number;
   export let height: number;
 
+  const interactionFactory = new InteractionFactory(width, height, $quadtree);
+
   let histogramMode: "selected" | "all" = "all";
 
   $: items = histogramMode === "all" ? $randomlySampledItems : $selectedItems;
-
   $: data = items.map(dataItemToRecord);
+
+  function onBrush(event: CustomEvent) {
+    const selections: Record<string, [number, number]> = event.detail;
+    const dimensions = Object.keys(selections);
+
+    dimensions.forEach(dim => {
+      const interaction = interactionFactory.createHistogramBrushInteraction(dim, selections[dim]);
+      registerNewInteraction(interaction);
+    });
+  }
 </script>
 
 <Column id="secondary-view" style="max-width:{width}px;height:{height}px">
@@ -50,6 +64,7 @@
       groupDimension="selected"
       width={310}
       height={height * 0.4}
+      on:end={onBrush}
     />
   </Row>
 </Column>

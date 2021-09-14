@@ -12,7 +12,18 @@
   export let groupDimension: string = null;
   export let showTitle = false;
 
-  let dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher();
+
+  let brushedInterval: Record<string, [number, number]> = null;
+
+  function onBrush(event: CustomEvent) {
+    brushedInterval = event.detail.value;
+    dispatch("interval", event.detail.value);
+  }
+
+  function onBrushEnd() {
+    dispatch("end", brushedInterval);
+  }
 
   $: colorEncoding =
     groupDimension === null
@@ -76,11 +87,14 @@
     }
   };
 
-  $: showTitle ? "" : (histogram.spec.layer[1].encoding.x["title"] = false);
+  $: if (showTitle) {
+    histogram.spec.layer[1].encoding.x["title"] = false;
+  };
 </script>
 
 <VegaLitePlot
   {id}
   spec={histogram}
-  on:brush={(event) => dispatch("interval", event.detail.value)}
+  on:brush={onBrush}
+  on:end={onBrushEnd}
 />
