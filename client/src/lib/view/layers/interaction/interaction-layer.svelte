@@ -1,25 +1,28 @@
 <script lang="typescript">
   import { afterUpdate } from "svelte";
 
-  import { hoveredPosition } from "$lib/state/hovered-position";
-  import { selectedBins } from "$lib/state/selected-bins";
-  import { currentTransform, isZooming } from "$lib/state/zoom";
-  import { hexbinning } from "$lib/state/hexbinning";
-  import { activeInteractionMode } from "$lib/state/active-interaction-mode";
-  import InteractionFactory from "$lib/provenance/doi-interaction-factory";
-  import { getDummyDataItem } from "$lib/util/dummy-data-item";
-  import { quadtree } from "$lib/state/quadtree";
-  import { getPointsInRect } from "$lib/util/find-in-quadtree";
   import type { DoiInteraction } from "$lib/provenance/doi-interaction";
+  import InteractionFactory from "$lib/provenance/doi-interaction-factory";
+
+  import { bins } from "$lib/state/bins";
+  import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
+  import { activeBrush } from "$lib/state/active-brush";
+  import { activeInteractionMode } from "$lib/state/active-interaction-mode";
   import { getLatestTimestamp, registerNewInteraction } from "$lib/state/explored-items";
+  import { hexbinning } from "$lib/state/hexbinning";
   import { hoveredBin } from "$lib/state/hovered-bin";
+  import { hoveredPosition } from "$lib/state/hovered-position";
+  import { sampledQuadtree } from "$lib/state/sampled-quadtree";
+  import { scaleX, scaleY } from "$lib/state/scales";
+  import { selectedBins } from "$lib/state/selected-bins";
+  import { pauseProgression, progressionState, resetProgression, startProgression } from "$lib/state/progression";
+  import { currentTransform, isZooming } from "$lib/state/zoom";
+
+  import { getDummyDataItem } from "$lib/util/dummy-data-item";
+  import { getSampledPointsInRect } from "$lib/util/find-in-quadtree";
+
   import BrushLayer from "./brush-layer.svelte";
   import ZoomLayer from "./zoom-layer.svelte";
-  import { bins } from "$lib/state/bins";
-  import { activeBrush } from "$lib/state/active-brush";
-  import { scaleX, scaleY } from "$lib/state/scales";
-import { pauseProgression, progressionState, resetProgression, startProgression } from "$lib/state/progression";
-import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
 
   export let id = "view-interaction-layer";
   export let width: number;
@@ -30,8 +33,8 @@ import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed
 
   const color = "rgba(255,69,0,.7)";
 
-  const interactionFactory = new InteractionFactory(width, height, $quadtree);
-  interactionFactory.getItemsInRegion = getPointsInRect;
+  const interactionFactory = new InteractionFactory(width, height, $sampledQuadtree);
+  interactionFactory.getItemsInRegion = getSampledPointsInRect;
   interactionFactory.getTimestamp = getLatestTimestamp;
   $: interactionFactory.width = width;
   $: interactionFactory.height = height;

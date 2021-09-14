@@ -2,11 +2,11 @@ import { readable, writable } from "svelte/store";
 import type DataItem from "$lib/types/data-item";
 import InteractionObserver from "$lib/provenance/interaction-observer";
 import { getPointsInR } from "$lib/util/find-in-quadtree";
-import { quadtree } from "./quadtree";
 import type { DoiInteraction } from "$lib/provenance/doi-interaction";
 import { sendInterestingItems } from "$lib/util/requests";
 import type { InteractionLog } from "$lib/provenance/interaction-log";
 import { interactionWeights } from "./interaction-technique-weights";
+import { lessRandomlySampledItems } from "./randomly-sampled-items";
 
 export const interactionObserver = new InteractionObserver(getPointsInR);
 
@@ -17,7 +17,6 @@ export const provenanceLogSize = writable(currentProvenanceLogSize);
 
 export const exploredItems = writable([] as DataItem[]);
 export const exploredItemInterest = writable(new Map<DataItem, number>());
-
 export const provenanceLog = readable(interactionObserver.interactionLog as InteractionLog);
 
 export function registerNewInteraction(interaction: DoiInteraction): void {
@@ -32,6 +31,7 @@ export function updateExploredItems(): void {
   setTimeout(() => {
     interactionObserver.interestThreshold = currentInteractedThreshold;
     interactionObserver.recentSteps = currentProvenanceLogSize;
+    console.log(interactionObserver.data);
 
     const explored = interactionObserver.getExploredData();
     exploredItemInterest.set(explored);
@@ -63,6 +63,7 @@ provenanceLogSize.subscribe((size) => {
   updateExploredItems();
 });
 
-quadtree.subscribe((newTree) => {
-  interactionObserver.data = newTree.data();
+lessRandomlySampledItems.subscribe(items => {
+  console.log("asdf", items);
+  interactionObserver.data = items.slice(0);
 });

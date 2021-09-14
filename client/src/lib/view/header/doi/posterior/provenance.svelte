@@ -16,10 +16,10 @@
   import Slider from "$lib/widgets/slider.svelte";
   import Histogram from "$lib/widgets/histogram.svelte";
   import type DataItem from "$lib/types/data-item";
-  import { separateThousands } from "$lib/util/number-transform";
   import List from "$lib/widgets/list.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
   import { onMount } from "svelte";
+  import { lessRandomlySampledItems } from "$lib/state/randomly-sampled-items";
 
   // TODO: suggest similar/dissimlar data based on prior/posterior/both
 
@@ -30,6 +30,8 @@
     .slice(start, $provenanceLog.log.length)
     .map((d) => d.mode)
     .reverse();
+
+  $: percentage = Math.floor($exploredItems.length/$lessRandomlySampledItems.length * 10000) / 100;
 
   function exploredItemsToRecord(items: Map<DataItem, number>): Record<"interest", number>[] {
     return Array.from(items.values()).map((value) => {
@@ -63,7 +65,7 @@
       <h3>
         <span>Interest Distrubtion</span>
         <span style="font-weight:normal">
-          Explored: <BigNumber>{separateThousands($exploredItems.length)}</BigNumber>
+          Explored: <BigNumber>~{percentage}%</BigNumber>
         </span>
       </h3>
       <Histogram
