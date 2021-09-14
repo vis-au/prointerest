@@ -14,7 +14,7 @@ scaleX.subscribe((s) => (x = s));
 scaleY.subscribe((s) => (y = s));
 
 // uses UNTRANSFORMED screen positions!
-export function getPointsInR(x: number, y: number, r: number): DataItem[] {
+export function getPointsInR(x: number, y: number, r: number, tree=currentQuadtree): DataItem[] {
   if (currentQuadtree === undefined) {
     return [];
   }
@@ -22,7 +22,7 @@ export function getPointsInR(x: number, y: number, r: number): DataItem[] {
   const pointsInR: DataItem[] = [];
   const radius2 = r * r;
 
-  currentQuadtree.visit((node, x1, y1, x2, y2) => {
+  tree.visit((node, x1, y1, x2, y2) => {
     if (node.length) {
       return x1 >= x + r || y1 >= y + r || x2 < x - r || y2 < y - r;
     }
@@ -41,14 +41,14 @@ export function getPointsInR(x: number, y: number, r: number): DataItem[] {
 }
 
 // uses UNTRANSFORMED, BUT TRANSFORMED screen positions!
-export function getPointsInRect(x0: number, y0: number, x3: number, y3: number): DataItem[] {
+export function getPointsInRect(x0: number, y0: number, x3: number, y3: number, tree=currentQuadtree): DataItem[] {
   if (currentQuadtree === undefined) {
     return [];
   }
 
   const pointsInRect: DataItem[] = [];
 
-  currentQuadtree.visit((node, x1, y1, x2, y2) => {
+  tree.visit((node, x1, y1, x2, y2) => {
     if (!node.length) {
       while (node !== undefined && node !== null) {
         const d = (node as QuadtreeLeaf<DataItem>).data as DataItem;
@@ -73,7 +73,8 @@ export function getUntransformedPointsInRect(
   x0: number,
   y0: number,
   x3: number,
-  y3: number
+  y3: number,
+  tree=currentQuadtree
 ): DataItem[] {
-  return getPointsInRect(x(x0), y(y0), x(x3), y(y3));
+  return getPointsInRect(x(x0), y(y0), x(x3), y(y3), tree);
 }
