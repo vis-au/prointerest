@@ -18,6 +18,8 @@
   import { bins } from "$lib/state/bins";
   import { activeBrush } from "$lib/state/active-brush";
   import { scaleX, scaleY } from "$lib/state/scales";
+import { pauseProgression, progressionState, resetProgression, startProgression } from "$lib/state/progression";
+import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
 
   export let id = "view-interaction-layer";
   export let width: number;
@@ -34,15 +36,21 @@
   $: interactionFactory.width = width;
   $: interactionFactory.height = height;
 
-  function buttonPressed(event: KeyboardEvent) {
+  function onKeyDown(event: KeyboardEvent) {
     if (event.key === "Control") {
       $activeInteractionMode = "brush";
     }
   }
 
-  function buttonReleased(event: KeyboardEvent) {
+  function onKeyUp(event: KeyboardEvent) {
     if (event.key === "Control") {
       $activeInteractionMode = "zoom";
+    } else if (event.key === " ") {
+      $progressionState === "paused" ? startProgression() : pauseProgression();
+    } else if (event.key === "Backspace") {
+      resetProgression();
+    } else if (event.key === "Enter") {
+      $isSecondaryViewCollapsed = !$isSecondaryViewCollapsed;
     }
   }
 
@@ -188,7 +196,7 @@
   />
 </div>
 
-<svelte:window on:keydown={buttonPressed} on:keyup={buttonReleased} />
+<svelte:window on:keydown={onKeyDown} on:keyup={onKeyUp} />
 
 <style>
   :global(canvas.interaction-canvas, svg.interaction-canvas) {
