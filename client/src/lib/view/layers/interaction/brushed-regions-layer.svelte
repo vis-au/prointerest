@@ -1,11 +1,14 @@
 <script lang="typescript">
-  import { activeBrush } from "$lib/state/active-brush";
+  import { geoPath } from "d3-geo";
+  import { afterUpdate } from "svelte";
+
+  import { activeBrush, activeLasso } from "$lib/state/active-brush";
   import { scaleX, scaleY } from "$lib/state/scales";
   import { selectedItems } from "$lib/state/selected-items";
   import { currentTransform } from "$lib/state/zoom";
   import { separateThousands } from "$lib/util/number-transform";
+import { claim_text } from "svelte/internal";
 
-  import { afterUpdate } from "svelte";
 
   export let width: number;
   export let height: number;
@@ -15,6 +18,10 @@
   afterUpdate(render);
 
   function render() {
+    if (!$activeBrush) {
+      return;
+    }
+
     const t = $currentTransform;
 
     const [[_x0, _y0], [_x1, _y1]] = $activeBrush;
@@ -35,6 +42,18 @@
     // draw label
     ctx.font = "13px sans-serif";
     ctx.fillText(`${separateThousands($selectedItems.length)} points`, x0, y1 + 15);
+
+    // draw lasso
+    if (!$activeLasso) {
+      ctx.closePath();
+      return;
+    }
+
+    const path = geoPath().context(ctx);
+    const polygon = {type: "LineString", coordinates: $activeLasso};
+    // ctx.strokeStyle = "rgba(0,0,0,0.73)";
+    path(polygon as any);
+    ctx.stroke();
 
     ctx.closePath();
   }

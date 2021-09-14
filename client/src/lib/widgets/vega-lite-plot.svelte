@@ -28,4 +28,4 @@
   });
 </script>
 
-<div id="{id}-vega-container" on:mouseup={ () => dispatch("end")}/>
+<div id="{id}-vega-container" on:mouseup={() => dispatch("end")} />

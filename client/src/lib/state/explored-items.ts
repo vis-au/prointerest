@@ -31,7 +31,6 @@ export function updateExploredItems(): void {
   setTimeout(() => {
     interactionObserver.interestThreshold = currentInteractedThreshold;
     interactionObserver.recentSteps = currentProvenanceLogSize;
-    console.log(interactionObserver.data);
 
     const explored = interactionObserver.getExploredData();
     exploredItemInterest.set(explored);

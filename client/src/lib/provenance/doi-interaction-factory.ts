@@ -50,7 +50,6 @@ export default class InteractionFactory {
     dimension: string,
     extent: [number, number]
   ): HistogramInteraction {
-
     const brushInteraction = new HistogramBrush();
 
     brushInteraction.dimension = dimension;

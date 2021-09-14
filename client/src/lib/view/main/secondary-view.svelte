@@ -29,7 +29,7 @@
     const selections: Record<string, [number, number]> = event.detail;
     const dimensions = Object.keys(selections);
 
-    dimensions.forEach(dim => {
+    dimensions.forEach((dim) => {
       const interaction = interactionFactory.createHistogramBrushInteraction(dim, selections[dim]);
       registerNewInteraction(interaction);
     });

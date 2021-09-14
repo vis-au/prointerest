@@ -89,12 +89,7 @@
 
   $: if (showTitle) {
     histogram.spec.layer[1].encoding.x["title"] = false;
-  };
+  }
 </script>
 
-<VegaLitePlot
-  {id}
-  spec={histogram}
-  on:brush={onBrush}
-  on:end={onBrushEnd}
-/>
+<VegaLitePlot {id} spec={histogram} on:brush={onBrush} on:end={onBrushEnd} />

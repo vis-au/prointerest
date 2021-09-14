@@ -3,7 +3,6 @@
   import { activeViewMode } from "$lib/state/active-view-mode";
   import BrushLayer from "../layers/interaction/brushed-regions-layer.svelte";
   import InteractionLayer from "../layers/interaction/interaction-layer.svelte";
-  import SuggestionLayer from "../layers/interaction/suggestion-layer.svelte";
   import ScatterplotView from "../layers/visualization/scatterplot-view.svelte";
   import BinnedScatterplotView from "../layers/visualization/binned-scatterplot-view.svelte";
   import Axes from "../layers/visualization/axes.svelte";
@@ -23,7 +22,7 @@
   {/if}
 
   <Axes {width} {height} />
-  <SuggestionLayer {width} {height} />
+  <!-- <SuggestionLayer {width} {height} /> -->
   <BrushLayer {width} {height} />
   <InteractionLayer {width} {height} />
 
