@@ -4,6 +4,7 @@ import { quadtree } from "$lib/state/quadtree";
 import type { ScaleLinear } from "d3-scale";
 import { scaleX, scaleY } from "$lib/state/scales";
 import { sampledQuadtree } from "$lib/state/sampled-quadtree";
+import { polygonContains } from "d3-polygon";
 
 let currentQuadtree: Quadtree<DataItem>;
 let currentSampledQuadtree: Quadtree<DataItem>;
@@ -18,7 +19,7 @@ scaleY.subscribe((s) => (y = s));
 
 // uses UNTRANSFORMED screen positions!
 export function getPointsInR(x: number, y: number, r: number, tree = currentQuadtree): DataItem[] {
-  if (currentQuadtree === undefined) {
+  if (tree === undefined) {
     return [];
   }
 
@@ -43,7 +44,7 @@ export function getPointsInR(x: number, y: number, r: number, tree = currentQuad
   return pointsInR;
 }
 
-// uses UNTRANSFORMED, BUT TRANSFORMED screen positions!
+// uses UNTRANSFORMED, BUT SCALED screen positions!
 export function getPointsInRect(
   x0: number,
   y0: number,
@@ -51,7 +52,7 @@ export function getPointsInRect(
   y3: number,
   tree = currentQuadtree
 ): DataItem[] {
-  if (currentQuadtree === undefined) {
+  if (tree === undefined) {
     return [];
   }
 
@@ -75,6 +76,18 @@ export function getPointsInRect(
   });
 
   return pointsInRect;
+}
+
+// uses UNTRANSFORMED, BUT SCALED screen positions!
+export function getPointsInPolygon(polygon: [number, number][], tree = currentQuadtree): DataItem[] {
+  if (tree === undefined) {
+    return [];
+  }
+
+  const items = tree.data();
+  return items.filter(item => {
+    return polygonContains(polygon, [item.position.x, item.position.y]);
+  });
 }
 
 // uses UNTRANSFORMED, UNSCALED DATA positions!

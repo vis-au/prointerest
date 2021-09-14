@@ -12,7 +12,7 @@ export default class HistogramBrush implements HistogramInteraction {
 
   public getAffectedItems(): DataItem[] {
     return this.data.filter(
-      item => item.values[this.index] > this.extent[0] && item.values[this.index] < this.extent[1]
+      (item) => item.values[this.index] > this.extent[0] && item.values[this.index] < this.extent[1]
     );
   }
 }
