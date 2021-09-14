@@ -21,7 +21,6 @@
   import { onMount } from "svelte";
   import { lessRandomlySampledItems } from "$lib/state/randomly-sampled-items";
 
-
   $: provenanceInterestValues = exploredItemsToRecord($exploredItemInterest);
   $: start = Math.max($provenanceLog.log.length - $provenanceLogSize, 0);
   $: consideredLog = $provenanceLog.log
@@ -29,7 +28,8 @@
     .map((d) => d.mode)
     .reverse();
 
-  $: percentage = Math.floor($exploredItems.length/$lessRandomlySampledItems.length * 10000) / 100;
+  $: percentage =
+    Math.floor(($exploredItems.length / $lessRandomlySampledItems.length) * 10000) / 100;
 
   function exploredItemsToRecord(items: Map<DataItem, number>): Record<"interest", number>[] {
     return Array.from(items.values()).map((value) => {
@@ -53,11 +53,7 @@
   <Column>
     <h3 style="width:{histogramSize - 20}px">
       Assign weights to interactions
-      <Toggle
-        id="auto-update"
-        style="font-weight:normal"
-        bind:active={autoUpdateAfterWeights}>
-
+      <Toggle id="auto-update" style="font-weight:normal" bind:active={autoUpdateAfterWeights}>
         auto update
       </Toggle>
     </h3>
@@ -66,7 +62,9 @@
         group="interaction-technique-weights"
         totalSize={histogramSize}
         bind:valueWeights={$interactionWeights}
-        on:end={() => {if (autoUpdateAfterWeights) updateExploredItems()}}
+        on:end={() => {
+          if (autoUpdateAfterWeights) updateExploredItems();
+        }}
       />
     </Row>
 

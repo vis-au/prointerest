@@ -15,7 +15,12 @@
   import { sampledQuadtree } from "$lib/state/sampled-quadtree";
   import { scaleX, scaleY } from "$lib/state/scales";
   import { selectedBins } from "$lib/state/selected-bins";
-  import { pauseProgression, progressionState, resetProgression, startProgression } from "$lib/state/progression";
+  import {
+    pauseProgression,
+    progressionState,
+    resetProgression,
+    startProgression
+  } from "$lib/state/progression";
   import { currentTransform, isZooming } from "$lib/state/zoom";
 
   import { getDummyDataItem } from "$lib/util/dummy-data-item";
@@ -41,7 +46,7 @@
 
   function onKeyDown(event: KeyboardEvent) {
     if (event.key === "Control") {
-      $activeInteractionMode = "brush";
+      $activeInteractionMode = "scat-brush";
     }
   }
 
@@ -67,7 +72,7 @@
     const x1_ = $scaleX(x1);
     const y0_ = $scaleY(y0);
     const y1_ = $scaleY(y1);
-    const interaction = interactionFactory.createBrushInteraction(x0_, y0_, x1_, y1_);
+    const interaction = interactionFactory.createScatterplotBrushInteraction(x0_, y0_, x1_, y1_);
     onInteraction(interaction);
   }
 
@@ -192,7 +197,7 @@
     id="brush-layer"
     {width}
     {height}
-    className={$activeInteractionMode !== "brush" ? "hidden" : ""}
+    className={$activeInteractionMode !== "scat-brush" ? "hidden" : ""}
     on:click={onClick}
     on:hover={onHover}
     on:end={onBrushEnd}

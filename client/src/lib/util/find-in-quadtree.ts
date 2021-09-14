@@ -12,12 +12,12 @@ let y: ScaleLinear<number, number>;
 
 // this is async to avoid error when loading page caused by access to lexical declaration of quadtr.
 setTimeout(() => quadtree.subscribe((newQuadtree) => (currentQuadtree = newQuadtree)), 0);
-sampledQuadtree.subscribe(t => currentSampledQuadtree = t);
+sampledQuadtree.subscribe((t) => (currentSampledQuadtree = t));
 scaleX.subscribe((s) => (x = s));
 scaleY.subscribe((s) => (y = s));
 
 // uses UNTRANSFORMED screen positions!
-export function getPointsInR(x: number, y: number, r: number, tree=currentQuadtree): DataItem[] {
+export function getPointsInR(x: number, y: number, r: number, tree = currentQuadtree): DataItem[] {
   if (currentQuadtree === undefined) {
     return [];
   }
@@ -44,7 +44,13 @@ export function getPointsInR(x: number, y: number, r: number, tree=currentQuadtr
 }
 
 // uses UNTRANSFORMED, BUT TRANSFORMED screen positions!
-export function getPointsInRect(x0: number, y0: number, x3: number, y3: number, tree=currentQuadtree): DataItem[] {
+export function getPointsInRect(
+  x0: number,
+  y0: number,
+  x3: number,
+  y3: number,
+  tree = currentQuadtree
+): DataItem[] {
   if (currentQuadtree === undefined) {
     return [];
   }
@@ -77,7 +83,7 @@ export function getUntransformedPointsInRect(
   y0: number,
   x3: number,
   y3: number,
-  tree=currentQuadtree
+  tree = currentQuadtree
 ): DataItem[] {
   return getPointsInRect(x(x0), y(y0), x(x3), y(y3), tree);
 }

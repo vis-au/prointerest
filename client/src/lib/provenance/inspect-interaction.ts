@@ -1,10 +1,10 @@
 import { quadtree as d3_quadtree } from "d3-quadtree";
 import type { Quadtree } from "d3-quadtree";
 import type DataItem from "../types/data-item";
-import type { DoiInteraction, InteractionMode } from "./doi-interaction";
+import type { ScatterplotInteraction, ScatterplotInteractionMode } from "./scatterplot-interaction";
 
-export default class Inspect implements DoiInteraction {
-  public mode: InteractionMode = "inspect";
+export default class Inspect implements ScatterplotInteraction {
+  public mode: ScatterplotInteractionMode = "inspect";
   public std = 0;
   public x = 0;
   public y = 0;

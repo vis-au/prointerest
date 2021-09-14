@@ -2,7 +2,7 @@ import type { Quadtree } from "d3-quadtree";
 import type { ZoomTransform } from "d3-zoom";
 
 import type DataItem from "../types/data-item";
-import Brush from "./brush-interaction";
+import ScatterplotBrush from "./scatterplot-brush-interaction";
 import Inspect from "./inspect-interaction";
 import Select from "./select-interaction";
 import ZoomAndPan from "./zoom-and-pan-interaction";
@@ -24,8 +24,13 @@ export default class InteractionFactory {
     this.getTimestamp = () => -1;
   }
 
-  public createBrushInteraction(x0: number, y0: number, x1: number, y1: number): Brush {
-    const brushInteraction = new Brush();
+  public createScatterplotBrushInteraction(
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number
+  ): ScatterplotBrush {
+    const brushInteraction = new ScatterplotBrush();
 
     brushInteraction.quadtree = this.quadtree;
     brushInteraction.getItemsInRegion = this._getItemsInRegion;

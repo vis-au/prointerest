@@ -1,12 +1,11 @@
 import type { Quadtree } from "d3-quadtree";
-
 import type DataItem from "../types/data-item";
-import type { DoiInteraction, InteractionMode } from "./doi-interaction";
+import type { ScatterplotInteraction, ScatterplotInteractionMode } from "./scatterplot-interaction";
 
 export type ItemsInRegionCallback = (x0: number, y0: number, x3: number, y3: number) => DataItem[];
 
-export default class Brush implements DoiInteraction {
-  public mode: InteractionMode = "brush";
+export default class ScatterplotBrush implements ScatterplotInteraction {
+  public mode: ScatterplotInteractionMode = "scat-brush";
   public std = 0; // max distance from mean is 3*std
   public x = 0;
   public y = 0;

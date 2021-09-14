@@ -2,10 +2,10 @@ import { quadtree as d3_quadtree } from "d3-quadtree";
 import type { Quadtree } from "d3-quadtree";
 import { zoomIdentity, ZoomTransform } from "d3-zoom";
 import type DataItem from "../types/data-item";
-import type { DoiInteraction, InteractionMode } from "./doi-interaction";
+import type { ScatterplotInteraction, ScatterplotInteractionMode } from "./scatterplot-interaction";
 
-export default class ZoomAndPan implements DoiInteraction {
-  public mode: InteractionMode = "zoom";
+export default class ZoomAndPan implements ScatterplotInteraction {
+  public mode: ScatterplotInteractionMode = "zoom";
   public std = 0; // max distance from mean is 3*std
   public x = 0;
   public y = 0;
