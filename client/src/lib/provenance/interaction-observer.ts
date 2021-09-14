@@ -59,7 +59,7 @@ export default class InteractionObserver {
       return -1;
     }
 
-    return latestInteractionOfType.timestamp - this.interactionLog.getLatestTimestamp();
+    return this.interactionLog.getLatestTimestamp() - latestInteractionOfType.timestamp;
   }
 
   private applyDecay(absoluteFrequency: number, type: InteractionMode) {
