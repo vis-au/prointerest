@@ -1,9 +1,9 @@
-import { quadtree as d3_quadtree } from "d3-quadtree";
 import type { Quadtree } from "d3-quadtree";
 import type { ScaleLinear } from "d3-scale";
-import type DataItem from "$lib/types/data-item";
-import { processedData } from "./processed-data";
 import { writable } from "svelte/store";
+import type DataItem from "$lib/types/data-item";
+import { createQuadtree } from "$lib/util/create-quadtree";
+import { processedData } from "./processed-data";
 import { scaleX, scaleY } from "./scales";
 import { activeViewEncodings } from "./active-view-encodings";
 import { dimensions } from "./processed-data";
@@ -21,12 +21,6 @@ let currentDimensions: string[] = [];
 const idIndex = 0;
 let xIndex = -1;
 let yIndex = -1;
-
-function createQuadtree() {
-  return d3_quadtree<DataItem>()
-    .x((d) => d.position.x)
-    .y((d) => d.position.y);
-}
 
 function insertIntoQuadtree(tree: Quadtree<DataItem>, rawItems: number[][]) {
   const dataItems = !rawItems ? [] : rawItems.map(arrayToDataItem);
