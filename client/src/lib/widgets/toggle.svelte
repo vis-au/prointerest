@@ -23,22 +23,10 @@
 
 <style>
   label.toggle {
-    margin: 0 5px;
     cursor: pointer;
   }
-  label.toggle input {
-    display: none;
-  }
   label.toggle span {
-    background: #efefef;
-    color: #000;
-    padding: 3px 10px;
-    border-radius: 3px;
     -moz-user-select: none;
     -webkit-user-select: none;
-  }
-  label.toggle input:checked + span {
-    background: #555;
-    color: #fff;
   }
 </style>

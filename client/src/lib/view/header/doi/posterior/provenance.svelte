@@ -21,11 +21,9 @@
   import { onMount } from "svelte";
   import { lessRandomlySampledItems } from "$lib/state/randomly-sampled-items";
 
-  // TODO: suggest similar/dissimlar data based on prior/posterior/both
 
   $: provenanceInterestValues = exploredItemsToRecord($exploredItemInterest);
   $: start = Math.max($provenanceLog.log.length - $provenanceLogSize, 0);
-  $: console.log($exploredItemInterest);
   $: consideredLog = $provenanceLog.log
     .slice(start, $provenanceLog.log.length)
     .map((d) => d.mode)
@@ -41,6 +39,7 @@
 
   const histogramSize = 700;
   let showAggregateInteractionCount = true;
+  let autoUpdateAfterWeights = false;
 
   onMount(() => {
     updateExploredItems();
@@ -52,12 +51,22 @@
   message="Configure how much weight each interaction should be assigned to, when computing the data of interest."
 >
   <Column>
-    <h3>Assign weights to interactions</h3>
+    <h3 style="width:{histogramSize - 20}px">
+      Assign weights to interactions
+      <Toggle
+        id="auto-update"
+        style="font-weight:normal"
+        bind:active={autoUpdateAfterWeights}>
+
+        auto update
+      </Toggle>
+    </h3>
     <Row style="height:50px;align-items:stretch;margin:20px 0">
       <WeightedValues
         group="interaction-technique-weights"
         totalSize={histogramSize}
         bind:valueWeights={$interactionWeights}
+        on:end={() => {if (autoUpdateAfterWeights) updateExploredItems()}}
       />
     </Row>
 
@@ -124,6 +133,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     font-size: 12pt;
     margin: 10px 0;
   }

@@ -5,7 +5,7 @@ import { lessRandomlySampledItems } from "./randomly-sampled-items";
 let currentSampledQuadtree = createQuadtree();
 export const sampledQuadtree = writable(currentSampledQuadtree);
 
-lessRandomlySampledItems.subscribe(items => {
+lessRandomlySampledItems.subscribe((items) => {
   currentSampledQuadtree = createQuadtree();
   currentSampledQuadtree.addAll(items);
   sampledQuadtree.set(currentSampledQuadtree);

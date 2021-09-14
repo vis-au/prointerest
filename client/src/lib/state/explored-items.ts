@@ -63,7 +63,7 @@ provenanceLogSize.subscribe((size) => {
   updateExploredItems();
 });
 
-lessRandomlySampledItems.subscribe(items => {
+lessRandomlySampledItems.subscribe((items) => {
   console.log("asdf", items);
   interactionObserver.data = items.slice(0);
 });

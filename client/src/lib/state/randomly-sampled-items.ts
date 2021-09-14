@@ -4,13 +4,12 @@ import type DataItem from "$lib/types/data-item";
 import { sample } from "../util/sampleListRandomly";
 import { quadtree } from "./quadtree";
 
-
 const iterationsBetweenUpdates = 10;
 
 const currentSmallSampleSize = 1000;
 let currentLargeSampleSize = 50000;
 export const sampleSize = writable(currentLargeSampleSize);
-sampleSize.subscribe(s => currentLargeSampleSize = s);
+sampleSize.subscribe((s) => (currentLargeSampleSize = s));
 
 let iteration = 0;
 let smallSampleProbabilty = 1;
@@ -19,7 +18,7 @@ let largeSampleProbability = 1;
 let currentQuadtree: Quadtree<DataItem> = null;
 let currentProcessedItems: DataItem[] = [];
 
-let largeRandomSample:  DataItem[] = [];
+let largeRandomSample: DataItem[] = [];
 export const randomlySampledItems = writable(largeRandomSample);
 
 let smallRandomSample: DataItem[] = [];
