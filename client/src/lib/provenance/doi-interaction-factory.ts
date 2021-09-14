@@ -6,6 +6,8 @@ import ScatterplotBrush from "./scatterplot-brush-interaction";
 import Inspect from "./inspect-interaction";
 import Select from "./select-interaction";
 import ZoomAndPan from "./zoom-and-pan-interaction";
+import type { HistogramInteraction } from "./histogram-interaction";
+import HistogramBrush from "./histogram-brush-interaction";
 
 const STANDARD_DIVIATION = 20;
 
@@ -39,6 +41,22 @@ export default class InteractionFactory {
     brushInteraction.width = Math.abs(x0 - x1);
     brushInteraction.y = y0;
     brushInteraction.height = Math.abs(y0 - y1);
+    brushInteraction.std = STANDARD_DIVIATION;
+
+    return brushInteraction;
+  }
+
+  public createHistogramBrushInteraction(
+    dimension: string,
+    extent: [number, number]
+  ): HistogramInteraction {
+
+    const brushInteraction = new HistogramBrush();
+
+    brushInteraction.dimension = dimension;
+    brushInteraction.extent = extent;
+    brushInteraction.data = this.quadtree.data();
+    brushInteraction.timestamp = this.getTimestamp();
     brushInteraction.std = STANDARD_DIVIATION;
 
     return brushInteraction;

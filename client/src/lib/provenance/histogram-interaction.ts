@@ -1,4 +1,3 @@
-import type { Quadtree } from "d3-quadtree";
 import type DataItem from "../types/data-item";
 
 export type HistogramInteractionMode = "hist-brush";
@@ -6,8 +5,10 @@ export const histogramInteractionModes: HistogramInteractionMode[] = ["hist-brus
 
 export interface HistogramInteraction {
   mode: HistogramInteractionMode;
+  dimension: string;
+  index: number;
+  extent: [number, number];
   std: number;
-  quadtree: Quadtree<DataItem>;
   timestamp: number;
   getAffectedItems: () => DataItem[];
 }
