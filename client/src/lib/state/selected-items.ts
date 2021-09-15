@@ -21,15 +21,14 @@ let currentLasso: [number, number][] = null;
 let x: ScaleLinear<number, number> = null;
 let y: ScaleLinear<number, number> = null;
 
-
 function getItemsInRectBrush() {
   const [[x0, y0], [x1, y1]] = currentBrush;
   return getPointsInRect(x(x0), y(y0), x(x1), y(y1));
 }
 
 function getItemsInLassoBrush() {
-  const scaledPolygon = currentLasso.map(position => {
-    return [x.invert(position[0]), y.invert(position[1])] as [number, number];
+  const scaledPolygon = currentLasso.map((position) => {
+    return [x(position[0]), y(position[1])] as [number, number];
   });
   return getPointsInPolygon(scaledPolygon);
 }
@@ -45,9 +44,7 @@ function getBrushedItems() {
     return [];
   }
 
-  return currentScatterplotBrush === "rect"
-    ? getItemsInRectBrush()
-    : getItemsInLassoBrush();
+  return currentScatterplotBrush === "rect" ? getItemsInRectBrush() : getItemsInLassoBrush();
 }
 
 function getItemsInSelectedBins() {

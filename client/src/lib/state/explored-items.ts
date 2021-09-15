@@ -63,6 +63,5 @@ provenanceLogSize.subscribe((size) => {
 });
 
 lessRandomlySampledItems.subscribe((items) => {
-  console.log("asdf", items);
   interactionObserver.data = items.slice(0);
 });

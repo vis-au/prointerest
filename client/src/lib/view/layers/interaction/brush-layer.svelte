@@ -2,15 +2,16 @@
   import type { D3BrushEvent } from "d3-brush";
   import { brush } from "d3-brush";
   import { geoPath } from "d3-geo";
+  import type { GeoPermissibleObjects } from "d3-geo";
   import { select } from "d3-selection";
 
   import { createEventDispatcher, onMount } from "svelte";
 
   import { activeBrush, activeLasso } from "$lib/state/active-brush";
+  import { scatterplotBrush } from "$lib/state/active-scatterplot-brush";
   import { scaleX, scaleY } from "$lib/state/scales";
   import { currentTransform } from "$lib/state/zoom";
   import type DataItem from "$lib/types/data-item";
-  import { scatterplotBrush } from "$lib/state/active-scatterplot-brush";
   import { lasso } from "$lib/util/lasso-brush";
 
   export let id: string;
@@ -19,6 +20,7 @@
   export let height: number;
 
   let brushCanvasElement: SVGElement;
+  let lassoCanvasElement: SVGElement;
 
   const dispatch = createEventDispatcher();
 
@@ -27,18 +29,13 @@
     .filter((event) => (event.ctrlKey || event.shiftKey) && !event.button)
     .on("end", onBrushEnd);
 
-  const lassoBehavior = lasso()
-    .on("start lasso", onLassoBrush)
-    .on("end", onBrushEnd);
+  const lassoBehavior = lasso().on("start lasso", onLassoBrush).on("end", onLassoEnd);
 
   function onBrushEnd(event: D3BrushEvent<DataItem>) {
     const selection = event.selection;
 
     if (selection === null || selection === undefined) {
-      $activeBrush = [
-        [null, null],
-        [null, null]
-      ];
+      $activeBrush = null;
       return;
     }
 
@@ -55,57 +52,83 @@
     // the brush is drawn by the brush-layer component to make the brushed region persist zoom+pan
     // we can therefore hide it here
     select(brushCanvasElement).selectAll("rect.selection,rect.handle").style("display", "none");
-    select(brushCanvasElement).selectAll("path.lasso").remove();
 
     dispatch("end", $activeBrush);
   }
 
   function onLassoBrush(polygon: [number, number][]) {
-    const svg = select(brushCanvasElement);
+    const svg = select(lassoCanvasElement);
     const path = geoPath();
 
     svg.select("path.lasso").remove();
 
     const l = svg.append("path").attr("class", "lasso");
-    $activeLasso = polygon;
 
-    l.datum({type: "LineString", coordinates: polygon})
-      .attr("fill", "rgba(255, 0, 0, 0.1)")
+    l.datum({ type: "LineString", coordinates: polygon })
+      .attr("fill", "rgba(0, 0, 0, 0.05)")
       .attr("stroke", "#333")
       .attr("stroke-width", 2)
-      .attr("d", path as any);
+      .attr("d", (d) => path(d as GeoPermissibleObjects));
+  }
 
-    brushCanvasElement.dispatchEvent(new CustomEvent('input'));
+  function onLassoEnd(polygon: [number, number][]) {
+    if (!polygon.length) {
+      $activeLasso = null;
+      return;
+    }
+
+    const t = $currentTransform;
+    $activeLasso = polygon.map((p) => [
+      $scaleX.invert(t.invertX(p[0])),
+      $scaleY.invert(t.invertY(p[1]))
+    ]);
+
+    // lasso is drawn by brush-layer component, so remove it here.
+    select(lassoCanvasElement).select("path.lasso").remove();
+
+    dispatch("end", $activeLasso);
   }
 
   onMount(() => {
     // use a timeout to ensure that the brush canvas has the right size when calling the brush
     // behavior
     setTimeout(() => {
-      const brushSvg = select(brushCanvasElement);
-      // brushSvg.call(brushBehavior);
-      brushSvg.call(lassoBehavior);
+      select(brushCanvasElement).call(brushBehavior);
+      select(lassoCanvasElement).call(lassoBehavior);
     }, 10);
   });
-
-  function updateBrush() {
-    const brushSvg = select(brushCanvasElement);
-    if ($scatterplotBrush === "rect") {
-      brushSvg.call(brushBehavior);
-    } else if ($scatterplotBrush === "lasso") {
-      brushSvg.call(lassoBehavior);
-    }
-  }
-
-  scatterplotBrush.subscribe(updateBrush);
 </script>
 
-<svg
-  id="{id}-brush-canvas"
-  class="brush interaction-canvas {className}"
-  {width}
-  {height}
-  on:mousemove={(e) => dispatch("hover", e)}
-  on:click={(e) => dispatch("click", e)}
-  bind:this={brushCanvasElement}
-/>
+<div class="{className} interaction-canvas container" style="width:{width}px;height:{height}px">
+  <svg
+    id="{id}-brush-canvas"
+    class="brush {className} {$scatterplotBrush === 'rect' ? '' : 'hidden'}"
+    {width}
+    {height}
+    bind:this={brushCanvasElement}
+    on:mousemove={(e) => dispatch("hover", e)}
+    on:click={(e) => dispatch("click", e)}
+  />
+  <svg
+    id="{id}-lasso-canvas"
+    class="lasso {className} {$scatterplotBrush === 'lasso' ? '' : 'hidden'}"
+    {width}
+    {height}
+    bind:this={lassoCanvasElement}
+    on:mousemove={(e) => dispatch("hover", e)}
+    on:click={(e) => dispatch("click", e)}
+  />
+</div>
+
+<style>
+  div.container {
+    position: absolute;
+  }
+  svg {
+    cursor: crosshair;
+    position: absolute;
+  }
+  svg.hidden {
+    display: none;
+  }
+</style>

@@ -1,4 +1,5 @@
 <script>
+  import { scatterplotBrush } from "$lib/state/active-scatterplot-brush";
   import {
     activeSuggestionInput,
     activeSuggestionOutput
@@ -6,6 +7,7 @@
   import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { activeViewMode } from "$lib/state/active-view-mode";
   import { dimensions } from "$lib/state/processed-data";
+  import { brushModes } from "$lib/types/brush-mode";
   import { suggestionInputs, suggestionOutputs } from "$lib/types/suggestion-mode";
   import { viewModes } from "$lib/types/view-modes";
   import Alternatives from "$lib/widgets/alternatives.svelte";
@@ -47,6 +49,14 @@
       name="suggestion-inputs"
       alternatives={suggestionInputs}
       bind:activeAlternative={$activeSuggestionInput}
+    />
+  </div>
+  <div class="configuration">
+    <h2>Brush</h2>
+    <Alternatives
+      name="scatterplot-brush-mode"
+      alternatives={brushModes}
+      bind:activeAlternative={$scatterplotBrush}
     />
   </div>
 </Row>

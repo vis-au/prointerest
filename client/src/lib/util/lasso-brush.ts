@@ -63,7 +63,7 @@ export function lasso(): {
       });
   };
 
-  lasso.on = function (type: "start"|"move"|"out"|"end", callback: (e: unknown) => void) {
+  lasso.on = function (type: "start" | "move" | "out" | "end", callback: (e: unknown) => void) {
     lassoDispatcher.on(type, callback);
     return lasso;
   };

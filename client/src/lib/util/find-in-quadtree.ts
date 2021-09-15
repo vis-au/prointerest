@@ -79,13 +79,16 @@ export function getPointsInRect(
 }
 
 // uses UNTRANSFORMED, BUT SCALED screen positions!
-export function getPointsInPolygon(polygon: [number, number][], tree = currentQuadtree): DataItem[] {
+export function getPointsInPolygon(
+  polygon: [number, number][],
+  tree = currentQuadtree
+): DataItem[] {
   if (tree === undefined) {
     return [];
   }
 
   const items = tree.data();
-  return items.filter(item => {
+  return items.filter((item) => {
     return polygonContains(polygon, [item.position.x, item.position.y]);
   });
 }

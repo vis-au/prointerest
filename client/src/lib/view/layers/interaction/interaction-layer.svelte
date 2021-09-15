@@ -67,13 +67,16 @@
   }
 
   function onBrushEnd() {
-    const [[x0, y0], [x1, y1]] = $activeBrush;
-    const x0_ = $scaleX(x0);
-    const x1_ = $scaleX(x1);
-    const y0_ = $scaleY(y0);
-    const y1_ = $scaleY(y1);
-    const interaction = interactionFactory.createScatterplotBrushInteraction(x0_, y0_, x1_, y1_);
-    onInteraction(interaction);
+    // can be null when using the lasso brush
+    if ($activeBrush !== null) {
+      const [[x0, y0], [x1, y1]] = $activeBrush;
+      const x0_ = $scaleX(x0);
+      const x1_ = $scaleX(x1);
+      const y0_ = $scaleY(y0);
+      const y1_ = $scaleY(y1);
+      const interaction = interactionFactory.createScatterplotBrushInteraction(x0_, y0_, x1_, y1_);
+      onInteraction(interaction);
+    }
   }
 
   function onZoomEnd() {
@@ -207,10 +210,10 @@
 <svelte:window on:keydown={onKeyDown} on:keyup={onKeyUp} />
 
 <style>
-  :global(canvas.interaction-canvas, svg.interaction-canvas) {
+  :global(.interaction-canvas) {
     position: absolute;
   }
-  :global(canvas.interaction-canvas.hidden, svg.interaction-canvas.hidden) {
+  :global(.interaction-canvas.hidden) {
     display: none;
   }
   div.interaction-canvas-container {
