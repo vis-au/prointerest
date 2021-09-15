@@ -22,11 +22,18 @@ let x: ScaleLinear<number, number> = null;
 let y: ScaleLinear<number, number> = null;
 
 function getItemsInRectBrush() {
+  if (currentBrush === null || currentBrush[0] === null) {
+    return [];
+  }
   const [[x0, y0], [x1, y1]] = currentBrush;
   return getPointsInRect(x(x0), y(y0), x(x1), y(y1));
 }
 
 function getItemsInLassoBrush() {
+  if (currentLasso === null) {
+    return [];
+  }
+
   const scaledPolygon = currentLasso.map((position) => {
     return [x(position[0]), y(position[1])] as [number, number];
   });
@@ -35,12 +42,6 @@ function getItemsInLassoBrush() {
 
 function getBrushedItems() {
   if (x === null || y === null) {
-    return [];
-  }
-  if (currentBrush === null || currentBrush[0] === null) {
-    return [];
-  }
-  if (currentLasso === null) {
     return [];
   }
 
