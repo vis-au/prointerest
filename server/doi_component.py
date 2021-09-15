@@ -1,7 +1,6 @@
 import numpy as np
-from sklearn.svm import LinearSVR
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+from pandas.core.frame import DataFrame
+from sklearn.tree import DecisionTreeRegressor
 
 class DoiComponent:
   '''
@@ -14,7 +13,7 @@ class DoiComponent:
   def __init__(self) -> None:
     self.weights: dict[str, float] = {}
     self.current_interest = np.empty(shape=(0, 2))
-    self.predictor: LinearSVR = make_pipeline(StandardScaler(), LinearSVR(random_state=0, tol=1e-5))
+    self.predictor: DecisionTreeRegressor = DecisionTreeRegressor(random_state=0)
 
 
   def set_components(self, weights: dict[str, float]):
@@ -33,7 +32,7 @@ class DoiComponent:
     pass
 
 
-  def evaluate_doi(self, X):
+  def compute_doi(self, X: DataFrame):
     '''
     Compute the degree of interest over a matrix of shape (n, m) using the degree-of-interest
     function of this object. Outputs a vector y of shape (n, 1), containing the actual doi for
@@ -42,7 +41,7 @@ class DoiComponent:
     pass
 
 
-  def predict_doi(self, X):
+  def predict_doi(self, X: DataFrame):
     '''
     Given the state of the doi predictor, predicts the degree of interest for the given a matrix X
     with shape (n, m) without evaluating the full function. Returns a vector y of shape (n, 1),
@@ -51,7 +50,7 @@ class DoiComponent:
     pass
 
 
-  def get_prediction_error(self, X):
+  def get_prediction_error(self, X: DataFrame):
     '''
     A benchmarking function for the predictor: How accurate are the predictions based on the current
     model? Takes a matrix X with shape (n, m) as input, then computes both the prediction and the
