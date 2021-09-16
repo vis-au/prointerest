@@ -34,7 +34,3 @@ class OutliernessComponent(DoiComponent):
     scaled = sum / len(predictions)
 
     return scaled
-
-
-  def predict_doi(self, X: pd.DataFrame):
-    return self.predictor.predict(X)

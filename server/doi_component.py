@@ -47,7 +47,7 @@ class DoiComponent:
     with shape (n, m) without evaluating the full function. Returns a vector y of shape (n, 1),
     containing the predicted doi for each item.
     '''
-    pass
+    return self.predictor.predict(X)
 
 
   def get_prediction_error(self, X: DataFrame):
@@ -61,6 +61,7 @@ class DoiComponent:
     actual_doi = self.compute_doi(X)
 
     return actual_doi - prediction
+
 
   def train(self, X: DataFrame):
     '''
