@@ -57,7 +57,7 @@ class DoiComponent:
     actual doi for this matrix, therefore has high runtime. Outputs the place-wise error as a vector
     of shape (n, 1).
     '''
-    prediction = self.predict_doi(X)
+    prediction = self.predict_doi(X.drop(columns=["id"]))
     actual_doi = self.compute_doi(X)
 
     return actual_doi - prediction
@@ -69,9 +69,8 @@ class DoiComponent:
     marix X of shape (n, m) and then uses the output as training data for the predictor. Returns the
     computed label vector of shape (n, 1).
     '''
-    X_ = X.drop(columns=["id"])
-    training_data = X_.to_numpy()
-    training_labels = self.compute_doi(X_)
+    training_data = X.drop(columns=["id"]).to_numpy()
+    training_labels = self.compute_doi(X)
 
     self.predictor.fit(training_data, training_labels)
 

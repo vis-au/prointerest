@@ -12,11 +12,11 @@ class OutliernessComponent(DoiComponent):
   def __init__(self) -> None:
     super().__init__()
     self.outliers_fraction = 0.15
-    self.outlierness_measures = self.generate_measures()
+    self.outlierness_measures = self._generate_measures()
     self.current_interest: pd.DataFrame = None
 
 
-  def generate_measures(self):
+  def _generate_measures(self):
     return [
       EllipticEnvelope(contamination=self.outliers_fraction),
       svm.OneClassSVM(nu=self.outliers_fraction, kernel="rbf", gamma=0.1),
