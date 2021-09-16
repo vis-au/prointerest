@@ -3,6 +3,7 @@ from flask import Flask, json, jsonify, request
 
 from database import *
 from doi_function import *
+from scagnostics_component import SCATTERPLOT_AXES
 from recommender import *
 
 app = Flask(__name__)
@@ -56,7 +57,9 @@ def reset():
 def send_weights(component: str):
   weights = json.loads(request.data)["weights"]
 
-  if component == "prior":
+  if component == "components":
+    set_component_weights(weights)
+  elif component == "prior":
     set_prior_weights(weights)
   elif component == "posterior":
     set_posterior_weights(weights)

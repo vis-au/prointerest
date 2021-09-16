@@ -3,6 +3,7 @@
   import { selectedDoiInterpolationFunction } from "$lib/state/selected-doi-interpolation-function";
   import { selectedDoiComponent } from "$lib/state/selected-doi-weight";
   import { functionNames } from "$lib/types/doi-interpolation-function";
+  import { sendComponentWeights } from "$lib/util/requests";
   import Dropdown from "$lib/widgets/dropdown.svelte";
   import Row from "$lib/widgets/row.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
@@ -18,6 +19,7 @@
     useDarkmode={true}
     bind:activeWeight={$selectedDoiComponent}
     bind:valueWeights={$componentWeights}
+    on:end={() => sendComponentWeights($componentWeights)}
   />
 
   <Dropdown

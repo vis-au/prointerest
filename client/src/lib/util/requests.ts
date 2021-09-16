@@ -53,6 +53,11 @@ export async function sendWeights(
   return sendRequestToBaseURL(`/weights/${component}`, "POST", { weights: record });
 }
 
+export async function sendComponentWeights(weights: Map<string, number>): Promise<void> {
+  const record = mapToRecord(weights);
+  return sendRequestToBaseURL("/weights/components", "POST", { weights: record });
+}
+
 export async function sendScagnosticWeights(weights: Map<string, number>): Promise<void> {
   // make sure that every scagnostic is assigned a weight
   const copy = new Map(weights);
