@@ -62,5 +62,16 @@ class DoiComponent:
 
     return actual_doi - prediction
 
-  def train(self):
-    pass
+  def train(self, X: DataFrame):
+    '''
+    Train the predictor model using the data in X. Evaluates the doi for all items in the input
+    marix X of shape (n, m) and then uses the output as training data for the predictor. Returns the
+    computed label vector of shape (n, 1).
+    '''
+    X_ = X.drop(columns=["id"])
+    training_data = X_.to_numpy()
+    training_labels = self.compute_doi(X_)
+
+    self.predictor.fit(training_data, training_labels)
+
+    return training_labels

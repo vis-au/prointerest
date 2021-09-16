@@ -36,13 +36,5 @@ class OutliernessComponent(DoiComponent):
     return scaled
 
 
-  def train(self, X: pd.DataFrame):
-    X_ = X.drop(columns=["id"])
-    training_data = X_.to_numpy()
-    training_labels = self.compute_doi(X_)
-
-    return self.predictor.fit(training_data, training_labels)
-
-
   def predict_doi(self, X: pd.DataFrame):
     return self.predictor.predict(X)
