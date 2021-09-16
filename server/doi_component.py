@@ -1,6 +1,8 @@
 import numpy as np
 from pandas.core.frame import DataFrame
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import SGDRegressor
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 class DoiComponent:
   '''
@@ -13,7 +15,7 @@ class DoiComponent:
   def __init__(self) -> None:
     self.weights: dict[str, float] = {}
     self.current_interest = np.empty(shape=(0, 2))
-    self.predictor: DecisionTreeRegressor = DecisionTreeRegressor(random_state=0)
+    self.predictor: SGDRegressor = make_pipeline(StandardScaler(), SGDRegressor(max_iter=1000, tol=1e-3))
 
 
   def set_components(self, weights: dict[str, float]):
@@ -72,6 +74,6 @@ class DoiComponent:
     training_data = X.drop(columns=["id"]).to_numpy()
     training_labels = self.compute_doi(X)
 
-    self.predictor.fit(training_data, training_labels)
+    self.predictor.partial_fit(training_data, training_labels)
 
     return training_labels
