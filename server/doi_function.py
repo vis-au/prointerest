@@ -1,5 +1,10 @@
 from typing import Any, Literal
+import pandas as pd
+import numpy as np
+
 from database import *
+from outlierness_component import OutliernessComponent
+
 
 COMPONENT_WEIGHTS = {
   "prior": 0.5,
@@ -60,5 +65,20 @@ def set_provenance_items(ids: list[str], doi: list[float]):
 
 
 # INTEREST COMPUTATION
+
+i = 0
+outlierness = OutliernessComponent()
 def compute_dois(items: list[list[Any]]):
-  return [0 for _ in items]
+  global i
+  df = pd.DataFrame(items)
+  df = df.drop(columns=[2, 3, 7, 18, 19])
+  df = df.astype(np.float64)
+
+  if i % 3 == 0:
+    df["id"] = df.index
+    doi = outlierness.train(df)
+  else:
+    doi = outlierness.predict_doi(df)
+
+  i += 1
+  return doi

@@ -38,7 +38,9 @@ def get_next_chunk():
   chunk_size = int(request.args.get("size"))
   # chunk = get_random_sample(chunk_size)
   chunk = get_next_chunk_from_db(chunk_size)
-  return cors_response(chunk)
+  doi = compute_dois(chunk)
+
+  return cors_response({"chunk": chunk, "doi": doi.tolist()})
 
 
 @app.route("/size", methods=["GET"])
