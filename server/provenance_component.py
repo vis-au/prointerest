@@ -5,17 +5,30 @@ import numpy as np
 
 class ProvenanceComponent(DoiComponent):
   def __init__(self) -> None:
-      super().__init__()
-      self.weights = {}
-      self.log = pd.DataFrame()
-      self.log.columns = ["timestamp", "mode", "ids"]
+    super().__init__()
+    self.weights = {}
+    self.log = pd.DataFrame(np.empty((0, 3)), columns=["timestamp", "mode", "ids"])
+    self.log = self.log.set_index("timestamp")
+    self.current_interest = pd.DataFrame(np.empty((0, 2)), columns=["id", "doi"])
+    self.current_interest = self.current_interest.set_index("id")
+
+
+  def add_interaction(self, interaction: list):
+    as_df = pd.DataFrame([interaction], columns=["timestamp", "mode", "ids"])
+    self.log = self.log.append(as_df, ignore_index=False)
+
+
+  def get_values_for_ids(self, interacted_ids, X: DataFrame):
+    return interacted_ids.merge(X.set_index("id"), on="id").drop(columns=["id"]).to_numpy()
 
 
   def train(self, X: DataFrame):
-    trained_ids = self.current_interest.set_index("id").index.astype(np.float128)
-    X["id"] = X["id"].astype(np.float128)
-    training_data = trained_ids.merge(X, on="id").to_numy()
-    training_labels = self.current_interest["doi"].to_numy()
+    interacted_ids = pd.DataFrame(self.current_interest["id"].astype(np.int64))
+    interacted_dois = pd.DataFrame(self.current_interest["doi"])
+
+    X["id"] = X["id"].astype(np.int64)
+    training_data = self.get_values_for_ids(interacted_ids, X)
+    training_labels = interacted_dois.to_numpy()
 
     self.predictor.fit(training_data, training_labels)
 
@@ -43,10 +56,10 @@ class ProvenanceComponent(DoiComponent):
     as_matrix = np.array([relative_count.index, relative_count]).transpose()
     self.current_interest = pd.DataFrame(as_matrix, columns=["id", "doi"])
 
-    self.current_interest["id"] = self.current_interest["id"].astype(np.float128)
+    self.current_interest["id"] = self.current_interest["id"].astype(np.int64)
 
     # return doi for ids in input
-    ids = X["id"].astype(np.float128)
+    ids = pd.DataFrame(X["id"].astype(np.int64), columns=["id"])
     return ids.merge(self.current_interest, on="id")
 
 
