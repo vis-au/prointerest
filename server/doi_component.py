@@ -57,7 +57,10 @@ class DoiComponent:
     actual doi for this matrix, therefore has high runtime. Outputs the place-wise error as a vector
     of shape (n, 1).
     '''
-    pass
+    prediction = self.predict_doi(X)
+    actual_doi = self.compute_doi(X)
+
+    return actual_doi - prediction
 
   def train(self):
     pass
