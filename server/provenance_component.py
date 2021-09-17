@@ -3,6 +3,14 @@ from doi_component import *
 import pandas as pd
 import numpy as np
 
+PROVENANCE_WEIGHTS = {
+  "scat-brush": 0,
+  "hist-brush": 0,
+  "select": 0,
+  "inspect": 0,
+  "zoom": 0
+}
+
 class ProvenanceComponent(DoiComponent):
   def __init__(self) -> None:
     super().__init__()

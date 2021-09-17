@@ -24,7 +24,7 @@ export class InteractionLog {
   public add(interaction: DoiInteraction): void {
     interaction.timestamp = this._log.length;
     this._log.push(interaction);
-    sendInteraction(interaction)
+    sendInteraction(interaction);
   }
 
   public getNRecentSteps(n: number): DoiInteraction[] {

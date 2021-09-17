@@ -79,8 +79,9 @@
       const interaction = interactionFactory.createScatterplotBrushInteraction(x0_, y0_, x1_, y1_);
       onInteraction(interaction);
     } else if ($activeLasso !== null) {
-      const polygon = $activeLasso
-        .map(pos => [$scaleX(pos[0]), $scaleY(pos[1])] as [number, number]);
+      const polygon = $activeLasso.map(
+        (pos) => [$scaleX(pos[0]), $scaleY(pos[1])] as [number, number]
+      );
       const interaction = interactionFactory.createLassoBrushInteraction(polygon);
       onInteraction(interaction);
     }

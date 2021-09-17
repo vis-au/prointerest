@@ -1,6 +1,7 @@
 import type { DoiInteraction } from "$lib/provenance/doi-interaction";
 import type DataItem from "$lib/types/data-item";
 import type { OutliernessMeasure } from "$lib/types/outlier-measures";
+import type { ProvenanceConfig } from "$lib/types/provenance-config";
 import { scagnostics } from "$lib/types/scagnostics";
 import { dataItemToList } from "./item-transform";
 import { mapToRecord } from "./map-to-record";
@@ -21,6 +22,19 @@ async function sendRequestToBaseURL(
       d.json()
     );
   }
+}
+
+function configToURLParams(config: Record<string, number>) {
+  let params = "";
+  const keys = Object.keys(config);
+  keys.forEach((key, i) => {
+    const value = config[key];
+    params += `${key}=${value}`;
+    if (i < keys.length - 1) {
+      params += "&";
+    }
+  });
+  return params;
 }
 
 // DATA ACCESS
@@ -93,7 +107,16 @@ export async function sendAxisDimension(axis: "x" | "y", dimension: string): Pro
 }
 
 export async function sendOutlierMetric(metric: OutliernessMeasure): Promise<void> {
-  return sendRequestToBaseURL(`/outlierness_metric?metric=${metric}`, "POST");
+  return sendRequestToBaseURL(`/config/outlierness?metric=${metric}`, "POST");
+}
+
+export async function sendProvenanceConfig(config: ProvenanceConfig): Promise<void> {
+  return sendRequestToBaseURL(`/config/provenance?${configToURLParams(config)}`, "POST");
+}
+
+export async function sendProvenanceWeights(weights: Map<string, number>): Promise<void> {
+  const record = mapToRecord(weights);
+  return sendRequestToBaseURL(`/weights/provenance`, "POST", { weights: record });
 }
 
 export async function sendSelectedItems(items: DataItem[]): Promise<void> {
@@ -102,9 +125,9 @@ export async function sendSelectedItems(items: DataItem[]): Promise<void> {
 }
 
 export function sendInteraction(interaction: DoiInteraction): Promise<void> {
-  const ids = interaction.getAffectedItems().map(d => d.id);
+  const ids = interaction.getAffectedItems().map((d) => d.id);
   const mode = interaction.mode;
-  return sendRequestToBaseURL("/interaction", "POST", {mode, ids});
+  return sendRequestToBaseURL("/interaction", "POST", { mode, ids });
 }
 
 export async function getDoiValues(items: DataItem[]): Promise<[number, number][]> {

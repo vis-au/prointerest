@@ -1,9 +1,7 @@
 <script lang="typescript">
-  import {
-    exploredItemInterest,
-    exploredItems
-  } from "$lib/state/explored-items";
+  import { exploredItemInterest, exploredItems } from "$lib/state/explored-items";
   import { interactionWeights } from "$lib/state/interaction-technique-weights";
+  import type DataItem from "$lib/types/data-item";
   import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
   import Column from "$lib/widgets/column.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
@@ -11,12 +9,11 @@
   import BigNumber from "$lib/widgets/big-number.svelte";
   import Slider from "$lib/widgets/slider.svelte";
   import Histogram from "$lib/widgets/histogram.svelte";
-  import type DataItem from "$lib/types/data-item";
   import List from "$lib/widgets/list.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
   import { lessRandomlySampledItems } from "$lib/state/randomly-sampled-items";
   import { interactionLog } from "$lib/provenance/interaction-log";
-
+  import { sendProvenanceConfig, sendProvenanceWeights } from "$lib/util/requests";
 
   let provenanceSize = 100;
   let interactionThreshold = 0.15;
@@ -59,7 +56,7 @@
         totalSize={histogramSize}
         bind:valueWeights={$interactionWeights}
         on:end={() => {
-          // if (autoUpdateAfterWeights) updateExploredItems();
+          sendProvenanceWeights($interactionWeights);
         }}
       />
     </Row>
@@ -89,6 +86,7 @@
         updateLive={false}
         style="margin-top: 20px"
         bind:value={interactionThreshold}
+        on:end={() => sendProvenanceConfig({ threshold: interactionThreshold })}
       />
     </Column>
 
@@ -116,6 +114,7 @@
           updateLive={false}
           style="margin-top: 20px"
           bind:value={provenanceSize}
+          on:end={() => sendProvenanceConfig({ log_size: provenanceSize })}
         />
       </Row>
     </Column>

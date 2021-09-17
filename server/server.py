@@ -67,6 +67,8 @@ def send_weights(component: str):
     set_posterior_weights(weights)
   elif component == "scagnostics":
     set_scagnostic_weights(weights)
+  elif component == "provenance":
+    set_provenance_weights(weights)
 
   return cors_response("ok")
 
@@ -101,10 +103,23 @@ def send_axis_dimension():
   return cors_response(True)
 
 
-@app.route("/outlierness_metric", methods=["POST"])
-def send_outlierness_metric():
-  metric = request.args.get("metric")
-  set_outlierness_metric(metric)
+@app.route("/config/<component>", methods=["POST"])
+def send_configuration(component):
+  if component == "outlierness":
+    if request.args.get("metric") is not None:
+      metric = request.args.get("metric")
+      set_outlierness_metric(metric)
+  elif component == "provenance":
+    if request.args.get("weights") is not None:
+      weights = request.args.get("weights")
+      print(weights)
+    if request.args.get("threshold") is not None:
+      threshold = request.args.get("threshold")
+      print(threshold)
+    if request.args.get("log_size") is not None:
+      log_size = request.args.get("log_size")
+      print(log_size)
+
   return cors_response(True)
 
 

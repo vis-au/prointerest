@@ -130,7 +130,7 @@ export default class InteractionFactory {
   }
 
   public set getItemsInPolygon(
-    f: ((polygon: [number, number][], t: Quadtree<DataItem>) => DataItem[])
+    f: (polygon: [number, number][], t: Quadtree<DataItem>) => DataItem[]
   ) {
     this._getItemsInPolygon = (polygon) => f(polygon, this.quadtree);
   }
