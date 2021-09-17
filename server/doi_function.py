@@ -5,6 +5,7 @@ import numpy as np
 from database import *
 from outlierness_component import OutliernessComponent
 from provenance_component import *
+from scagnostics_component import ScagnosticsComponent
 
 
 COMPONENT_WEIGHTS = {
@@ -38,6 +39,14 @@ def set_posterior_weights(weights: dict[str, float]):
   global POSTERIOR_WEIGHTS
   POSTERIOR_WEIGHTS = weights
 
+def set_scagnostic_weights(weights: dict[str, float]):
+  global SCAGNOSTIC_WEIGHTS
+  SCAGNOSTIC_WEIGHTS = weights
+
+def set_provenance_weights(weights: dict[str, float]):
+  global PROVENANCE_WEIGHTS
+  PROVENANCE_WEIGHTS = weights
+
 
 def set_dimensions_of_interest(dimensions: list[str]):
   global dimensions_of_interest
@@ -51,31 +60,20 @@ def set_outlierness_metric(metric: str):
   global outlierness_metric
   outlierness_metric = metric
 
-def set_selected_item_ids(ids: list[any]):
-  mark_ids_selected(ids)
-
-
-def set_scagnostic_weights(weights: dict[str, float]):
-  global SCAGNOSTIC_WEIGHTS
-  SCAGNOSTIC_WEIGHTS = weights
-
-def set_provenance_weights(weights: dict[str, float]):
-  global PROVENANCE_WEIGHTS
-  PROVENANCE_WEIGHTS = weights
-
 
 # INTEREST COMPUTATION
 current_chunk = 0
 current_interactions = 0
 
-outlierness = OutliernessComponent()
-provenance = ProvenanceComponent()
+outlierness_comp = OutliernessComponent()
+provenance_comp = ProvenanceComponent()
+scagnostics_comp = ScagnosticsComponent()
 
 
 def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: list[any]):
   global current_interactions
   # interaction: [timestamp: number, mode: string, ids: list[number]]
-  provenance.add_interaction([
+  provenance_comp.add_interaction([
     current_interactions, mode, np.array(items)[:,0]
   ])
   df = pd.DataFrame(items)
@@ -83,7 +81,7 @@ def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: 
   df = df.astype(np.float64)
   df["id"] = df.index
 
-  provenance.train(df)
+  provenance_comp.train(df)
 
   current_interactions += 1
 
@@ -94,13 +92,15 @@ def compute_dois(items: list[list[Any]]):
   df = df.drop(columns=[2, 3, 7, 18, 19])
   df = df.astype(np.float64)
 
-  provenance_doi = provenance.predict_doi(df)
+  provenance_doi = provenance_comp.predict_doi(df)
 
   if current_chunk % 3 == 0:
     df["id"] = df.index
-    outlierness_doi = outlierness.train(df)
+    outlierness_doi = outlierness_comp.train(df)
+    # scagnostics_doi = scagnostics_comp.train(df.loc[0:10])
   else:
-    outlierness_doi = outlierness.predict_doi(df)
+    outlierness_doi = outlierness_comp.predict_doi(df)
+    # scagnostics_doi = scagnostics_comp.predict_doi(df)
 
   doi = outlierness_doi + provenance_doi
 

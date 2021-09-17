@@ -4,13 +4,15 @@ import random
 TOTAL_SIZE = 112145904
 
 # database constants
-PATH = "./data/nyc_taxis.shuffled_full.csv.gz"
-TABLE = "data"
-PROCESSED = "processed" # name of database containing ids of processed data
-SELECTED = "selected"
-PROVENANCE = "provenance"
-DOI = "doi"
-ID = "tripID"
+PATH = "./data/nyc_taxis.shuffled_full.csv.gz" # path to the (compressed) csv file
+
+CSV_DB = "data" # name of view on the csv file
+PROCESSED_DB = "processed" # name of database containing ids of processed data
+DOI_DB = "doi" # name of database containing current doi values
+
+ID = "tripID" # column in a table containing the id of data items as in the original data
+DOI = "doi" # column in a table containing the doi value
+
 ID_INDEX = 0
 
 cursor = duckdb.connect() # database connection
@@ -37,61 +39,15 @@ DIMENSION_EXTENTS = {
 
 
 def initialize_db():
-  cursor.execute(f"CREATE VIEW {TABLE} AS SELECT * FROM read_csv_auto('{PATH}')")
-  cursor.execute(f"CREATE TABLE {PROCESSED} ({ID} VARCHAR UNIQUE PRIMARY KEY)")
-  cursor.execute(f"CREATE TABLE {SELECTED} ({ID} VARCHAR UNIQUE PRIMARY KEY)")
-  cursor.execute(f"CREATE TABLE {PROVENANCE} ({ID} VARCHAR UNIQUE PRIMARY KEY,{DOI} DOUBLE)")
+  cursor.execute(f"CREATE VIEW {CSV_DB} AS SELECT * FROM read_csv_auto('{PATH}')")
+  cursor.execute(f"CREATE TABLE {PROCESSED_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY)")
+  cursor.execute(f"CREATE TABLE {DOI_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY, {DOI} VARCHAR)")
 
 
 def mark_ids_plotted(ids: list):
   values = "('"+"'),('".join(ids)+"')"
-  query = f"INSERT INTO {PROCESSED} ({ID}) VALUES {values}"
+  query = f"INSERT INTO {PROCESSED_DB} ({ID}) VALUES {values}"
   cursor.execute(query)
-
-
-def mark_ids_selected(ids: list[str]):
-  if len(ids) == 0:
-    return
-  query = f"DELETE FROM {SELECTED}"
-  cursor.execute(query)
-  values = "('"+"'),('".join(ids)+"')"
-  query = f"INSERT INTO {SELECTED} ({ID}) VALUES {values}"
-  cursor.execute(query)
-
-
-def mark_ids_provenance(ids: list[str], doi_values: list[float]):
-  if len(ids) == 0:
-    return
-  query = f"DELETE FROM {PROVENANCE}"
-  cursor.execute(query)
-  values = ""
-  for index, id in enumerate(ids):
-    if index == 0:
-      values = f"({id},{doi_values[index]})"
-    else:
-      values = f"({id},{doi_values[index]}),{values}"
-  query = f"INSERT INTO {PROVENANCE} ({ID},{DOI}) VALUES {values}"
-  cursor.execute(query)
-
-
-def is_id_selected(id: str):
-  query = f"SELECT * FROM {SELECTED} WHERE {ID}={id}"
-  result = cursor.execute(query).fetchall()
-  return len(result) > 0
-
-
-def get_id_from_provenance(id: str):
-  query = f"SELECT * FROM {PROVENANCE} WHERE {ID}={id}"
-  result = cursor.execute(query).fetchall()
-  if len(result) > 0:
-    return result[0]
-  else:
-    return result
-
-
-def is_id_in_provenance(id: str):
-  result = get_id_from_provenance(id)
-  return len(result) > 0
 
 
 def process_chunk(chunk: list[tuple[float]]):
@@ -108,17 +64,46 @@ def process_chunk(chunk: list[tuple[float]]):
 
 
 def get_next_chunk_from_db(chunk_size: int):
-  query = f"SELECT * FROM {TABLE} WHERE {ID} NOT IN (SELECT {ID} FROM {PROCESSED}) LIMIT {chunk_size}"
+  query = f"SELECT * FROM {CSV_DB} WHERE {ID} NOT IN (SELECT {ID} FROM {PROCESSED_DB}) LIMIT {chunk_size}"
   next_chunk = cursor.execute(query).fetchall()
   next_chunk = process_chunk(next_chunk)
   ids = [str(item[ID_INDEX]) for item in next_chunk]
   mark_ids_plotted(ids)
-
   return next_chunk
 
 
+def save_dois(ids: list, dois: list):
+  values = ""
+  for i, id in enumerate(ids):
+    values = f"{values}({id},{dois[i]})"
+    if i < len(ids) - 1:
+      values += ","
+  query = f"INSERT INTO {DOI_DB} ({ID}, {DOI}) VALUES {values}"
+  cursor.execute(query)
+
+
+def get_dois(ids: list):
+  id_list = ""
+  for id in ids:
+    id_list += str(id)
+    if id != ids[-1]:
+      id_list += ","
+  query = f"SELECT {DOI} FROM {DOI_DB} WHERE {ID} IN ({id_list})"
+  return cursor.execute(query).fetchnumpy()
+
+
+def update_doi(id: str, doi: str):
+  query = f"UPDATE {DOI_DB} SET {DOI}={doi} WHERE {ID}={id}"
+  cursor.execute(query)
+
+
+def update_dois(ids: list, dois: list):
+  for i, id in enumerate(ids):
+    update_doi(id, dois[i])
+
+
 def get_dimensions_in_data():
-  query = f"SELECT * FROM {TABLE} LIMIT 1"
+  query = f"SELECT * FROM {CSV_DB} LIMIT 1"
   item = cursor.execute(query).fetchdf()
   dimensions = list(item.columns)
   dimensions = dimensions + ["trip_duration", "tip_ratio"]
@@ -147,12 +132,12 @@ def get_dimension_extent(dimension: str):
 
 def get_items_for_ids(ids: list[str]):
   id_list = "'"+"','".join(ids)+"'"
-  query = f"SELECT * FROM {TABLE} WHERE {ID} IN ({id_list})"
+  query = f"SELECT * FROM {CSV_DB} WHERE {ID} IN ({id_list})"
   df = cursor.execute(query).fetchdf()
   items = df.to_numpy()
   return items
 
 
 def reset_progression():
-  query = f"DELETE FROM {PROCESSED}"
+  query = f"DELETE FROM {PROCESSED_DB}"
   cursor.execute(query)

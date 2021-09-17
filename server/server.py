@@ -36,11 +36,13 @@ def get_dim_extent(dimension):
 @app.route("/next_chunk", methods=["GET"])
 def get_next_chunk():
   chunk_size = int(request.args.get("size"))
-  # chunk = get_random_sample(chunk_size)
   chunk = get_next_chunk_from_db(chunk_size)
-  doi = compute_dois(chunk)
 
-  return cors_response({"chunk": chunk, "doi": doi.tolist()})
+  dois = compute_dois(chunk).tolist()
+  ids = np.array(chunk)[:, 0].tolist()
+  save_dois(ids, dois)
+
+  return cors_response({"chunk": chunk})
 
 
 @app.route("/size", methods=["GET"])
@@ -151,12 +153,12 @@ def get_suggested_items():
   pass
 
 
-@app.route("/doi", methods=["POST"])
-def get_doi():
-  items: list[list[Any]] = json.loads(request.data)["items"]
+# @app.route("/doi", methods=["POST"])
+# def get_doi():
+#   items: list[list[Any]] = json.loads(request.data)["items"]
 
-  interest = compute_dois(items)
-  return cors_response(interest)
+#   interest = compute_dois(items)
+#   return cors_response(interest)
 
 
 @app.route("/prediction", methods=["GET"])
