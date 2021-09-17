@@ -29,6 +29,9 @@ class ProvenanceComponent(DoiComponent):
 
 
   def train(self, X: DataFrame):
+    if len(self.log) == 0:
+      return pd.Series(np.zeros((len(X))))
+
     interacted_ids = pd.DataFrame(X["id"].astype(np.int64))
     computed_doi = self.compute_doi(X)
 
@@ -37,9 +40,14 @@ class ProvenanceComponent(DoiComponent):
     training_labels = computed_doi.to_numpy()
 
     self.predictor.fit(training_data, training_labels)
+    self.is_trained = True
+    return training_labels
 
 
-  def evaluate_doi(self, X: DataFrame):
+  def compute_doi(self, X: DataFrame):
+    if len(self.log) == 0:
+      return pd.Series(np.zeros((len(X))))
+
     # "flatten" the list of ids into separate rows
     s = self.log.set_index(['timestamp', "mode"])['ids']
 
@@ -67,10 +75,6 @@ class ProvenanceComponent(DoiComponent):
 
     # input might contain items that have not been interacted with, which evaluate to NaN, so set them 0
     doi.loc[doi.isna()] = 0
+    doi = doi.astype(np.float64)
 
     return doi
-
-
-  def predict_doi(self, X):
-    X_ = X.drop(columns=["id"])
-    return self.predictor.predict(X_.to_numpy())

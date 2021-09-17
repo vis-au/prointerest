@@ -65,30 +65,44 @@ def set_provenance_weights(weights: dict[str, float]):
 
 
 # INTEREST COMPUTATION
-current_timestamp = 0
+current_chunk = 0
+current_interactions = 0
 
 outlierness = OutliernessComponent()
+provenance = ProvenanceComponent()
+
+
+def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: list[any]):
+  global current_interactions
+  # interaction: [timestamp: number, mode: string, ids: list[number]]
+  provenance.add_interaction([
+    current_interactions, mode, np.array(items)[:,0]
+  ])
+  df = pd.DataFrame(items)
+  df = df.drop(columns=[2, 3, 7, 18, 19])
+  df = df.astype(np.float64)
+  df["id"] = df.index
+
+  provenance.train(df)
+
+  current_interactions += 1
+
+
 def compute_dois(items: list[list[Any]]):
-  global current_timestamp
+  global current_chunk
   df = pd.DataFrame(items)
   df = df.drop(columns=[2, 3, 7, 18, 19])
   df = df.astype(np.float64)
 
-  if current_timestamp % 3 == 0:
+  provenance_doi = provenance.predict_doi(df)
+
+  if current_chunk % 3 == 0:
     df["id"] = df.index
-    doi = outlierness.train(df)
+    outlierness_doi = outlierness.train(df)
   else:
-    doi = outlierness.predict_doi(df)
+    outlierness_doi = outlierness.predict_doi(df)
 
-  current_timestamp += 1
+  doi = outlierness_doi + provenance_doi
+
+  current_chunk += 1
   return doi
-
-
-provenance_component = ProvenanceComponent()
-def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], ids: list[any]):
-  global current_timestamp
-  # interaction: [timestamp: number, mode: string, ids: list[number]]
-  provenance_component.add_interaction([
-    current_timestamp, mode, ids
-  ])
-  current_timestamp += 1

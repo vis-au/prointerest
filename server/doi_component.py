@@ -1,5 +1,5 @@
 import numpy as np
-from pandas.core.frame import DataFrame
+from pandas.core.frame import DataFrame, Series
 from sklearn.linear_model import SGDRegressor
 
 class DoiComponent:
@@ -14,6 +14,7 @@ class DoiComponent:
     self.weights: dict[str, float] = {}
     self.current_interest = np.empty(shape=(0, 2))
     self.predictor: SGDRegressor = SGDRegressor(max_iter=1000, tol=1e-3)
+    self.is_trained = False
 
 
   def set_components(self, weights: dict[str, float]):
@@ -47,6 +48,9 @@ class DoiComponent:
     with shape (n, m) without evaluating the full function. Returns a vector y of shape (n, 1),
     containing the predicted doi for each item.
     '''
+    if not self.is_trained:
+      return Series(np.zeros((len(X))))
+
     return self.predictor.predict(X)
 
 
@@ -73,5 +77,5 @@ class DoiComponent:
     training_labels = self.compute_doi(X)
 
     self.predictor.partial_fit(training_data, training_labels)
-
+    self.is_trained = True
     return training_labels
