@@ -1,10 +1,12 @@
+import { sendInteraction } from "$lib/util/requests";
+import { readable } from "svelte/store";
 import type { DoiInteraction, InteractionMode } from "./doi-interaction";
 
 const SIZE_BEFORE_FLUSH = 1000;
 const FLUSH_INTERVAL = 5000;
 
 export class InteractionLog {
-  public log: DoiInteraction[] = [];
+  private _log: DoiInteraction[] = [];
 
   public startAutomatedFlush(): void {
     if (window !== undefined) {
@@ -13,28 +15,32 @@ export class InteractionLog {
   }
 
   private flush() {
-    if (this.log.length < SIZE_BEFORE_FLUSH) {
+    if (this._log.length < SIZE_BEFORE_FLUSH) {
       return;
     }
-    this.log.splice(this.log.length - SIZE_BEFORE_FLUSH, this.log.length);
+    this._log.splice(this._log.length - SIZE_BEFORE_FLUSH, this._log.length);
   }
 
   public add(interaction: DoiInteraction): void {
-    interaction.timestamp = this.log.length;
-    this.log.push(interaction);
+    interaction.timestamp = this._log.length;
+    this._log.push(interaction);
+    sendInteraction(interaction)
   }
 
   public getNRecentSteps(n: number): DoiInteraction[] {
-    const recentSteps = n > this.log.length ? this.log.length : n;
-    return this.log.slice(-recentSteps);
+    const recentSteps = n > this._log.length ? this._log.length : n;
+    return this._log.slice(-recentSteps);
   }
 
   public getLatestTimestamp(): number {
-    if (this.log.length === 0) {
+    if (!this._log) {
+      this._log = [];
+    }
+    if (this._log.length === 0) {
       return -1;
     }
 
-    return this.log[this.log.length - 1].timestamp;
+    return this._log[this._log.length - 1].timestamp;
   }
 
   public getLatestInteractionOfType(type: InteractionMode, maxAge = 10): DoiInteraction {
@@ -49,10 +55,12 @@ export class InteractionLog {
 
     return recentInteractions[lastIndexOfType];
   }
+
+  public get log(): DoiInteraction[] {
+    return this._log;
+  }
 }
 
 const instance: InteractionLog = new InteractionLog();
 
-export function getInteractionLog(): InteractionLog {
-  return instance;
-}
+export const interactionLog = readable(instance);

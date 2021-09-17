@@ -10,7 +10,6 @@
   export let height: number;
 
   async function evaluateInterest() {
-    // updateExploredItems();
     // const doiValues = await getDoiValues($quadtree.data());
     // const map = new Map<number, number>();
     // doiValues.forEach((pair) => map.set(pair[0], pair[1]));

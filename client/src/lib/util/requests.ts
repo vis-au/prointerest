@@ -1,3 +1,4 @@
+import type { DoiInteraction } from "$lib/provenance/doi-interaction";
 import type DataItem from "$lib/types/data-item";
 import type { OutliernessMeasure } from "$lib/types/outlier-measures";
 import { scagnostics } from "$lib/types/scagnostics";
@@ -100,8 +101,10 @@ export async function sendSelectedItems(items: DataItem[]): Promise<void> {
   return sendRequestToBaseURL("/selected_items", "POST", { items: values });
 }
 
-export async function sendInterestingItems(ids: string[], doi: number[]): Promise<void> {
-  return sendRequestToBaseURL("/interesting_items", "POST", { ids, doi });
+export function sendInteraction(interaction: DoiInteraction): Promise<void> {
+  const ids = interaction.getAffectedItems().map(d => d.id);
+  const mode = interaction.mode;
+  return sendRequestToBaseURL("/interaction", "POST", {mode, ids});
 }
 
 export async function getDoiValues(items: DataItem[]): Promise<[number, number][]> {

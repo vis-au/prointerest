@@ -3,12 +3,12 @@
 
   import type { DoiInteraction } from "$lib/provenance/doi-interaction";
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
+  import { interactionLog } from "$lib/provenance/interaction-log";
 
   import { bins } from "$lib/state/bins";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { activeBrush } from "$lib/state/active-brush";
   import { activeInteractionMode } from "$lib/state/active-interaction-mode";
-  import { getLatestTimestamp, registerNewInteraction } from "$lib/state/explored-items";
   import { hexbinning } from "$lib/state/hexbinning";
   import { hoveredBin } from "$lib/state/hovered-bin";
   import { hoveredPosition } from "$lib/state/hovered-position";
@@ -40,7 +40,7 @@
 
   const interactionFactory = new InteractionFactory(width, height, $sampledQuadtree);
   interactionFactory.getItemsInRegion = getSampledPointsInRect;
-  interactionFactory.getTimestamp = getLatestTimestamp;
+  interactionFactory.getTimestamp = $interactionLog.getLatestTimestamp;
   $: interactionFactory.width = width;
   $: interactionFactory.height = height;
 
@@ -63,7 +63,7 @@
   }
 
   function onInteraction(interaction: DoiInteraction) {
-    registerNewInteraction(interaction);
+    $interactionLog.add(interaction);
   }
 
   function onBrushEnd() {

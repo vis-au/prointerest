@@ -1,16 +1,12 @@
 <script lang="typescript">
-  import { interactionWeights } from "$lib/state/interaction-technique-weights";
-  import Column from "$lib/widgets/column.svelte";
-  import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
-  import WeightedValues from "$lib/widgets/weighted-values.svelte";
   import {
     exploredItemInterest,
-    exploredItems,
-    interactionThreshold,
-    provenanceLog,
-    provenanceLogSize,
-    updateExploredItems
+    exploredItems
   } from "$lib/state/explored-items";
+  import { interactionWeights } from "$lib/state/interaction-technique-weights";
+  import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
+  import Column from "$lib/widgets/column.svelte";
+  import WeightedValues from "$lib/widgets/weighted-values.svelte";
   import Row from "$lib/widgets/row.svelte";
   import BigNumber from "$lib/widgets/big-number.svelte";
   import Slider from "$lib/widgets/slider.svelte";
@@ -18,13 +14,17 @@
   import type DataItem from "$lib/types/data-item";
   import List from "$lib/widgets/list.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
-  import { onMount } from "svelte";
   import { lessRandomlySampledItems } from "$lib/state/randomly-sampled-items";
+  import { interactionLog } from "$lib/provenance/interaction-log";
+
+
+  let provenanceSize = 100;
+  let interactionThreshold = 0.15;
 
   $: provenanceInterestValues = exploredItemsToRecord($exploredItemInterest);
-  $: start = Math.max($provenanceLog.log.length - $provenanceLogSize, 0);
-  $: consideredLog = $provenanceLog.log
-    .slice(start, $provenanceLog.log.length)
+  $: start = Math.max($interactionLog.log.length - provenanceSize, 0);
+  $: consideredLog = $interactionLog.log
+    .slice(start, $interactionLog.log.length)
     .map((d) => d.mode)
     .reverse();
 
@@ -40,10 +40,6 @@
   const histogramSize = 700;
   let showAggregateInteractionCount = true;
   let autoUpdateAfterWeights = false;
-
-  onMount(() => {
-    updateExploredItems();
-  });
 </script>
 
 <DoiConfig
@@ -63,7 +59,7 @@
         totalSize={histogramSize}
         bind:valueWeights={$interactionWeights}
         on:end={() => {
-          if (autoUpdateAfterWeights) updateExploredItems();
+          // if (autoUpdateAfterWeights) updateExploredItems();
         }}
       />
     </Row>
@@ -92,7 +88,7 @@
         max={1}
         updateLive={false}
         style="margin-top: 20px"
-        bind:value={$interactionThreshold}
+        bind:value={interactionThreshold}
       />
     </Column>
 
@@ -119,7 +115,7 @@
           steps={99}
           updateLive={false}
           style="margin-top: 20px"
-          bind:value={$provenanceLogSize}
+          bind:value={provenanceSize}
         />
       </Row>
     </Column>
