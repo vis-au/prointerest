@@ -4,6 +4,7 @@ import numpy as np
 
 from database import *
 from outlierness_component import OutliernessComponent
+from provenance_component import ProvenanceComponent
 
 
 COMPONENT_WEIGHTS = {
@@ -59,26 +60,31 @@ def set_scagnostic_weights(weights: dict[str, float]):
   SCAGNOSTIC_WEIGHTS = weights
 
 
-def set_provenance_items(ids: list[str], doi: list[float]):
-  # mark_ids_provenance(ids, doi)
-  pass
-
-
 # INTEREST COMPUTATION
+current_timestamp = 0
 
-i = 0
 outlierness = OutliernessComponent()
 def compute_dois(items: list[list[Any]]):
-  global i
+  global current_timestamp
   df = pd.DataFrame(items)
   df = df.drop(columns=[2, 3, 7, 18, 19])
   df = df.astype(np.float64)
 
-  if i % 3 == 0:
+  if current_timestamp % 3 == 0:
     df["id"] = df.index
     doi = outlierness.train(df)
   else:
     doi = outlierness.predict_doi(df)
 
-  i += 1
+  current_timestamp += 1
   return doi
+
+
+provenance_component = ProvenanceComponent()
+def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], ids: list[any]):
+  global current_timestamp
+  # interaction: [timestamp: number, mode: string, ids: list[number]]
+  provenance_component.add_interaction([
+    current_timestamp, mode, ids
+  ])
+  current_timestamp += 1

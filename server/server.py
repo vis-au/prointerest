@@ -120,13 +120,13 @@ def send_selected_items():
   return cors_response(True)
 
 
-@app.route("/interesting_items", methods=["POST"])
-def send_interesting_items():
+@app.route("/interaction", methods=["POST"])
+def send_interaction():
   res = json.loads(request.data)
   ids = res["ids"]
-  doi = res["doi"]
+  mode = res["mode"] # "brush", "zoom", "selection"
 
-  set_provenance_items(ids, doi)
+  log_interaction(mode, ids)
 
   return cors_response(True)
 
