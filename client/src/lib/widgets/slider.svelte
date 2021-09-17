@@ -1,4 +1,6 @@
 <script lang="typescript">
+  import { createEventDispatcher } from "svelte";
+
   import BigNumber from "./big-number.svelte";
 
   export let id: string;
@@ -12,6 +14,8 @@
   export let showValue = true;
   export let showDomain = true;
   export let style = "";
+
+  const dispatch = createEventDispatcher();
 
   const step = (max - min) / steps;
 
@@ -40,7 +44,10 @@
       {max}
       {step}
       bind:value={sliderValue}
-      on:mouseup={() => (value = sliderValue)}
+      on:mouseup={() => {
+        value = sliderValue;
+        dispatch("end");
+      }}
     />
   {/if}
   {#if showDomain}
