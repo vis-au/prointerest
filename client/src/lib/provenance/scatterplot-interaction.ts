@@ -19,8 +19,6 @@ export const defaultItemInRegion: (
 export interface ScatterplotInteraction {
   mode: ScatterplotInteractionMode;
   std: number;
-  x: number;
-  y: number;
   quadtree: Quadtree<DataItem>;
   timestamp: number;
   getAffectedItems: () => DataItem[];

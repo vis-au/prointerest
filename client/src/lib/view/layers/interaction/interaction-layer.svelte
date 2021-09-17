@@ -7,7 +7,7 @@
 
   import { bins } from "$lib/state/bins";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
-  import { activeBrush } from "$lib/state/active-brush";
+  import { activeBrush, activeLasso } from "$lib/state/active-brush";
   import { activeInteractionMode } from "$lib/state/active-interaction-mode";
   import { hexbinning } from "$lib/state/hexbinning";
   import { hoveredBin } from "$lib/state/hovered-bin";
@@ -24,7 +24,7 @@
   import { currentTransform, isZooming } from "$lib/state/zoom";
 
   import { getDummyDataItem } from "$lib/util/dummy-data-item";
-  import { getSampledPointsInRect } from "$lib/util/find-in-quadtree";
+  import { getPointsInPolygon, getPointsInRect } from "$lib/util/find-in-quadtree";
 
   import BrushLayer from "./brush-layer.svelte";
   import ZoomLayer from "./zoom-layer.svelte";
@@ -39,7 +39,9 @@
   const color = "rgba(255,69,0,.7)";
 
   const interactionFactory = new InteractionFactory(width, height, $sampledQuadtree);
-  interactionFactory.getItemsInRegion = getSampledPointsInRect;
+  $: interactionFactory.quadtree = $sampledQuadtree;
+  interactionFactory.getItemsInRegion = getPointsInRect;
+  interactionFactory.getItemsInPolygon = getPointsInPolygon;
   interactionFactory.getTimestamp = $interactionLog.getLatestTimestamp;
   $: interactionFactory.width = width;
   $: interactionFactory.height = height;
@@ -75,6 +77,11 @@
       const y0_ = $scaleY(y0);
       const y1_ = $scaleY(y1);
       const interaction = interactionFactory.createScatterplotBrushInteraction(x0_, y0_, x1_, y1_);
+      onInteraction(interaction);
+    } else if ($activeLasso !== null) {
+      const polygon = $activeLasso
+        .map(pos => [$scaleX(pos[0]), $scaleY(pos[1])] as [number, number]);
+      const interaction = interactionFactory.createLassoBrushInteraction(polygon);
       onInteraction(interaction);
     }
   }

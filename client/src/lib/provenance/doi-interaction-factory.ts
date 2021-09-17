@@ -8,14 +8,16 @@ import Select from "./select-interaction";
 import ZoomAndPan from "./zoom-and-pan-interaction";
 import type { HistogramInteraction } from "./histogram-interaction";
 import HistogramBrush from "./histogram-brush-interaction";
+import ScatterplotLassoBrush from "./scatterplot-lasso-brush-interaction";
 
 const STANDARD_DIVIATION = 20;
 
 export default class InteractionFactory {
   private screenWidth: number;
   private screenHeight: number;
-  private quadtree: Quadtree<DataItem>;
+  public quadtree: Quadtree<DataItem>;
   private _getItemsInRegion: (x0: number, y0: number, x3: number, y3: number) => DataItem[];
+  private _getItemsInPolygon: (polygon: [number, number][]) => DataItem[];
   public getTimestamp: () => number;
 
   constructor(width: number, height: number, quadtree: Quadtree<DataItem>) {
@@ -23,6 +25,7 @@ export default class InteractionFactory {
     this.screenHeight = height;
     this.quadtree = quadtree;
     this._getItemsInRegion = () => [];
+    this._getItemsInPolygon = () => [];
     this.getTimestamp = () => -1;
   }
 
@@ -44,6 +47,18 @@ export default class InteractionFactory {
     brushInteraction.std = STANDARD_DIVIATION;
 
     return brushInteraction;
+  }
+
+  public createLassoBrushInteraction(polygon: [number, number][]): ScatterplotLassoBrush {
+    const lassoInteraction = new ScatterplotLassoBrush();
+
+    lassoInteraction.quadtree = this.quadtree;
+    lassoInteraction.getItemsInRegion = this._getItemsInPolygon;
+    lassoInteraction.timestamp = this.getTimestamp();
+    lassoInteraction.polygon = polygon;
+    lassoInteraction.std = STANDARD_DIVIATION;
+
+    return lassoInteraction;
   }
 
   public createHistogramBrushInteraction(
@@ -112,5 +127,11 @@ export default class InteractionFactory {
     f: (x0: number, y0: number, x3: number, y3: number, t: Quadtree<DataItem>) => DataItem[]
   ) {
     this._getItemsInRegion = (_x0, _y0, _x3, _y3) => f(_x0, _y0, _x3, _y3, this.quadtree);
+  }
+
+  public set getItemsInPolygon(
+    f: ((polygon: [number, number][], t: Quadtree<DataItem>) => DataItem[])
+  ) {
+    this._getItemsInPolygon = (polygon) => f(polygon, this.quadtree);
   }
 }
