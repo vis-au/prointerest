@@ -148,7 +148,7 @@
   }
   div.entry.active {
     filter: brightness(0.95);
-    border-bottom: 3px solid black;
+    border: 3px solid black;
   }
   .dark div.entry {
     background: #555;
@@ -159,7 +159,7 @@
   }
   .dark div.entry.active {
     filter: brightness(1.1);
-    border-bottom: 3px solid white;
+    border: 3px solid white;
   }
 
   div.entry label {
