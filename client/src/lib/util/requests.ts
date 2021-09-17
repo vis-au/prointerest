@@ -125,7 +125,7 @@ export async function sendSelectedItems(items: DataItem[]): Promise<void> {
 }
 
 export function sendInteraction(interaction: DoiInteraction): Promise<void> {
-  const ids = interaction.getAffectedItems().map((d) => d.id);
+  const ids = interaction.getAffectedItems().map((d) => d.values);
   const mode = interaction.mode;
   return sendRequestToBaseURL("/interaction", "POST", { mode, ids });
 }
