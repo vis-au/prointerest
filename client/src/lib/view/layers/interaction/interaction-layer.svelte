@@ -1,6 +1,4 @@
 <script lang="typescript">
-  import { afterUpdate } from "svelte";
-
   import type { DoiInteraction } from "$lib/provenance/doi-interaction";
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import { interactionLog } from "$lib/provenance/interaction-log";
@@ -10,7 +8,6 @@
   import { activeBrush, activeLasso } from "$lib/state/active-brush";
   import { activeInteractionMode } from "$lib/state/active-interaction-mode";
   import { hexbinning } from "$lib/state/hexbinning";
-  import { hoveredBin } from "$lib/state/hovered-bin";
   import { hoveredPosition } from "$lib/state/hovered-position";
   import { sampledQuadtree } from "$lib/state/sampled-quadtree";
   import { scaleX, scaleY } from "$lib/state/scales";
@@ -27,16 +24,11 @@
   import { getPointsInPolygon, getPointsInRect } from "$lib/util/find-in-quadtree";
 
   import BrushLayer from "./brush-layer.svelte";
+  import SelectionLayer from "./selection-layer.svelte";
   import ZoomLayer from "./zoom-layer.svelte";
 
-  export let id = "view-interaction-layer";
   export let width: number;
   export let height: number;
-  export let lineWidth = 4;
-
-  let selectionCanvas: HTMLCanvasElement;
-
-  const color = "rgba(255,69,0,.7)";
 
   const interactionFactory = new InteractionFactory(width, height, $sampledQuadtree);
   $: interactionFactory.quadtree = $sampledQuadtree;
@@ -135,65 +127,13 @@
     const interaction = interactionFactory.createSelectInteraction(x, y);
     onInteraction(interaction);
   }
-
-  function renderHoveredBin(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
-    if (!$hoveredBin) {
-      return;
-    }
-
-    const x = $hoveredBin.x;
-    const y = $hoveredBin.y;
-
-    ctx.beginPath();
-    ctx.translate(x, y);
-    ctx.strokeStyle = color;
-    ctx.fillStyle = "rgba(0, 0, 0, 0.0)";
-    ctx.lineWidth = lineWidth * 0.5;
-    ctx.setLineDash([2]);
-    ctx.stroke(hexagonPath);
-    ctx.fill(hexagonPath);
-    ctx.translate(-x, -y);
-    ctx.closePath();
-    ctx.setLineDash([]);
-  }
-
-  function renderSelectedBins(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.fillStyle = "rgba(0, 0, 0, 0.0)";
-    ctx.lineWidth = lineWidth;
-    $selectedBins.forEach((bin) => {
-      ctx.translate(bin.x, bin.y);
-      ctx.stroke(hexagonPath);
-      ctx.fill(hexagonPath);
-      ctx.translate(-bin.x, -bin.y);
-    });
-    ctx.closePath();
-  }
-
-  function render() {
-    if (!selectionCanvas) {
-      return;
-    }
-
-    const hexagonPath = new Path2D($hexbinning.hexagon());
-    const ctx = selectionCanvas.getContext("2d");
-    ctx.clearRect(0, 0, width, height);
-
-    renderHoveredBin(ctx, hexagonPath);
-    renderSelectedBins(ctx, hexagonPath);
-  }
-
-  afterUpdate(render);
 </script>
 
 <div class="interaction-canvas-container {$isZooming ? 'zooming' : ''}">
-  <canvas
-    id="{id}-selection-canvas"
-    class="selection interaction-canvas"
+  <SelectionLayer
+    id="selection-layer"
     {width}
     {height}
-    bind:this={selectionCanvas}
   />
   <ZoomLayer
     id="zoom-layer"
