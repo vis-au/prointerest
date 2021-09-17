@@ -27,10 +27,11 @@
 
   function onBrush(event: CustomEvent) {
     const selections: Record<string, [number, number]> = event.detail;
-    const dimensions = Object.keys(selections);
+    const dims = Object.keys(selections);
 
-    dimensions.forEach((dim) => {
-      const interaction = interactionFactory.createHistogramBrushInteraction(dim, selections[dim]);
+    dims.forEach((dim) => {
+      const interaction = interactionFactory
+        .createHistogramBrushInteraction(dim, $dimensions.indexOf(dim), selections[dim]);
       $interactionLog.add(interaction);
     });
   }

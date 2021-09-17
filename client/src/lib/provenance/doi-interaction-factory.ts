@@ -63,12 +63,14 @@ export default class InteractionFactory {
 
   public createHistogramBrushInteraction(
     dimension: string,
+    index: number,
     extent: [number, number]
   ): HistogramInteraction {
     const brushInteraction = new HistogramBrush();
 
     brushInteraction.dimension = dimension;
     brushInteraction.extent = extent;
+    brushInteraction.index = index;
     brushInteraction.data = this.quadtree.data();
     brushInteraction.timestamp = this.getTimestamp();
     brushInteraction.std = STANDARD_DIVIATION;
