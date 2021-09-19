@@ -1,6 +1,6 @@
 import numpy as np
 from pandas.core.frame import DataFrame, Series
-from sklearn.linear_model import SGDRegressor
+from sklearn import svm
 
 class DoiComponent:
   '''
@@ -13,7 +13,8 @@ class DoiComponent:
   def __init__(self) -> None:
     self.weights: dict[str, float] = {}
     self.current_interest = np.empty(shape=(0, 2))
-    self.predictor: SGDRegressor = SGDRegressor(max_iter=1000, tol=1e-3)
+    # self.predictor: SGDRegressor = SGDRegressor(max_iter=1000, tol=1e-3)
+    self.predictor: svm.SVR = svm.SVR()
     self.is_trained = False
 
 
@@ -76,6 +77,6 @@ class DoiComponent:
     training_data = X.drop(columns=["id"]).to_numpy()
     training_labels = self.compute_doi(X)
 
-    self.predictor.partial_fit(training_data, training_labels)
+    self.predictor.fit(training_data, training_labels)
     self.is_trained = True
     return training_labels

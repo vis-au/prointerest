@@ -4,7 +4,6 @@ from flask import Flask, json, jsonify, request
 from database import *
 from doi_function import *
 from scagnostics_component import SCATTERPLOT_AXES
-from recommender import *
 
 app = Flask(__name__)
 
@@ -38,9 +37,12 @@ def get_next_chunk():
   chunk_size = int(request.args.get("size"))
   chunk = get_next_chunk_from_db(chunk_size)
 
-  dois = compute_dois(chunk).tolist()
   ids = np.array(chunk)[:, 0].tolist()
+  dois = compute_dois(chunk).tolist()
   save_dois(ids, dois)
+
+  centers, labels = compute_doi_classes(dois)
+  print(centers, labels)
 
   return cors_response({"chunk": chunk})
 
@@ -122,18 +124,6 @@ def send_configuration(component):
       log_size = request.args.get("log_size")
       print(log_size)
 
-  return cors_response(True)
-
-
-@app.route("/selected_items", methods=["POST"])
-def send_selected_items():
-  # list of list of values, where the first entry is the item id
-  items: list[list[Any]] = json.loads(request.data)["items"]
-
-  # ids is a list of strings
-  ids: list[str] = [str(item[0]) for item in items]
-
-  set_selected_item_ids(ids)
   return cors_response(True)
 
 

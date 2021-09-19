@@ -1,6 +1,7 @@
 from typing import Any, Literal
 import pandas as pd
 import numpy as np
+from sklearn.cluster import MiniBatchKMeans
 
 from database import *
 from outlierness_component import OutliernessComponent
@@ -21,6 +22,8 @@ POSTERIOR_WEIGHTS = {
   "provenance": .5,
   "scagnostics": .5
 }
+
+DOI_CLASSES = 10 # number of clusters the doi values are grouped into
 
 dimensions_of_interest: list[str] = []
 ranges_of_interest: dict[str, float] = {}
@@ -46,6 +49,10 @@ def set_scagnostic_weights(weights: dict[str, float]):
 def set_provenance_weights(weights: dict[str, float]):
   global PROVENANCE_WEIGHTS
   PROVENANCE_WEIGHTS = weights
+
+def set_doi_classes(classes: int):
+  global DOI_CLASSES
+  DOI_CLASSES = classes
 
 
 def set_dimensions_of_interest(dimensions: list[str]):
@@ -102,7 +109,17 @@ def compute_dois(items: list[list[Any]]):
     outlierness_doi = outlierness_comp.predict_doi(df)
     # scagnostics_doi = scagnostics_comp.predict_doi(df)
 
-  doi = outlierness_doi + provenance_doi
+  prior = outlierness_doi
+  posterior = provenance_doi
+  doi = COMPONENT_WEIGHTS["prior"] * prior + COMPONENT_WEIGHTS["posterior"] * posterior
 
   current_chunk += 1
   return doi
+
+
+def compute_doi_classes(doi: list[list[float]]):
+  X = np.array(doi).reshape(-1, 1)
+  kmeans = MiniBatchKMeans(n_clusters=DOI_CLASSES, random_state=0).fit(X)
+  centers = kmeans.cluster_centers_.reshape((1, -1))
+  labels = kmeans.labels_
+  return centers, labels
