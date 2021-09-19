@@ -42,7 +42,7 @@ def get_next_chunk():
   save_dois(ids, dois)
 
   centers, labels = compute_doi_classes(dois)
-  print(centers, labels)
+  # print(centers, labels)
 
   return cors_response({"chunk": chunk})
 

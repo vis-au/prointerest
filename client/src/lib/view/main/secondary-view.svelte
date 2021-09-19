@@ -27,6 +27,9 @@
 
   function onBrush(event: CustomEvent) {
     const selections: Record<string, [number, number]> = event.detail;
+    if (selections === null) {
+      return;
+    }
     const dims = Object.keys(selections);
 
     dims.forEach((dim) => {
