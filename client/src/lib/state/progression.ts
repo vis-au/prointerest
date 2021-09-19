@@ -3,7 +3,6 @@ import { getNextChunk } from "$lib/util/requests";
 import { writable } from "svelte/store";
 import { processedData } from "./processed-data";
 import { sendReset } from "../util/requests";
-import { activeDoiValues } from "./latest-doi-values";
 
 export const CHUNK_SIZE = 1000;
 
@@ -12,15 +11,15 @@ export const updateInterval = writable(currentInterval);
 
 export const progressionState = writable("paused" as ProgressionState);
 
-function saveDoi(items: number[][], doi: number[]) {
-  activeDoiValues.update((dois) => {
-    items.forEach((item, i) => {
-      dois.set(item[0], doi[i]);
-    });
+// function saveDoi(items: number[][], doi: number[]) {
+//   activeDoiValues.update((dois) => {
+//     items.forEach((item, i) => {
+//       dois.set(item[0], doi[i]);
+//     });
 
-    return dois;
-  });
-}
+//     return dois;
+//   });
+// }
 
 const progressionCallback = () => {
   getNextChunk(CHUNK_SIZE).then((chunk) => {
@@ -28,7 +27,7 @@ const progressionCallback = () => {
       return [...processed, ...chunk.chunk];
     });
 
-    saveDoi(chunk.chunk, chunk.doi);
+    // saveDoi(chunk.chunk, chunk.doi);
   });
 };
 
