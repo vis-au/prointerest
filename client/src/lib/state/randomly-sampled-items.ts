@@ -1,7 +1,7 @@
 import type { Quadtree } from "d3-quadtree";
 import { writable } from "svelte/store";
 import type DataItem from "$lib/types/data-item";
-import { sample } from "../util/sampleListRandomly";
+import { sample } from "../util/sample-list";
 import { quadtree } from "./quadtree";
 
 const iterationsBetweenUpdates = 10;

@@ -1,6 +1,4 @@
 <script lang="typescript">
-  import { active } from "d3-transition";
-
   import Dropdown from "./dropdown.svelte";
 
   export let id = "";
