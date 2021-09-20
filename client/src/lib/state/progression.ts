@@ -11,6 +11,9 @@ export const updateInterval = writable(currentInterval);
 
 export const progressionState = writable("paused" as ProgressionState);
 
+let currentlyWaiting = false;
+export const waitingForChunk = writable(currentlyWaiting);
+
 // function saveDoi(items: number[][], doi: number[]) {
 //   activeDoiValues.update((dois) => {
 //     items.forEach((item, i) => {
@@ -22,13 +25,18 @@ export const progressionState = writable("paused" as ProgressionState);
 // }
 
 const progressionCallback = () => {
-  getNextChunk(CHUNK_SIZE).then((chunk) => {
-    processedData.update((processed) => {
-      return [...processed, ...chunk.chunk];
+  if (!currentlyWaiting) {
+    currentlyWaiting = true;
+    waitingForChunk.set(true);
+    getNextChunk(CHUNK_SIZE).then((chunk) => {
+      processedData.update((processed) => {
+        return [...processed, ...chunk.chunk];
+      });
+      currentlyWaiting = false;
+      waitingForChunk.set(currentlyWaiting)
+      // saveDoi(chunk.chunk, chunk.doi);
     });
-
-    // saveDoi(chunk.chunk, chunk.doi);
-  });
+  }
 };
 
 let progressionInterval: NodeJS.Timer = null;
