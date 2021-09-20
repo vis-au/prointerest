@@ -3,6 +3,8 @@ import { getNextChunk } from "$lib/util/requests";
 import { writable } from "svelte/store";
 import { processedData } from "./processed-data";
 import { sendReset } from "../util/requests";
+import { doiValues } from "./doi-values";
+import { doiLabels } from "./doi-labels";
 
 export const CHUNK_SIZE = 1000;
 
@@ -14,15 +16,8 @@ export const progressionState = writable("paused" as ProgressionState);
 let currentlyWaiting = false;
 export const waitingForChunk = writable(currentlyWaiting);
 
-// function saveDoi(items: number[][], doi: number[]) {
-//   activeDoiValues.update((dois) => {
-//     items.forEach((item, i) => {
-//       dois.set(item[0], doi[i]);
-//     });
-
-//     return dois;
-//   });
-// }
+const currentDoiLabels: Map<number, number> = new Map();
+const currentDoiValues: Map<number, number> = new Map();
 
 const progressionCallback = () => {
   if (!currentlyWaiting) {
@@ -32,9 +27,18 @@ const progressionCallback = () => {
       processedData.update((processed) => {
         return [...processed, ...chunk.chunk];
       });
+      chunk.labels.forEach((label, i) => {
+        currentDoiLabels.set(chunk.chunk[i][0], label);
+      });
+      chunk.dois.forEach((doi, i) => {
+        currentDoiValues.set(chunk.chunk[i][0], doi);
+      });
+
+      doiLabels.update(() => currentDoiLabels);
+      doiValues.update(() => currentDoiValues);
+
       currentlyWaiting = false;
-      waitingForChunk.set(currentlyWaiting)
-      // saveDoi(chunk.chunk, chunk.doi);
+      waitingForChunk.set(currentlyWaiting);
     });
   }
 };
