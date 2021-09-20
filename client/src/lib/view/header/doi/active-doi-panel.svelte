@@ -4,7 +4,7 @@
   import Dimensions from "./prior/dimensions.svelte";
   import Provenance from "./posterior/provenance.svelte";
   import Scagnostics from "./posterior/scagnostics.svelte";
-  import MainViewOverlay from "$lib/widgets/main-view-overlay.svelte";
+  import ViewOverlay from "$lib/widgets/view-overlay.svelte";
 
   export let x: number;
   export let y: number;
@@ -16,7 +16,7 @@
   }
 </script>
 
-<MainViewOverlay {x} {y} {width} {height} visible={$selectedDoiWeight !== null} on:close={close}>
+<ViewOverlay {x} {y} {width} {height} visible={$selectedDoiWeight !== null} on:close={close}>
   {#if $selectedDoiWeight === "outlierness"}
     <Outlierness />
   {:else if $selectedDoiWeight === "dimensions"}
@@ -26,4 +26,4 @@
   {:else if $selectedDoiWeight === "provenance"}
     <Provenance />
   {/if}
-</MainViewOverlay>
+</ViewOverlay>

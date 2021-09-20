@@ -70,7 +70,7 @@
     </div>
   </SplitView>
 
-  <ActiveDoiPanel x={0} y={headerHeight} width={plotWidth} height={topHeight} />
+  <ActiveDoiPanel x={0} y={0} width={innerWidth} height={innerHeight} />
   <ResizingOverlay x={mousePosition[0]} y={$isResizing?.startY} />
 </div>
 
