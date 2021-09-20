@@ -12,6 +12,7 @@ DOI_DB = "doi" # name of database containing current doi values
 
 ID = "tripID" # column in a table containing the id of data items as in the original data
 DOI = "doi" # column in a table containing the doi value
+BIN = "label" # column in a table containing the current label assigned to a doi
 
 ID_INDEX = 0
 
@@ -41,7 +42,7 @@ DIMENSION_EXTENTS = {
 def initialize_db():
   cursor.execute(f"CREATE VIEW {CSV_DB} AS SELECT * FROM read_csv_auto('{PATH}')")
   cursor.execute(f"CREATE TABLE {PROCESSED_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY)")
-  cursor.execute(f"CREATE TABLE {DOI_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY, {DOI} VARCHAR)")
+  cursor.execute(f"CREATE TABLE {DOI_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY,{DOI} VARCHAR, {BIN} VARCHAR)")
 
 
 def mark_ids_plotted(ids: list):
@@ -72,13 +73,13 @@ def get_next_chunk_from_db(chunk_size: int):
   return next_chunk
 
 
-def save_dois(ids: list, dois: list):
+def save_dois(ids: list, dois: list, bins: list):
   values = ""
   for i, id in enumerate(ids):
-    values = f"{values}({id},{dois[i]})"
+    values = f"{values}({id},{dois[i]},{bins[i]})"
     if i < len(ids) - 1:
       values += ","
-  query = f"INSERT INTO {DOI_DB} ({ID}, {DOI}) VALUES {values}"
+  query = f"INSERT INTO {DOI_DB} ({ID}, {DOI}, {BIN}) VALUES {values}"
   cursor.execute(query)
 
 
