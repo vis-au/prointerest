@@ -1,12 +1,15 @@
 <script lang="typescript">
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
+  import type HistogramBrushInteraction from "$lib/provenance/histogram-brush-interaction";
   import { interactionLog } from "$lib/provenance/interaction-log";
   import { interestingDimensions } from "$lib/state/interesting-dimensions";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
   import { randomlySampledItems } from "$lib/state/randomly-sampled-items";
   import { quadtree } from "$lib/state/quadtree";
+  import { secondaryBrushedItems } from "$lib/state/secondary-brushed-items";
   import { selectedItems } from "$lib/state/selected-items";
+  import type DataItem from "$lib/types/data-item";
   import { dataItemToRecord } from "$lib/util/item-transform";
   import MultiHistogram from "$lib/widgets/multi-histogram.svelte";
   import Alternatives from "$lib/widgets/alternatives.svelte";
@@ -42,11 +45,29 @@
     }
     const dims = Object.keys(selections);
 
+    if (dims.length === 0) {
+      $secondaryBrushedItems = [];
+      return;
+    }
+
     dims.forEach((dim) => {
       const interaction = interactionFactory
         .createHistogramBrushInteraction(dim, $dimensions.indexOf(dim), selections[dim]);
       $interactionLog.add(interaction);
     });
+
+    const recent = $interactionLog.getNRecentSteps(1)[0] as HistogramBrushInteraction;
+
+    if (recent.dimension === "doi" || recent.dimension === "label") {
+      const dim = recent.dimension;
+      $secondaryBrushedItems = data
+        .filter(
+          (item) => item[dim] > recent.extent[0] && item[dim] < recent.extent[1]
+        )
+        .map((item) => item["__item__"] as DataItem);
+    } else {
+      $secondaryBrushedItems = recent.getAffectedItems();
+    }
   }
 </script>
 

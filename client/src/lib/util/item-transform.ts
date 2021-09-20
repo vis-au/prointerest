@@ -21,6 +21,7 @@ export function dataItemToRecord(dataItem: DataItem): Record<string, unknown> {
   item["selected"] = dataItem.selected;
   item["doi"] = currentDoiValues.get(dataItem.id);
   item["label"] = currentDoiLabels.get(dataItem.id);
+  item["__item__"] = dataItem; // self reference
 
   return item;
 }
