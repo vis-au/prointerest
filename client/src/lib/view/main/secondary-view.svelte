@@ -11,9 +11,10 @@
   import MultiHistogram from "$lib/widgets/multi-histogram.svelte";
   import Alternatives from "$lib/widgets/alternatives.svelte";
   import Column from "$lib/widgets/column.svelte";
+  import ControlButton from "$lib/widgets/control-button.svelte";
   import Options from "$lib/widgets/options.svelte";
   import Row from "$lib/widgets/row.svelte";
-  import ControlButton from "../../widgets/control-button.svelte";
+  import Toggle from "$lib/widgets/toggle.svelte";
 
   export let width: number;
   export let height: number;
@@ -21,9 +22,18 @@
   const interactionFactory = new InteractionFactory(width, height, $quadtree);
 
   let histogramMode: "selected" | "all" = "all";
+  let showDoiLabels = true;
+  let showDoiValues = true;
 
   $: items = histogramMode === "all" ? $randomlySampledItems : $selectedItems;
   $: data = items.map(dataItemToRecord);
+
+  $: selectedDoiDimensions = [showDoiValues ? "doi" : null, showDoiLabels ? "label" : null]
+    .filter(d => d !== null);
+
+  $: selectedDimensions = Object.keys($interestingDimensions)
+    .filter((d) => $interestingDimensions[d])
+    .concat(selectedDoiDimensions);
 
   function onBrush(event: CustomEvent) {
     const selections: Record<string, [number, number]> = event.detail;
@@ -56,6 +66,8 @@
         showInactive={false}
         bind:activeOptions={$interestingDimensions}
       />
+      <Toggle id="doi-values" style="margin-right:10px" bind:active={showDoiValues}>doi values</Toggle>
+      <Toggle id="doi-labels" bind:active={showDoiLabels}>doi labels</Toggle>
     </Row>
     <ControlButton on:click={() => ($isSecondaryViewCollapsed = true)}>close</ControlButton>
   </Row>
@@ -63,7 +75,7 @@
     <MultiHistogram
       id="secondary-selected-dims"
       {data}
-      dimensions={Object.keys($interestingDimensions).filter((d) => $interestingDimensions[d])}
+      dimensions={selectedDimensions}
       showTitle={false}
       groupDimension="selected"
       width={310}
