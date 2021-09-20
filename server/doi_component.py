@@ -1,6 +1,6 @@
 import numpy as np
 from pandas.core.frame import DataFrame, Series
-from sklearn import svm
+from sklearn.linear_model import PassiveAggressiveRegressor
 
 class DoiComponent:
   '''
@@ -13,8 +13,9 @@ class DoiComponent:
   def __init__(self) -> None:
     self.weights: dict[str, float] = {}
     self.current_interest = np.empty(shape=(0, 2))
+    # self.predictor: svm.SVR = svm.SVR()
     # self.predictor: SGDRegressor = SGDRegressor(max_iter=1000, tol=1e-3)
-    self.predictor: svm.SVR = svm.SVR()
+    self.predictor = PassiveAggressiveRegressor()
     self.is_trained = False
 
 
@@ -77,6 +78,10 @@ class DoiComponent:
     training_data = X.drop(columns=["id"]).to_numpy()
     training_labels = self.compute_doi(X)
 
-    self.predictor.fit(training_data, training_labels)
+    if not self.is_trained:
+      self.predictor.fit(training_data, training_labels)
+    else:
+      self.predictor.partial_fit(training_data, training_labels)
+
     self.is_trained = True
     return training_labels

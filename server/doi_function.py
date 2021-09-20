@@ -88,7 +88,7 @@ def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: 
   df = df.astype(np.float64)
   df["id"] = df.index
 
-  provenance_comp.train(df)
+  # provenance_comp.train(df)
 
   current_interactions += 1
 
@@ -99,7 +99,7 @@ def compute_dois(items: list[list[Any]]):
   df = df.drop(columns=[2, 3, 7, 18, 19])
   df = df.astype(np.float64)
 
-  provenance_doi = provenance_comp.predict_doi(df)
+  # provenance_doi = provenance_comp.predict_doi(df)
 
   if current_chunk % 3 == 0:
     df["id"] = df.index
@@ -110,7 +110,7 @@ def compute_dois(items: list[list[Any]]):
     # scagnostics_doi = scagnostics_comp.predict_doi(df)
 
   prior = outlierness_doi
-  posterior = provenance_doi
+  posterior = 1
   doi = COMPONENT_WEIGHTS["prior"] * prior + COMPONENT_WEIGHTS["posterior"] * posterior
 
   current_chunk += 1
@@ -122,7 +122,7 @@ def compute_doi_classes(doi: list[list[float]]):
   est = KBinsDiscretizer(n_bins=DOI_CLASSES, encode="ordinal", strategy="quantile")
   X = np.array(doi).reshape((-1, 1))
   est.fit(X)
-  bins = est.bin_edges_
+  bins = est.bin_edges_[0].tolist()
   Xt = est.transform(X)
-  labels = Xt.reshape((1, -1))
+  labels = Xt.reshape((1, -1)).tolist()[0]
   return bins, labels
