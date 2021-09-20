@@ -5,6 +5,7 @@ import type { ProvenanceConfig } from "$lib/types/provenance-config";
 import { scagnostics } from "$lib/types/scagnostics";
 import { dataItemToList } from "./item-transform";
 import { mapToRecord } from "./map-to-record";
+import { sample } from "./sample-list";
 
 const BASE_URL = "http://127.0.0.1:5000";
 
@@ -125,12 +126,16 @@ export async function sendSelectedItems(items: DataItem[]): Promise<void> {
 }
 
 export function sendInteraction(interaction: DoiInteraction): Promise<void> {
-  const ids = interaction.getAffectedItems().map((d) => d.values);
+  const MAX_ITEMS_PER_INTERACTION = 1000;
+  const ids = interaction.getAffectedItems()
+    .map((d) => d.values);
   if (ids.length === 0) {
     return;
   }
+  const sampledIds = ids
+    .filter(() => sample(MAX_ITEMS_PER_INTERACTION / ids.length));
   const mode = interaction.mode;
-  return sendRequestToBaseURL("/interaction", "POST", { mode, ids });
+  return sendRequestToBaseURL("/interaction", "POST", { mode, ids: sampledIds });
 }
 
 export async function getDoiValues(items: DataItem[]): Promise<[number, number][]> {
