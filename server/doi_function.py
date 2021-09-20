@@ -1,7 +1,7 @@
 from typing import Any, Literal
 import pandas as pd
 import numpy as np
-from sklearn.cluster import MiniBatchKMeans
+from sklearn.preprocessing import KBinsDiscretizer
 
 from database import *
 from outlierness_component import OutliernessComponent
@@ -118,8 +118,11 @@ def compute_dois(items: list[list[Any]]):
 
 
 def compute_doi_classes(doi: list[list[float]]):
-  X = np.array(doi).reshape(-1, 1)
-  kmeans = MiniBatchKMeans(n_clusters=DOI_CLASSES, random_state=0).fit(X)
-  centers = kmeans.cluster_centers_.reshape((1, -1))
-  labels = kmeans.labels_
-  return centers, labels
+  # est = KBinsDiscretizer(n_bins=DOI_CLASSES, encode="ordinal", strategy="kmeans")
+  est = KBinsDiscretizer(n_bins=DOI_CLASSES, encode="ordinal", strategy="quantile")
+  X = np.array(doi).reshape((-1, 1))
+  est.fit(X)
+  bins = est.bin_edges_
+  Xt = est.transform(X)
+  labels = Xt.reshape((1, -1))
+  return bins, labels
