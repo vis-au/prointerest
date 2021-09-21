@@ -2,17 +2,6 @@ from pyscagnostics import scagnostics
 from doi_component import DoiComponent
 import pandas as pd
 
-SCAGNOSTIC_WEIGHTS = {
-  "outlying": 0.11,
-  "skewed": 0.11,
-  "clumpy": 0.11,
-  "sparse": 0.11,
-  "striated": 0.11,
-  "convex": 0.11,
-  "skinny": 0.11,
-  "stringy": 0.11,
-  "monotonic": 0.11
-}
 SCAGNOSTICS = [
   "Outlying", "Skewed", "Clumpy", "Sparse", "Striated", "Convex", "Skinny", "Stringy", "Monotonic"
 ]
@@ -24,7 +13,17 @@ SCATTERPLOT_AXES: dict[str, str] = {
 class ScagnosticsComponent(DoiComponent):
   def __init__(self) -> None:
       super().__init__()
-      self.weights = SCAGNOSTIC_WEIGHTS
+      self.weights = {
+        "outlying": 0.11,
+        "skewed": 0.11,
+        "clumpy": 0.11,
+        "sparse": 0.11,
+        "striated": 0.11,
+        "convex": 0.11,
+        "skinny": 0.11,
+        "stringy": 0.11,
+        "monotonic": 0.11
+      }
 
   def _compute_scagnostics(self, df):
     return scagnostics(df)

@@ -4,9 +4,9 @@ import numpy as np
 from sklearn.preprocessing import KBinsDiscretizer
 
 from database import *
-from outlierness_component import OutliernessComponent
+from outlierness_component import *
 from provenance_component import *
-from scagnostics_component import ScagnosticsComponent
+from scagnostics_component import *
 
 
 COMPONENT_WEIGHTS = {
@@ -43,12 +43,13 @@ def set_posterior_weights(weights: dict[str, float]):
   POSTERIOR_WEIGHTS = weights
 
 def set_scagnostic_weights(weights: dict[str, float]):
-  global SCAGNOSTIC_WEIGHTS
-  SCAGNOSTIC_WEIGHTS = weights
+  scagnostics_comp.weights = weights
 
 def set_provenance_weights(weights: dict[str, float]):
-  global PROVENANCE_WEIGHTS
-  PROVENANCE_WEIGHTS = weights
+  provenance_comp.weights = weights
+
+def set_outlierness_weights(weights: dict[str, float]):
+  outlierness_comp.weights = weights
 
 def set_doi_classes(classes: int):
   global DOI_CLASSES

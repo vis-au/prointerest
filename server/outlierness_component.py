@@ -14,6 +14,11 @@ class OutliernessComponent(DoiComponent):
     self.outliers_fraction = 0.15
     self.outlierness_measures = self._generate_measures()
     self.current_interest: pd.DataFrame = None
+    self.weights = {
+      "elliptic": 0.33,
+      "oneclass": 0.33,
+      "forest": 0.33
+    }
 
 
   def _generate_measures(self):
@@ -26,11 +31,19 @@ class OutliernessComponent(DoiComponent):
 
 
   def compute_doi(self, X: pd.DataFrame):
-    X_ = X.to_numpy()
-    predictions = np.array(
-      [measure.fit(X_).predict(X_) for measure in self.outlierness_measures]
-    )
-    sum = predictions.sum(axis=0)
+    X_ = X[[5, 17]].to_numpy()
+    predictions = np.array([
+      (self.outlierness_measures[0].fit(X_).predict(X_) == -1).astype(int),
+      (self.outlierness_measures[1].fit(X_).predict(X_) == -1).astype(int),
+      (self.outlierness_measures[2].fit(X_).predict(X_) == -1).astype(int),
+    ])
+    weights = np.array([
+      self.weights["elliptic"],
+      self.weights["oneclass"],
+      self.weights["forest"]
+    ]).reshape(3, 1)
+
+    sum = (predictions * weights).sum(axis=0)
     scaled = sum / len(predictions)
 
     return scaled
