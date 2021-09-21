@@ -29,9 +29,9 @@
   {#if $activeViewMode === "binned"}
     <ColorLegend
       id="color"
-      left={width - 240}
-      top={height - 120}
-      title=""
+      x={width - 240}
+      y={height - 120}
+      title="Bin color"
       blockSize={10}
       steps={10}
       bind:colorScale={$colorScale}

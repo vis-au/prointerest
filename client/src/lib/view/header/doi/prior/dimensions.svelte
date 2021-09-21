@@ -72,7 +72,7 @@
           bins={100}
           width={550}
           height={50}
-          on:interval={(event) => selectedInterval = event.detail[dim]}
+          on:interval={(event) => (selectedInterval = event.detail[dim])}
           on:end={() => setInterestingInterval(dim, selectedInterval)}
         />
       {/if}

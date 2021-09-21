@@ -8,9 +8,9 @@
 
   export let id: string;
   export let colorScale: ScaleSequential<string, never> | ScaleDiverging<string, never>;
-  export let title: string;
-  export let top = 0;
-  export let left = 0;
+  export let title: string = null;
+  export let x: number;
+  export let y: number;
   export let width = 225;
   export let height = 55;
   export let margin = 3;
@@ -21,7 +21,6 @@
   $: colorScale =
     $colorScaleType === "linear" ? scaleSequential($colorScheme) : scaleSequentialLog($colorScheme);
 
-  const segmentWidth = width / (steps + 1);
   $: scaleX = scaleLinear()
     .domain([0, steps])
     .range([margin, width - margin]);
@@ -30,6 +29,7 @@
     .domain([0, steps])
     .range([margin, height - margin]);
 
+  $: segmentWidth = width / (steps + 1);
   $: domain = colorScale.domain();
   $: values = range(
     domain[0],
@@ -38,10 +38,12 @@
   );
 </script>
 
-<svg id="{id}-legend-canvas" class="legend" {width} {height} style="left: {left}px; top: {top}px">
-  <g class="color">
+<svg id="{id}-legend-canvas" class="legend" {width} {height} style="left:{x}px;top:{y}px">
+  {#if title !== null}
     <text class="legend-title" x={margin} y={margin}>{title}</text>
-    <g class="values" transform="translate(0,{22})">
+  {/if}
+  <g class="color" transform="translate(0,{title !== null ? 22 : 0})">
+    <g class="values">
       {#each values as value, i}
         <rect
           class="value"
@@ -53,35 +55,33 @@
         />
       {/each}
     </g>
-    <g class="label left" transform="translate({margin},{blockSize + margin + 5})">
+    <g class="label left" transform="translate({margin},-3)">
       <rect width="30" height="14" />
       <text class="low">{id === "center" ? "> left" : "low"}</text>
     </g>
-    <g class="label right" transform="translate({width - margin},{blockSize + margin + 5})">
+    <g class="label right" transform="translate({width - margin},-3)">
       <rect x={-30} width="30" height="14" />
       <text class="high">{id === "center" ? "> right" : "high"}</text>
     </g>
   </g>
-  {#if $colorScaleType !== null}
-    <g
-      class="scale-type"
-      transform="translate({width - colorScaleTypes.length * 15 + margin},{height - 5 - margin})"
-    >
-      {#each colorScaleTypes as type, index}
-        <circle
-          class="scale-type-toggle"
-          cx={index * 15}
-          cy="0"
-          r="5"
-          fill={$colorScaleType === type ? "black" : "white"}
-          stroke="black"
-          on:click={() => ($colorScaleType = type)}
-        >
-          <title>{type}</title>
-        </circle>
-      {/each}
-    </g>
-  {/if}
+  <g
+    class="scale-type"
+    transform="translate({width - colorScaleTypes.length * 15 + margin},{height - 5 - margin})"
+  >
+    {#each colorScaleTypes as type, index}
+      <circle
+        class="scale-type-toggle"
+        cx={index * 15}
+        cy="0"
+        r="5"
+        fill={$colorScaleType === type ? "black" : "white"}
+        stroke="black"
+        on:click={() => ($colorScaleType = type)}
+      >
+        <title>{type}</title>
+      </circle>
+    {/each}
+  </g>
   <g class="color-scheme" transform="translate({margin},{height - 12 - margin})">
     {#if id === "center"}
       {#each divergingSchemes as scheme, index}
