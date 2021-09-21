@@ -1,13 +1,12 @@
 <script lang="typescript">
   import { hexbinning } from "$lib/state/hexbinning";
-  import { suggestedItems } from "$lib/state/suggested-items";
   import { viewPort as vp } from "$lib/state/visible-data";
   import { afterUpdate } from "svelte";
 
   export let width: number;
   export let height: number;
 
-  $: bins = $hexbinning($suggestedItems);
+  $: bins = $hexbinning([]);
   $: visibleBins = bins.filter((bin) => {
     return bin.x > $vp.minX && bin.x < $vp.maxX && bin.y > $vp.minY && bin.y < $vp.maxY;
   });

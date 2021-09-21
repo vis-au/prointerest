@@ -1,5 +1,2 @@
-export type SuggestionInput = "explored" | "interesting";
-export const suggestionInputs = ["explored", "interesting"];
-
-export type SuggestionOutput = "similar" | "dissimilar";
-export const suggestionOutputs: SuggestionOutput[] = ["similar", "dissimilar"];
+export type SuggestionMode = "high" | "medium" | "low" | "none";
+export const suggestionModes: SuggestionMode[] = ["none", "high", "medium", "low"];
