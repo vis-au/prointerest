@@ -5,11 +5,11 @@
 
 {#if newTab}
   <a {href} target="_blank" rel="noopener noreferrer">
-    <slot></slot>
+    <slot />
   </a>
 {:else}
   <a {href}>
-    <slot></slot>
+    <slot />
   </a>
 {/if}
 

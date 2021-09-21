@@ -4,10 +4,9 @@ import SuggestionProvider from "$lib/provenance/suggestion-provider";
 import type DataItem from "$lib/types/data-item";
 import type { SuggestionInput, SuggestionOutput } from "$lib/types/suggestion-mode";
 import { activeSuggestionInput, activeSuggestionOutput } from "./active-suggestion-modes";
-import { quadtree } from "./quadtree";
 import { interestingDimensions } from "./interesting-dimensions";
 import { dimensions } from "./processed-data";
-import { exploredItems, interactionObserver } from "./explored-items";
+import { exploredItems } from "./explored-items";
 import { interestingItems } from "./interesting-items";
 
 const suggestionProvider = new SuggestionProvider();
@@ -47,12 +46,6 @@ activeSuggestionInput.subscribe((newMode) => {
 activeSuggestionOutput.subscribe((newMode) => {
   currentOutputMode = newMode;
   updateSuggestedItems();
-});
-
-quadtree.subscribe((newTree) => {
-  const dataspace = newTree.data();
-  interactionObserver.data = dataspace;
-  suggestionProvider.processedDataspace = dataspace;
 });
 
 dimensions.subscribe((dims) => (currenDimensions = dims));

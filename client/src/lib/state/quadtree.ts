@@ -27,7 +27,7 @@ function insertIntoQuadtree(tree: Quadtree<DataItem>, rawItems: number[][]) {
 
   tree.addAll(dataItems);
 
-  return tree;
+  return dataItems;
 }
 
 function arrayToDataItem(item: number[]) {
@@ -52,15 +52,18 @@ function recreateQuadtree() {
   quadtree.set(newTree);
 }
 
+export const processedItems = writable([] as DataItem[]);
+
 // is run asynchronously to ensure that the scales are set
 setTimeout(() => {
   processedData.subscribe((newData) => {
-    const newItems = newData.slice(newData.length - newData.length - CHUNK_SIZE, newData.length);
+    const newDatas = newData.slice(newData.length - newData.length - CHUNK_SIZE, newData.length);
 
     if (newData.length === 0) {
       recreateQuadtree();
     } else {
-      insertIntoQuadtree(currentQuadtree, newItems);
+      const newItems = insertIntoQuadtree(currentQuadtree, newDatas);
+      processedItems.update((items) => items.concat(newItems));
       quadtree.set(currentQuadtree);
     }
 

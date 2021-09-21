@@ -27,10 +27,12 @@ export const lessRandomlySampledItems = writable(smallRandomSample);
 
 // additional set of items that ensure that every bin in the view is at least represented once.
 export const randomlySampledBinItems = derived(bins, (newBins) => {
-  return newBins.map((bin) => {
-    const probability = bin.length === 1 ? 1 : smallSampleProbabilty;
-    return bin.filter(() => sample(probability));
-  }).flat();
+  return newBins
+    .map((bin) => {
+      const probability = bin.length === 1 ? 1 : smallSampleProbabilty;
+      return bin.filter(() => sample(probability));
+    })
+    .flat();
 });
 
 quadtree.subscribe((newTree) => {
