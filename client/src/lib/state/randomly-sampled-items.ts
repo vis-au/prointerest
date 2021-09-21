@@ -29,7 +29,7 @@ export const lessRandomlySampledItems = writable(smallRandomSample);
 export const randomlySampledBinItems = derived(bins, (newBins) => {
   return newBins
     .map((bin) => {
-      const probability = bin.length === 1 ? 1 : smallSampleProbabilty;
+      const probability = bin.length === 1 ? 2 : smallSampleProbabilty;
       return bin.filter(() => sample(probability));
     })
     .flat();

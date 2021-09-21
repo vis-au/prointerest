@@ -7,7 +7,6 @@
   import BinnedScatterplotView from "../layers/visualization/binned-scatterplot-view.svelte";
   import Axes from "../layers/visualization/axes.svelte";
   import ColorLegend from "./color-legend.svelte";
-  import ProgressionControls from "./progression-controls.svelte";
   import ViewControls from "./view-controls.svelte";
 
   export let width: number;
@@ -30,7 +29,7 @@
     <ColorLegend
       id="color"
       x={width - 240}
-      y={height - 120}
+      y={height - 80}
       title="Bin color"
       blockSize={10}
       steps={10}
@@ -38,5 +37,4 @@
     />
   {/if}
   <ViewControls />
-  <ProgressionControls x={width - 240} y={height - 50} />
 </main>

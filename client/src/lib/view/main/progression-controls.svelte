@@ -13,54 +13,84 @@
   import Row from "$lib/widgets/row.svelte";
   import ControlButton from "../../widgets/control-button.svelte";
 
-  export let x: number;
-  export let y: number;
+  export let x = 0;
+  export let y = 0;
+  export let useAbsolutePositioning = true;
+  export let useDarkMode = false;
+  export let style = "";
 
   const width = 120;
 
   $: progress = $processedData.length / $totalSize;
+  $: position = useAbsolutePositioning
+    ? `position:absolute;left:${x}px;top:${y}px`
+    : "position:relative";
 </script>
 
-<Row id="progression-controls" style="left:{x}px;top:{y}px">
-  <Column>
-    <div id="progression-text">
-      <span>Processed:</span>
-      <span><BigNumber>{abbreviate($processedData.length)}</BigNumber></span>
+<div class="progression-controls {useDarkMode ? 'dark' : ''}" style="{style};{position}">
+  <Row>
+    <Column>
+      <div class="progression-text">
+        <span>Processed:</span>
+        <span><BigNumber>{abbreviate($processedData.length)}</BigNumber></span>
+      </div>
+      <ProgressBar
+        id={"progression"}
+        {progress}
+        current={$processedData.length}
+        total={$totalSize}
+        {width}
+        height={5}
+      />
+    </Column>
+    <div class="control-panel-buttons" style="display:row;align-items:center;">
+      {#if $progressionState === "paused"}
+        <ControlButton on:click={startProgression}>start</ControlButton>
+      {:else if $progressionState === "running"}
+        <ControlButton on:click={pauseProgression}>pause</ControlButton>
+      {/if}
+      <ControlButton on:click={resetProgression}>reset</ControlButton>
     </div>
-    <ProgressBar
-      id={"progression"}
-      {progress}
-      current={$processedData.length}
-      total={$totalSize}
-      {width}
-      height={5}
-    />
-  </Column>
-  <Row id="buttons">
-    {#if $progressionState === "paused"}
-      <ControlButton on:click={startProgression}>start</ControlButton>
-    {:else if $progressionState === "running"}
-      <ControlButton on:click={pauseProgression}>pause</ControlButton>
-    {/if}
-    <ControlButton on:click={resetProgression}>reset</ControlButton>
   </Row>
-</Row>
+</div>
 
 <style>
-  :global(#progression-controls) {
-    position: absolute;
+  .progression-controls {
+    color: black;
     font-size: 10pt;
     background: white;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 3px;
   }
-  div#progression-text {
+  .progression-controls.dark {
+    color: white;
+    background: #333;
+    border: none;
+    padding: 0 5px;
+  }
+  .progression-text {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
   }
-  :global(#buttons button) {
+  :global(.progression-controls .control-panel-buttons button) {
     margin-left: 5px;
+    width: 50px;
+  }
+  :global(.progression-controls.dark .control-panel-buttons button) {
+    background: #555;
+  }
+  :global(.progression-controls .big-number) {
+    color: #333;
+    max-width: 50px;
+  }
+  :global(.progression-controls.dark .big-number) {
+    background: none;
+    color: #fff;
+    padding: 0;
+  }
+  :global(.progression-controls.dark .progress-bar) {
+    border-color: white;
   }
 </style>

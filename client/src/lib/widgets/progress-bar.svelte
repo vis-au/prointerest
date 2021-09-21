@@ -24,6 +24,7 @@
     justify-content: flex-start;
     align-items: center;
     margin-top: 1px;
+    background: #fff;
   }
   .progress-bar .progress {
     background: black;
