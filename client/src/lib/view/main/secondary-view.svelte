@@ -5,7 +5,7 @@
   import { interestingDimensions } from "$lib/state/interesting-dimensions";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
-  import { randomlySampledItems } from "$lib/state/randomly-sampled-items";
+  import { randomlySampledBinItems } from "$lib/state/randomly-sampled-items";
   import { quadtree } from "$lib/state/quadtree";
   import { secondaryBrushedItems } from "$lib/state/secondary-brushed-items";
   import { selectedItems } from "$lib/state/selected-items";
@@ -28,7 +28,7 @@
   let showDoiLabels = true;
   let showDoiValues = true;
 
-  $: items = histogramMode === "all" ? $randomlySampledItems : $selectedItems;
+  $: items = histogramMode === "all" ? $randomlySampledBinItems : $selectedItems;
   $: data = items.map(dataItemToRecord);
 
   $: selectedDoiDimensions = [showDoiValues ? "doi" : null, showDoiLabels ? "label" : null].filter(
@@ -65,7 +65,7 @@
     if (recent.dimension === "doi" || recent.dimension === "label") {
       const dim = recent.dimension;
       $secondaryBrushedItems = data
-        .filter((item) => item[dim] > recent.extent[0] && item[dim] < recent.extent[1])
+        .filter((item) => item[dim] >= recent.extent[0] && item[dim] <= recent.extent[1])
         .map((item) => item["__item__"] as DataItem);
     } else {
       $secondaryBrushedItems = recent.getAffectedItems();

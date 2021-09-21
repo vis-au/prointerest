@@ -1,8 +1,9 @@
 import type { Quadtree } from "d3-quadtree";
-import { writable } from "svelte/store";
+import { derived, writable } from "svelte/store";
 import type DataItem from "$lib/types/data-item";
 import { sample } from "../util/sample-list";
 import { quadtree } from "./quadtree";
+import { bins } from "./bins";
 
 const iterationsBetweenUpdates = 10;
 
@@ -23,6 +24,14 @@ export const randomlySampledItems = writable(largeRandomSample);
 
 let smallRandomSample: DataItem[] = [];
 export const lessRandomlySampledItems = writable(smallRandomSample);
+
+// additional set of items that ensure that every bin in the view is at least represented once.
+export const randomlySampledBinItems = derived(bins, (newBins) => {
+  return newBins.map((bin) => {
+    const probability = bin.length === 1 ? 1 : smallSampleProbabilty;
+    return bin.filter(() => sample(probability));
+  }).flat();
+});
 
 quadtree.subscribe((newTree) => {
   // check if quadtree has changed (for exaxmple when opening the secondary view panel)
