@@ -3,8 +3,8 @@
   import { selectedOutlierMeasure } from "$lib/state/selected-outlier-measure";
   import { sendWeights } from "$lib/util/requests";
   import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
+  import Link from "$lib/widgets/link.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
-  import BigNumber from "$lib/widgets/big-number.svelte";
 
   const width = 800;
 </script>
@@ -24,15 +24,15 @@
   />
   <p class="explanation" style="max-width:{width}px">
     Info:
-    {#if $selectedOutlierMeasure === "tukey"}
-      The "tukey" measure captures outlierness by determining, if the item falls outside the Tukey
-      ranges across <BigNumber>75%</BigNumber> of the data.
-    {:else if $selectedOutlierMeasure === "scagnostic"}
-      The "scagnostics" measure captures outlierness by determining if the item returns an
-      outlierness scagnostic value of greater than <BigNumber>.95</BigNumber>.
-    {:else if $selectedOutlierMeasure === "clustering"}
-      The "clustering" measure captures outlierness by determining, if the item is assigned its own
-      cluster when applying DBSCAN to the data.
+    {#if $selectedOutlierMeasure === "elliptic"}
+      Apply sklearn's EllipticEnvelope metric.
+      Check the <Link href="https://scikit-learn.org/stable/modules/generated/sklearn.covariance.EllipticEnvelope.html">documentation</Link> for more details.
+    {:else if $selectedOutlierMeasure === "oneclass"}
+      Apply sklearn's OneClassSVM metric.
+      Check the <Link href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html">documentation</Link> for more details.
+    {:else if $selectedOutlierMeasure === "forest"}
+      Apply sklearn's IsolationForest metric.
+      Check the <Link href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html">documentation</Link> for more details.
     {:else}
       Click on a measure above to learn more.
     {/if}

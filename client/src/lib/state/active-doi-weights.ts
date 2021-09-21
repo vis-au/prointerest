@@ -1,7 +1,8 @@
 import type { PosteriorEntry, PriorEntry } from "$lib/types/doi-weights";
 import type { InteractionMode } from "$lib/provenance/doi-interaction";
 import { writable } from "svelte/store";
-import { OutliernessMeasure, outliernessMeasures } from "$lib/types/outlier-measures";
+import { outliernessMeasures } from "$lib/types/outlier-measures";
+import type { OutliernessMeasure } from "$lib/types/outlier-measures";
 
 const weights = new Map<"prior" | "posterior", number>();
 weights.set("prior", 0.5);
