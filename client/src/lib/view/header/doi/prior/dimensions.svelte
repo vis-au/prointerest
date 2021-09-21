@@ -12,6 +12,7 @@
   import { truncateFloat } from "$lib/util/number-transform";
 
   let tabularData = $randomlySampledItems.map(dataItemToRecord);
+  let selectedInterval: [number, number] = null;
 
   const extents = new Map<string, [number, number]>();
 
@@ -71,7 +72,8 @@
           bins={100}
           width={550}
           height={50}
-          on:interval={(event) => setInterestingInterval(dim, event.detail[dim])}
+          on:interval={(event) => selectedInterval = event.detail[dim]}
+          on:end={() => setInterestingInterval(dim, selectedInterval)}
         />
       {/if}
     </Column>

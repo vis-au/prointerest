@@ -22,6 +22,10 @@
     dispatch("interval", event.detail.value);
   }
 
+  function onEnd() {
+    dispatch("end");
+  }
+
   $: colorEncoding =
     groupDimension === null
       ? {
@@ -92,4 +96,4 @@
   }
 </script>
 
-<VegaLitePlot {id} spec={histogram} on:brush={onBrush} />
+<VegaLitePlot {id} spec={histogram} on:brush={onBrush} on:end={onEnd} />
