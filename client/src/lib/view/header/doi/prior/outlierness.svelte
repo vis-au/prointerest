@@ -1,22 +1,28 @@
-<script>
+<script lang="typescript">
+  import { outliernessWeights } from "$lib/state/active-doi-weights";
   import { selectedOutlierMeasure } from "$lib/state/selected-outlier-measure";
-  import { outliernessMeasures } from "$lib/types/outlier-measures";
-  import Alternatives from "$lib/widgets/alternatives.svelte";
-  import BigNumber from "$lib/widgets/big-number.svelte";
+  import { sendWeights } from "$lib/util/requests";
   import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
+  import WeightedValues from "$lib/widgets/weighted-values.svelte";
+  import BigNumber from "$lib/widgets/big-number.svelte";
+
+  const width = 800;
 </script>
 
 <DoiConfig
-  title="Set outlier measure"
+  title="Configure outlier weights"
   message="You can choose between three different outlierness metrics that are used to determine whether a data item is an outlier or not."
+  {width}
 >
-  <Alternatives
-    name="outlierness-measure"
-    alternatives={outliernessMeasures}
-    bind:activeAlternative={$selectedOutlierMeasure}
+  <WeightedValues
+    id="outlierness-weights"
+    totalSize={width}
+    height={40}
+    bind:valueWeights={$outliernessWeights}
+    bind:activeWeight={$selectedOutlierMeasure}
+    on:end={() => sendWeights("outlierness", $outliernessWeights)}
   />
-
-  <p class="explanation">
+  <p class="explanation" style="max-width:{width}px">
     Info:
     {#if $selectedOutlierMeasure === "tukey"}
       The "tukey" measure captures outlierness by determining, if the item falls outside the Tukey
@@ -27,6 +33,8 @@
     {:else if $selectedOutlierMeasure === "clustering"}
       The "clustering" measure captures outlierness by determining, if the item is assigned its own
       cluster when applying DBSCAN to the data.
+    {:else}
+      Click on a measure above to learn more.
     {/if}
   </p>
 </DoiConfig>

@@ -14,7 +14,7 @@
 <Row id="component-weights" style="align-items:stretch">
   <h2>Configure DOI Components</h2>
   <WeightedValues
-    group="doi-interpolation"
+    id="doi-interpolation"
     totalSize={400}
     useDarkmode={true}
     bind:activeWeight={$selectedDoiComponent}

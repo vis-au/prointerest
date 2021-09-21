@@ -3,10 +3,13 @@
   import ControlButton from "$lib/widgets/control-button.svelte";
 
   export let title: string;
+  export let width: number = null;
   export let message = "";
+
+  $: widthStyle = width === null ? "" : `width:${width}px`;
 </script>
 
-<div class="doi-config">
+<div class="doi-config" style={widthStyle}>
   <h2>
     <span>{title}</span>
     <ControlButton on:click={() => ($selectedDoiWeight = null)}>close</ControlButton>

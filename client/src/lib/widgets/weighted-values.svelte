@@ -5,10 +5,11 @@
 
   import Divider from "./divider.svelte";
 
-  export let group: string;
+  export let id: string;
   export let valueWeights: Map<string, number>;
   export let activeWeight: string = null;
   export let totalSize = 250;
+  export let height = 28;
   export let showValue = false;
   export let useDarkmode = false;
   export let backgroundColor = "";
@@ -18,7 +19,7 @@
   const dispatch = createEventDispatcher();
 
   function getId(key: string) {
-    return `${key.split(" ").join("_")}-${group}`;
+    return `${key.split(" ").join("_")}-${id}`;
   }
 
   function selectWeight(weight: string) {
@@ -86,7 +87,7 @@
   }
 </script>
 
-<div id={group} class="weighted-values {useDarkmode ? 'dark' : ''}">
+<div {id} class="weighted-values {useDarkmode ? 'dark' : ''}" style="height:{height}px">
   {#each weights as entry, i}
     <div
       class="entry {activeWeight === entry[0] ? 'active' : ''}"
@@ -105,7 +106,7 @@
       <input
         id={getId(entry[0])}
         type="radio"
-        name={group}
+        name={id}
         value={entry[0]}
         bind:group={activeWeight}
         on:click={() => selectWeight(entry[0])}
@@ -117,7 +118,7 @@
         left={weights[i][0]}
         right={weights[i + 1][0]}
         isResizing={resize && resize.leftId == weights[i][0] && resize.rightId == weights[i + 1][0]}
-        {group}
+        group={id}
         weights={valueWeights}
         on:resize-started={(e) => onResizingStarted(e.detail)}
       />

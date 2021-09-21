@@ -31,8 +31,9 @@
   $: items = histogramMode === "all" ? $randomlySampledItems : $selectedItems;
   $: data = items.map(dataItemToRecord);
 
-  $: selectedDoiDimensions = [showDoiValues ? "doi" : null, showDoiLabels ? "label" : null]
-    .filter(d => d !== null);
+  $: selectedDoiDimensions = [showDoiValues ? "doi" : null, showDoiLabels ? "label" : null].filter(
+    (d) => d !== null
+  );
 
   $: selectedDimensions = Object.keys($interestingDimensions)
     .filter((d) => $interestingDimensions[d])
@@ -51,8 +52,11 @@
     }
 
     dims.forEach((dim) => {
-      const interaction = interactionFactory
-        .createHistogramBrushInteraction(dim, $dimensions.indexOf(dim), selections[dim]);
+      const interaction = interactionFactory.createHistogramBrushInteraction(
+        dim,
+        $dimensions.indexOf(dim),
+        selections[dim]
+      );
       $interactionLog.add(interaction);
     });
 
@@ -61,9 +65,7 @@
     if (recent.dimension === "doi" || recent.dimension === "label") {
       const dim = recent.dimension;
       $secondaryBrushedItems = data
-        .filter(
-          (item) => item[dim] > recent.extent[0] && item[dim] < recent.extent[1]
-        )
+        .filter((item) => item[dim] > recent.extent[0] && item[dim] < recent.extent[1])
         .map((item) => item["__item__"] as DataItem);
     } else {
       $secondaryBrushedItems = recent.getAffectedItems();
@@ -87,7 +89,9 @@
         showInactive={false}
         bind:activeOptions={$interestingDimensions}
       />
-      <Toggle id="doi-values" style="margin-right:10px" bind:active={showDoiValues}>doi values</Toggle>
+      <Toggle id="doi-values" style="margin-right:10px" bind:active={showDoiValues}
+        >doi values</Toggle
+      >
       <Toggle id="doi-labels" bind:active={showDoiLabels}>doi labels</Toggle>
     </Row>
     <ControlButton on:click={() => ($isSecondaryViewCollapsed = true)}>close</ControlButton>

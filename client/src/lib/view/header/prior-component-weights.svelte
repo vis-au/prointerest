@@ -9,7 +9,7 @@
 <Row style="align-items:stretch">
   <h2>Prior</h2>
   <WeightedValues
-    group="doi-weights"
+    id="doi-weights"
     totalSize={400}
     backgroundColor="#80b1d3"
     useDarkmode={true}

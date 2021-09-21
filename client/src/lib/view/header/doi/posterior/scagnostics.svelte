@@ -57,7 +57,7 @@
   <Column>
     <h3>Assign weights</h3>
     <WeightedValues
-      group="selected-scagnostics"
+      id="selected-scagnostics"
       totalSize={maxWidth}
       bind:valueWeights={selectedWeights}
       on:end={() => sendScagnosticWeights($scagnosticWeights)}

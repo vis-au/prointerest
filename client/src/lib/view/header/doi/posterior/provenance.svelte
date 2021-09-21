@@ -1,6 +1,5 @@
 <script lang="typescript">
   import { exploredItemInterest, exploredItems } from "$lib/state/explored-items";
-  import { interactionWeights } from "$lib/state/interaction-technique-weights";
   import type DataItem from "$lib/types/data-item";
   import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
   import Column from "$lib/widgets/column.svelte";
@@ -14,6 +13,7 @@
   import { lessRandomlySampledItems } from "$lib/state/randomly-sampled-items";
   import { interactionLog } from "$lib/provenance/interaction-log";
   import { sendProvenanceConfig, sendProvenanceWeights } from "$lib/util/requests";
+  import { interactionWeights } from "$lib/state/active-doi-weights";
 
   let provenanceSize = 100;
   let interactionThreshold = 0.15;
@@ -52,7 +52,7 @@
     </h3>
     <Row style="height:50px;align-items:stretch;margin:20px 0">
       <WeightedValues
-        group="interaction-technique-weights"
+        id="interaction-technique-weights"
         totalSize={histogramSize}
         bind:valueWeights={$interactionWeights}
         on:end={() => {

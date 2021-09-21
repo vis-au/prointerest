@@ -7,9 +7,9 @@ let currentDimensions: string[] = [];
 dimensions.subscribe((dims) => (currentDimensions = dims));
 
 let currentDoiLabels: Map<number, number> = new Map();
-doiLabels.subscribe((values) => currentDoiLabels = values);
+doiLabels.subscribe((values) => (currentDoiLabels = values));
 let currentDoiValues: Map<number, number> = new Map();
-doiValues.subscribe((values) => currentDoiValues = values);
+doiValues.subscribe((values) => (currentDoiValues = values));
 
 export function dataItemToRecord(dataItem: DataItem): Record<string, unknown> {
   const item = {};

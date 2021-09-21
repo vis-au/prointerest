@@ -9,7 +9,7 @@
 <Row style="align-items:stretch;">
   <h2>Posterior</h2>
   <WeightedValues
-    group="doi-weights"
+    id="doi-weights"
     totalSize={400}
     useDarkmode={true}
     backgroundColor="#fdb462"

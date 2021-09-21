@@ -6,7 +6,6 @@
   import { selectedBins } from "$lib/state/selected-bins";
   import { secondaryBrushedItems } from "$lib/state/secondary-brushed-items";
 
-
   export let id: string;
   export let width: number;
   export let height: number;
