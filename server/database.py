@@ -140,5 +140,5 @@ def get_items_for_ids(ids: list[str]):
 
 
 def reset_progression():
-  query = f"DELETE FROM {PROCESSED_DB}"
-  cursor.execute(query)
+  cursor.execute(f"DELETE FROM {PROCESSED_DB}")
+  cursor.execute(f"DELETE FROM {DOI_DB}")

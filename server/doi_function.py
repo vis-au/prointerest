@@ -73,14 +73,13 @@ def set_outlierness_metric(metric: str):
 current_chunk = 0
 current_interactions = 0
 
-outlierness_comp = OutliernessComponent()
+outlierness_comp = OutliernessComponent([5, 17])
 provenance_comp = ProvenanceComponent()
 scagnostics_comp = ScagnosticsComponent()
 
 
 def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: list[any]):
   global current_interactions
-  # interaction: [timestamp: number, mode: string, ids: list[number]]
   provenance_comp.add_interaction([
     current_interactions, mode, np.array(items)[:,0]
   ])
@@ -88,8 +87,6 @@ def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: 
   df = df.drop(columns=[2, 3, 7, 18, 19])
   df = df.astype(np.float64)
   df["id"] = df.index
-
-  # provenance_comp.train(df)
 
   current_interactions += 1
 
@@ -100,18 +97,11 @@ def compute_dois(items: list[list[Any]]):
   df = df.drop(columns=[2, 3, 7, 18, 19])
   df = df.astype(np.float64)
 
-  # provenance_doi = provenance_comp.predict_doi(df)
-
-  if current_chunk % 3 == 0:
-    df["id"] = df.index
-    outlierness_doi = outlierness_comp.train(df)
-    # scagnostics_doi = scagnostics_comp.train(df.loc[0:10])
-  else:
-    outlierness_doi = outlierness_comp.predict_doi(df)
-    # scagnostics_doi = scagnostics_comp.predict_doi(df)
+  df["id"] = df.index
+  outlierness_doi = outlierness_comp.train(df)
 
   prior = outlierness_doi
-  posterior = 1
+  posterior = 0
   doi = COMPONENT_WEIGHTS["prior"] * prior + COMPONENT_WEIGHTS["posterior"] * posterior
 
   current_chunk += 1
@@ -127,3 +117,15 @@ def compute_doi_classes(doi: list[list[float]]):
   Xt = est.transform(X)
   labels = Xt.reshape((1, -1)).tolist()[0]
   return bins, labels
+
+
+def compute_doi_prediction_error(items: list[list[Any]]):
+  df = pd.DataFrame(items)
+  df = df.drop(columns=[2, 3, 7, 18, 19])
+  df = df.astype(np.float64)
+  df["id"] = df.index
+
+  error = outlierness_comp.get_prediction_error(df)
+  print(error)
+  print(error.mean())
+  return error
