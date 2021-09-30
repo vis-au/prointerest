@@ -46,16 +46,45 @@ class ProgressiveBinSampler():
     return np.concatenate(tuple([self.X_reservoir[x] for x in self.X_reservoir]))
 
 
-  def _bin(self, y: np.ndarray):
+  def get_bin_edges(self, y: np.ndarray, bins: np.ndarray):
+    '''Given the bins assigned to a set of numerical values, returns boundaries of these bins.
+
+    The output is a list of boundary values x_0 to x_l for bins b_0 to b_l, such that
+    x_j = min(b_j) and x_l = max(b_l).
+
+    Parameters
+    ----------
+    y : np.ndarray
+      DoI values, i.e., "list" of floating point values. Has shape (n, ).
+    bins : np.ndarray
+      Bin labels assigned to the DoI values in `y`. Has shape (n, ).
+
+    Returns
+    -------
+    list[float]
+      Bin boundaries from y.min() to y.max().
     '''
-    Sorts the input by value and then divides it into bin_size bins of equal size. If
-    len(y) / n_bins has a residual, items assigned to the "overflow" bin are merged into the last
+    edges = []
+    max_label = np.max(bins)
+    # add lower bounds per bin
+    for i in range(max_label):
+      edges += [np.min(y[bins == i])]
+
+    # add upper bound
+    edges += [np.max(y[bins == max_label])]
+    return edges
+
+
+  def _bin(self, y: np.ndarray):
+    '''Sorts the input by value and then divides it into bin_size bins of equal size.
+
+    If len(y) / n_bins has a residual, items assigned to the "overflow" bin are merged into the last
     one to guarantee n_bins.
 
     Parameters
     ----------
     y : np.ndarray
-      A "list" of floating point values. Has shape (n, ).
+      DoI values, i.e., "list" of floating point values. Has shape (n, ).
 
     Returns
     -------
@@ -68,7 +97,7 @@ class ProgressiveBinSampler():
     index = np.arange(0, total_size)
     index[sort] = index // bin_size
 
-    # merge "residual" bin with last bin
+    # merge "residual" bin with last bin to guarantee n_bins in output
     if total_size // self.n_bins != total_size / self.n_bins:
       index[index == self.n_bins] = self.n_bins - 1
 
@@ -140,7 +169,7 @@ class ProgressiveBinSampler():
     return self.X_reservoir
 
 
-  def add_chunk(self, X: np.ndarray, y: np.ndarray, processed: int):
+  def add_chunk(self, X: np.ndarray, y: np.ndarray, processed: int, compute_edges=False):
     ''' Adds a new chunk to the sample using reservoir sampling.
 
     Parameters
@@ -151,18 +180,24 @@ class ProgressiveBinSampler():
       Numeric values assigned to each item in the chunk. Has shape (n, ).
     processed : int
       The number of items processed in the computation so far.
+    compute_edges : boolean
+      Whether or not the bin edges should be returned as well.
 
     Returns
     -------
     X_res : dict[str, np.ndarray]
       A dictionary of bins after sampling, indexed by bin labels from `bin`.
-    bins : np.ndarray
+    labels : np.ndarray
       The bins computed for each item in y. Has shape (n, ).
+    edges : list[number]
+      The bin edges for the computed bins
     '''
-    # bins can be used to index both X and y
-    bins = self._bin(y)
+    # labels can be used to index both X and y
+    labels = self._bin(y)
+    self._reservoir_sample_by_bin(X, labels, processed)
 
-    X_res = self._reservoir_sample_by_bin(X, bins, processed)
-    self.X_reservoir = X_res
-
-    return X_res, bins
+    if compute_edges:
+      edges = self.get_bin_edges(y, labels)
+      return self.X_reservoir, labels, edges
+    else:
+      return self.X_reservoir, labels
