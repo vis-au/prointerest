@@ -115,7 +115,7 @@ def compute_dois(items: list[list[Any]]):
   posterior = 0
   doi = COMPONENT_WEIGHTS["prior"] * prior + COMPONENT_WEIGHTS["posterior"] * posterior
 
-  _, labels, edges = progressive_sampler.add_chunk(X_, doi, items_processed, compute_edges=True)
+  _, _, labels, edges = progressive_sampler.add_chunk(X_, doi, items_processed, compute_edges=True)
 
   current_chunk += 1
   return doi, labels, edges

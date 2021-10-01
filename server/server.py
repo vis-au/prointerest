@@ -38,14 +38,13 @@ def get_next_chunk():
   chunk = get_next_chunk_from_db(chunk_size)
 
   ids = np.array(chunk)[:, 0].tolist()
-  dois = compute_dois(chunk).tolist()
-  bins, labels = compute_doi_classes(dois)
+  dois, labels, bins = compute_dois(chunk)
   save_dois(ids, dois, labels)
 
   return cors_response({
     "chunk": chunk,
-    "dois": dois,
-    "labels": labels,
+    "dois": dois.tolist(),
+    "labels": labels.tolist(),
     "bins": bins
   })
 
