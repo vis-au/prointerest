@@ -17,11 +17,13 @@ async function sendRequestToBaseURL(
   body?: Record<string, unknown>
 ) {
   if (body === undefined) {
-    return fetch(`${BASE_URL}${path}`, { method }).then((d) => d.json());
+    return fetch(`${BASE_URL}${path}`, { method })
+      .then((d) => d.json())
+      .catch(console.error);
   } else {
-    return fetch(`${BASE_URL}${path}`, { method, body: JSON.stringify(body) }).then((d) =>
-      d.json()
-    );
+    return fetch(`${BASE_URL}${path}`, { method, body: JSON.stringify(body) })
+      .then((d) => d.json())
+      .catch(console.error);
   }
 }
 
