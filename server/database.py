@@ -13,6 +13,7 @@ DOI_DB = "doi" # name of database containing current doi values
 ID = "tripID" # column in a table containing the id of data items as in the original data
 DOI = "doi" # column in a table containing the doi value
 BIN = "label" # column in a table containing the current label assigned to a doi
+CHUNK = "chunk" # column in a table storing the chunk an item was processed
 
 ID_INDEX = 0
 
@@ -41,13 +42,15 @@ DIMENSION_EXTENTS = {
 
 def initialize_db():
   cursor.execute(f"CREATE VIEW {CSV_DB} AS SELECT * FROM read_csv_auto('{PATH}')")
-  cursor.execute(f"CREATE TABLE {PROCESSED_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY)")
+  cursor.execute(f"CREATE TABLE {PROCESSED_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY, {CHUNK} INTEGER)")
   cursor.execute(f"CREATE TABLE {DOI_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY,{DOI} VARCHAR, {BIN} VARCHAR)")
 
 
 def mark_ids_plotted(ids: list):
-  values = "('"+"'),('".join(ids)+"')"
-  query = f"INSERT INTO {PROCESSED_DB} ({ID}) VALUES {values}"
+  chunk = cursor.execute(f"SELECT MAX({CHUNK}) FROM {PROCESSED_DB}").fetchall()[0]
+  chunk = chunk[0] if chunk[0] is not None else 0
+  values = "('"+f"',{chunk}),('".join(ids)+f"',{chunk})"
+  query = f"INSERT INTO {PROCESSED_DB} ({ID}, {CHUNK}) VALUES {values}"
   cursor.execute(query)
 
 
@@ -62,6 +65,22 @@ def process_chunk(chunk: list[tuple[float]]):
     tuple = tuple + (ratio, )
     extended_chunk.append(tuple)
   return extended_chunk
+
+
+def get_from_processed(query_filters: list[str], as_numpy=False):
+  where_clause = ""
+  for filter in query_filters:
+    where_clause = f"{where_clause} {filter}"
+
+  if len(where_clause) == 0:
+    return []
+
+  query = f"SELECT * FROM {PROCESSED_DB} WHERE {where_clause}"
+
+  if as_numpy:
+    return cursor.execute(query).fetchnumpy()
+  else:
+    return cursor.execute(query).fetchall()
 
 
 def get_next_chunk_from_db(chunk_size: int):

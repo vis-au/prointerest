@@ -232,4 +232,4 @@ class ProgressiveBinSampler():
       edges = self.get_bin_edges(y, labels)
       return self.X_reservoir, self.y_reservoir, labels, edges
     else:
-      return self.X_reservoir, self.y_reservoir,labels
+      return self.X_reservoir, self.y_reservoir, labels
