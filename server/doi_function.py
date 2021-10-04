@@ -1,13 +1,13 @@
 from typing import Any, Literal
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import KBinsDiscretizer
 
 from database import *
 from outlierness_component import *
 from provenance_component import *
 from scagnostics_component import *
 from progressive_bin_sampler import ProgressiveBinSampler
+from doi_approximator import ActualDoiEvaluator
 
 
 COMPONENT_WEIGHTS = {
@@ -92,19 +92,8 @@ def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: 
 
   current_interactions += 1
 
-items_processed = 0
-def compute_dois(items: list[list[Any]]):
-  global current_chunk
-  X = np.array(items)
-
-  if items_processed == 0:
-    sample = np.empty((0, X.shape[1]))
-  else:
-    progressive_sampler.get_current_sample()
-
-  X_ = np.append(sample, X, axis=0)
-
-  df = pd.DataFrame(X_)
+def doi_f(X: np.ndarray):
+  df = pd.DataFrame(X)
   df = df.drop(columns=[2, 3, 7, 18, 19])
   df = df.astype(np.float64)
 
@@ -114,8 +103,17 @@ def compute_dois(items: list[list[Any]]):
   prior = outlierness_doi
   posterior = 0
   doi = COMPONENT_WEIGHTS["prior"] * prior + COMPONENT_WEIGHTS["posterior"] * posterior
+  return doi
 
-  _, _, labels, edges = progressive_sampler.add_chunk(X_, doi, items_processed, compute_edges=True)
+
+doi_module = ActualDoiEvaluator(doi=doi_f, n_dims=20)
+items_processed = 0
+
+def compute_dois(items: list[list[Any]]):
+  global current_chunk
+  X = np.array(items)
+
+  doi, labels, edges = doi_module.get_next(current_chunk, X)
 
   current_chunk += 1
   return doi, labels, edges
