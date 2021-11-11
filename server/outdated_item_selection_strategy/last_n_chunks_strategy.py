@@ -1,5 +1,6 @@
 from .outdated_item_selection_strategy import OutdatedItemSelectionStrategy
-from database import ID, get_from_processed
+from database import ID, CHUNK, get_from_processed
+import time
 
 class LastNChunksStrategy(OutdatedItemSelectionStrategy):
   ''' Outdated item detection strategy that retrieves the last `n` chunks as outdated. All chunks
@@ -15,8 +16,11 @@ class LastNChunksStrategy(OutdatedItemSelectionStrategy):
     self.n_chunks = n_chunks
 
   def get_outdated_ids(self, current_chunk: int):
+    start = time.time()
     res = get_from_processed([
-      f"chunk > {current_chunk - self.n_chunks}"
-    ], as_numpy=True)
+      f"{CHUNK} >= {current_chunk - self.n_chunks}"
+    ], as_df=True)
+    print("getting from processed took", time.time() - start)
 
-    return res[ID.lower()]
+    print(current_chunk, self.n_chunks)
+    return res[ID.lower()].to_numpy()

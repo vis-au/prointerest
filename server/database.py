@@ -1,4 +1,5 @@
 import duckdb
+import numpy as np
 import random
 
 TOTAL_SIZE = 112145904
@@ -8,6 +9,7 @@ PATH = "./data/nyc_taxis.shuffled_full.csv.gz" # path to the (compressed) csv fi
 
 CSV_DB = "data" # name of view on the csv file
 PROCESSED_DB = "processed" # name of database containing ids of processed data
+LAST_UPDATE_DB = "last_updated" # name of the
 DOI_DB = "doi" # name of database containing current doi values
 
 ID = "tripID" # column in a table containing the id of data items as in the original data
@@ -40,19 +42,25 @@ DIMENSION_EXTENTS = {
 }
 
 
-def initialize_db():
+def initialize_db(path=None):
+  global PATH
+  if path is not None and len(path) > 0:
+    PATH = path
   cursor.execute(f"CREATE VIEW {CSV_DB} AS SELECT * FROM read_csv_auto('{PATH}')")
   cursor.execute(f"CREATE TABLE {PROCESSED_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY, {CHUNK} INTEGER)")
   cursor.execute(f"CREATE TABLE {DOI_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY,{DOI} VARCHAR, {BIN} VARCHAR)")
+  cursor.execute(f"CREATE TABLE {LAST_UPDATE_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY, {CHUNK} INTEGER)")
 
 
 def mark_ids_plotted(ids: list):
   chunk = cursor.execute(f"SELECT MAX({CHUNK}) FROM {PROCESSED_DB}").fetchall()[0]
-  chunk = chunk[0] if chunk[0] is not None else 0
+  chunk = chunk[0] + 1 if chunk[0] is not None else 0
   values = "('"+f"',{chunk}),('".join(ids)+f"',{chunk})"
+
   query = f"INSERT INTO {PROCESSED_DB} ({ID}, {CHUNK}) VALUES {values}"
   cursor.execute(query)
-
+  query = f"INSERT INTO {LAST_UPDATE_DB} ({ID}, {CHUNK}) VALUES {values}"
+  cursor.execute(query)
 
 def process_chunk(chunk: list[tuple[float]]):
   extended_chunk = []
@@ -67,20 +75,42 @@ def process_chunk(chunk: list[tuple[float]]):
   return extended_chunk
 
 
-def get_from_processed(query_filters: list[str], as_numpy=False):
+def update_dois(ids: list[str], values: list[str], chunk: int):
+  for i, id in enumerate(ids):
+    cursor.execute(f"UPDATE {PROCESSED_DB} SET {DOI}={values[i]} WHERE {ID}={id}")
+    cursor.execute(f"UPDATE {LAST_UPDATE_DB} SET {CHUNK}={chunk} WHERE {ID}={id}")
+
+
+def get_from_db(db_name: str, query_filters: list[str], dimensions: list[str], distinct=False, as_df=False):
   where_clause = ""
   for filter in query_filters:
-    where_clause = f"{where_clause} {filter}"
+    if len(where_clause) == 0:
+      where_clause = f"{filter}"
+    else:
+      where_clause = f"{where_clause} AND {filter}"
 
   if len(where_clause) == 0:
-    return []
+    return np.empty(0) if as_df else []
 
-  query = f"SELECT * FROM {PROCESSED_DB} WHERE {where_clause}"
+  select = "SELECT DISTINCT" if distinct else "SELECT"
+  query = f"{select} {dimensions} FROM {db_name} WHERE {where_clause}"
 
-  if as_numpy:
-    return cursor.execute(query).fetchnumpy()
+  if as_df:
+    return cursor.execute(query).fetchdf()
   else:
     return cursor.execute(query).fetchall()
+
+
+def get_from_data(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+  return get_from_db(CSV_DB, query_filters, dimensions, distinct, as_df)
+
+
+def get_from_processed(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+  return get_from_db(PROCESSED_DB, query_filters, dimensions, distinct, as_df)
+
+
+def get_from_latest_update(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+  return get_from_db(LAST_UPDATE_DB, query_filters, dimensions, distinct, as_df)
 
 
 def get_next_chunk_from_db(chunk_size: int):
@@ -158,6 +188,14 @@ def get_items_for_ids(ids: list[str]):
   return items
 
 
+def drop_tables():
+  cursor.execute(f"DROP TABLE IF EXISTS {PROCESSED_DB}")
+  cursor.execute(f"DROP TABLE IF EXISTS {LAST_UPDATE_DB}")
+  cursor.execute(f"DROP TABLE IF EXISTS {DOI_DB}")
+  cursor.execute(f"DROP VIEW IF EXISTS {CSV_DB}")
+
+
 def reset_progression():
   cursor.execute(f"DELETE FROM {PROCESSED_DB}")
+  cursor.execute(f"DELETE FROM {LAST_UPDATE_DB}")
   cursor.execute(f"DELETE FROM {DOI_DB}")

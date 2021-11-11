@@ -25,6 +25,6 @@ class RegularIntervalStrategy(OutdatedItemSelectionStrategy):
     res = get_from_processed([
       f"MOD({CHUNK}, {current_chunk})=0",
       f"CHUNK < {self.max_age}"
-    ], as_numpy=True)
+    ], as_df=True)
 
-    return res[ID.lower()]
+    return res[ID.lower()].to_numpy()

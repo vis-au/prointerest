@@ -15,6 +15,6 @@ class OutdatedBinStrategy(OutdatedItemSelectionStrategy):
       return np.empty((0,))
     res = get_from_processed([
       f"{CHUNK} IN {str(tuple(outdated))}"
-    ], as_numpy=True)
+    ], as_df=True)
 
-    return res[ID.lower()]
+    return res[ID.lower()].to_numpy()
