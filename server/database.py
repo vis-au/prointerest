@@ -1,5 +1,6 @@
 import duckdb
 import numpy as np
+import pandas as pd
 import random
 
 TOTAL_SIZE = 112145904
@@ -52,7 +53,7 @@ def initialize_db(path=None):
   cursor.execute(f"CREATE TABLE {LAST_UPDATE_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY, {CHUNK} INTEGER)")
 
 
-def mark_ids_plotted(ids: list):
+def mark_ids_processed(ids: list):
   chunk = cursor.execute(f"SELECT MAX({CHUNK}) FROM {PROCESSED_DB}").fetchall()[0]
   chunk = chunk[0] + 1 if chunk[0] is not None else 0
   values = "('"+f"',{chunk}),('".join(ids)+f"',{chunk})"
@@ -62,17 +63,26 @@ def mark_ids_plotted(ids: list):
   query = f"INSERT INTO {LAST_UPDATE_DB} ({ID}, {CHUNK}) VALUES {values}"
   cursor.execute(query)
 
-def process_chunk(chunk: list[tuple[float]]):
-  extended_chunk = []
-  for tuple in chunk:
-    pickup_datetime = tuple[2]
-    dropoff_datetime = tuple[3]
-    duration = (dropoff_datetime-pickup_datetime).total_seconds()
-    tuple = tuple + (duration, )
-    ratio = tuple[15] / tuple[17]
-    tuple = tuple + (ratio, )
-    extended_chunk.append(tuple)
-  return extended_chunk
+# def process_chunk(chunk: list[tuple[float]]):
+#   extended_chunk = []
+#   for tuple in chunk:
+#     pickup_datetime = tuple[2]
+#     dropoff_datetime = tuple[3]
+#     duration = (dropoff_datetime-pickup_datetime).total_seconds()
+#     tuple = tuple + (duration, )
+#     ratio = tuple[15] / tuple[17]
+#     tuple = tuple + (ratio, )
+#     extended_chunk.append(tuple)
+#   return extended_chunk
+
+
+def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
+  dropoff = chunk["tpep_dropoff_datetime"]
+  pickup = chunk["tpep_pickup_datetime"]
+  chunk["duration"] = dropoff - pickup
+  chunk["duration"] = chunk["duration"].apply(lambda x: x.total_seconds())
+  chunk["ratio"] = chunk["tip_amount"] / chunk["total_amount"]
+  return chunk
 
 
 def update_dois(ids: list[str], values: list[str], chunk: int):
@@ -113,13 +123,32 @@ def get_from_latest_update(query_filters: list[str], dimensions="*", distinct=Fa
   return get_from_db(LAST_UPDATE_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_next_chunk_from_db(chunk_size: int):
+def get_from_doi(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+  return get_from_db(DOI_DB, query_filters, dimensions, distinct, as_df)
+
+
+def get_next_chunk_from_db(chunk_size: int, as_df=False):
   query = f"SELECT * FROM {CSV_DB} WHERE {ID} NOT IN (SELECT {ID} FROM {PROCESSED_DB}) LIMIT {chunk_size}"
-  next_chunk = cursor.execute(query).fetchall()
+
+  next_chunk = cursor.execute(query).fetchdf()
   next_chunk = process_chunk(next_chunk)
-  ids = [str(item[ID_INDEX]) for item in next_chunk]
-  mark_ids_plotted(ids)
-  return next_chunk
+  next_chunk[ID] = next_chunk[ID].astype(str)
+  ids = next_chunk[ID].to_list()
+
+  mark_ids_processed(ids)
+  return next_chunk if as_df else next_chunk.values.tolist()
+
+
+def update_last_update(ids: list, last_chunk=-1):
+  ids_str = f"({','.join(ids)})"
+
+  if last_chunk == -1:
+    subquery = f"SELECT MAX({CHUNK}) FROM {PROCESSED_DB}"
+    query = f"UPDATE {LAST_UPDATE_DB} SET {CHUNK}=({subquery}) WHERE {ID} IN {ids_str} "
+  else:
+    query = f"UPDATE {LAST_UPDATE_DB} SET {CHUNK}={last_chunk} WHERE {ID} IN {ids_str}"
+
+  cursor.execute(query)
 
 
 def save_dois(ids: list, dois: list, bins: list):
@@ -130,6 +159,7 @@ def save_dois(ids: list, dois: list, bins: list):
       values += ","
   query = f"INSERT INTO {DOI_DB} ({ID}, {DOI}, {BIN}) VALUES {values}"
   cursor.execute(query)
+  update_last_update(ids)
 
 
 def get_dois(ids: list):
@@ -145,11 +175,14 @@ def get_dois(ids: list):
 def update_doi(id: str, doi: str):
   query = f"UPDATE {DOI_DB} SET {DOI}={doi} WHERE {ID}={id}"
   cursor.execute(query)
+  update_last_update([id])
 
 
 def update_dois(ids: list, dois: list):
   for i, id in enumerate(ids):
     update_doi(id, dois[i])
+
+  update_last_update(ids)
 
 
 def get_dimensions_in_data():
