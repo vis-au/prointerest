@@ -1,7 +1,8 @@
 from pandas.core.frame import DataFrame
-from doi_component import *
 import pandas as pd
 import numpy as np
+
+from .doi_component import DoiComponent
 
 class ProvenanceComponent(DoiComponent):
   def __init__(self) -> None:

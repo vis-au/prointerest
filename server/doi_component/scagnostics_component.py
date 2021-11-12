@@ -1,6 +1,8 @@
 from pyscagnostics import scagnostics
-from doi_component import DoiComponent
 import pandas as pd
+
+from .doi_component import DoiComponent
+
 
 SCAGNOSTICS = [
   "Outlying", "Skewed", "Clumpy", "Sparse", "Striated", "Convex", "Skinny", "Stringy", "Monotonic"

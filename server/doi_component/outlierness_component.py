@@ -1,4 +1,3 @@
-from doi_component import DoiComponent
 import pandas as pd
 import numpy as np
 
@@ -6,6 +5,8 @@ from sklearn import svm
 from sklearn.covariance import EllipticEnvelope
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
+
+from .doi_component import DoiComponent
 
 # adapted from https://scikit-learn.org/stable/modules/outlier_detection.html
 class OutliernessComponent(DoiComponent):
