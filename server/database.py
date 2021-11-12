@@ -84,6 +84,8 @@ def mark_ids_processed(ids: list):
 
 
 def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
+  if len(chunk) == 0:
+    return chunk
   dropoff = chunk["tpep_dropoff_datetime"]
   pickup = chunk["tpep_pickup_datetime"]
   chunk["duration"] = dropoff - pickup
@@ -136,6 +138,7 @@ def get_from_doi(query_filters: list[str], dimensions="*", distinct=False, as_df
 
 def get_next_chunk_from_db(chunk_size: int, as_df=False):
   query = f"SELECT * FROM {CSV_DB} WHERE {ID} NOT IN (SELECT {ID} FROM {PROCESSED_DB}) LIMIT {chunk_size}"
+  # query = f"SELECT * FROM {CSV_DB} LEFT JOIN (SELECT {ID} FROM {PROCESSED_DB}) ON {ID} LIMIT {chunk_size}"
 
   next_chunk = cursor.execute(query).fetchdf()
   next_chunk = process_chunk(next_chunk)
@@ -220,12 +223,15 @@ def get_dimension_extent(dimension: str):
   return DIMENSION_EXTENTS.get(dimension)
 
 
-def get_items_for_ids(ids: list[str]):
+def get_items_for_ids(ids: list[str], as_df=False):
   id_list = "'"+"','".join(ids)+"'"
   query = f"SELECT * FROM {CSV_DB} WHERE {ID} IN ({id_list})"
   df = cursor.execute(query).fetchdf()
-  items = df.to_numpy()
-  return items
+
+  if as_df:
+    return df
+  else:
+    return df.to_numpy()
 
 
 def drop_tables():

@@ -1,4 +1,5 @@
 from numpy import empty, ndarray
+from pandas import DataFrame
 from database import get_items_for_ids
 
 class ContextItemSelectionStrategy:
@@ -19,7 +20,7 @@ class ContextItemSelectionStrategy:
     '''
     context_ids = self.get_context_ids(current_chunk)
     if len(context_ids) == 0:
-      return empty(0)
+      return DataFrame([])
 
     context_id_list = context_ids.tolist()
-    return get_items_for_ids(context_id_list)
+    return get_items_for_ids(context_id_list, as_df=True)
