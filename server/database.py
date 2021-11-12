@@ -54,6 +54,13 @@ def initialize_db(path=None):
 
 
 def mark_ids_processed(ids: list):
+  if len(ids) > 10000:
+    # optimization: when too many ids get loaded, the query becomes too long. Therefore run this
+    # operation recursively in two parts until the threshold is cleared
+    mark_ids_processed(ids[:round(len(ids) / 2)])
+    mark_ids_processed(ids[round(len(ids)/2):])
+    return
+
   chunk = cursor.execute(f"SELECT MAX({CHUNK}) FROM {PROCESSED_DB}").fetchall()[0]
   chunk = chunk[0] + 1 if chunk[0] is not None else 0
   values = "('"+f"',{chunk}),('".join(ids)+f"',{chunk})"
