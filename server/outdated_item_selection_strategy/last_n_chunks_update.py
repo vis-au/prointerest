@@ -2,7 +2,7 @@ from .outdated_item_selection_strategy import OutdatedItemSelectionStrategy
 from database import ID, CHUNK, get_from_processed
 import time
 
-class LastNChunksStrategy(OutdatedItemSelectionStrategy):
+class LastNChunksUpdate(OutdatedItemSelectionStrategy):
   ''' Outdated item detection strategy that retrieves the last `n` chunks as outdated. All chunks
   older than `n` timesteps are consindered irrelevant.
 

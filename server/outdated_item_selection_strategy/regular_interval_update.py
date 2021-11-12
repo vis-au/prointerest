@@ -1,7 +1,7 @@
 from .outdated_item_selection_strategy import OutdatedItemSelectionStrategy
 from database import ID, CHUNK, get_from_processed
 
-class RegularIntervalStrategy(OutdatedItemSelectionStrategy):
+class RegularIntervalUpdate(OutdatedItemSelectionStrategy):
   ''' Outdated item detection strategy that retrieves items in regular intervals, such that an item
   becomes outdated every `interval` steps.
 

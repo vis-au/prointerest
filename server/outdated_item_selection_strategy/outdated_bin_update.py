@@ -2,7 +2,7 @@ import numpy as np
 from .outdated_item_selection_strategy import OutdatedItemSelectionStrategy
 from database import ID, CHUNK, get_from_processed
 
-class OutdatedBinStrategy(OutdatedItemSelectionStrategy):
+class OutdatedBinUpdate(OutdatedItemSelectionStrategy):
   ''' Outdated item detection strategy that compares binnings before and after the computation of
   the doi value to determine items that are outdated, as their bin has changed significantly.
   '''

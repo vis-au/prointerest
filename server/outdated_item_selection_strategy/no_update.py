@@ -1,9 +1,7 @@
+from numpy import empty
 from .outdated_item_selection_strategy import OutdatedItemSelectionStrategy
-from database import ID, get_from_processed
 
-class NoChunkStrategy(OutdatedItemSelectionStrategy):
+class NoUpdate(OutdatedItemSelectionStrategy):
   '''' Outdated item detection strategy that never detects any outdated items.'''
   def get_outdated_ids(self, current_chunk: int):
-    res = get_from_processed(["FALSE"], as_df=True)
-    print(res)
-    return res[ID.lower()].to_numpy()
+    return empty((0, self.n_dims))
