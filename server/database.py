@@ -162,6 +162,13 @@ def update_last_update(ids: list, last_chunk=-1):
 
 
 def save_dois(ids: list, dois: list, bins: list):
+  if len(ids) > 10000:
+    # optimization: when too many ids get loaded, the query becomes too long. Therefore run this
+    # operation recursively in two parts until the threshold is cleared
+    save_dois(ids[:round(len(ids) / 2)], dois[:round(len(ids) / 2)], bins[:round(len(ids) / 2)])
+    save_dois(ids[round(len(ids)/2):], dois[round(len(ids)/2):], bins[round(len(ids)/2):])
+    return
+
   values = ""
   for i, id in enumerate(ids):
     values = f"{values}({id},{dois[i]},{bins[i]})"

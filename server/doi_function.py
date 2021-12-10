@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 
 from database import *
-from outlierness_component import *
-from provenance_component import *
-from scagnostics_component import *
-from progressive_bin_sampler import ProgressiveBinSampler
+from doi_component.outlierness_component import *
+from doi_component.provenance_component import *
+from doi_component.scagnostics_component import *
+from storage_strategy.progressive_bin_sampler import ProgressiveBinSampler
 from doi_approximator import ActualDoiEvaluator
 
 

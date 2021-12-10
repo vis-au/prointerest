@@ -3,7 +3,7 @@ from flask import Flask, json, jsonify, request
 
 from database import *
 from doi_function import *
-from scagnostics_component import SCATTERPLOT_AXES
+from doi_component.scagnostics_component import SCATTERPLOT_AXES
 
 app = Flask(__name__)
 

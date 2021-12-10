@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.neighbors import KDTree
-from progressive_bin_sampler import ProgressiveBinSampler
+from storage_strategy.progressive_bin_sampler import ProgressiveBinSampler
 from typing import final
 
 
