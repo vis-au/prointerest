@@ -10,7 +10,7 @@ class ContextItemSelectionStrategy:
     return empty(0)
 
   def get_context_items(self, current_chunk: int) -> ndarray:
-    ''' Takes the `ids` of items comptued in `get_context_ids` and retrieves the actual data from
+    ''' Takes the `ids` of items computed in `get_context_ids` and retrieves the actual data from
     the database. Returns an ndarray of shape (n, m).
 
     Parameters

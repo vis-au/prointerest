@@ -4,7 +4,7 @@ from database import ID, get_from_data
 from .context_item_selection_strategy import ContextItemSelectionStrategy
 
 
-class SamplingBasedContext(ContextItemSelectionStrategy):
+class RandomSamplingBasedContext(ContextItemSelectionStrategy):
     def __init__(self, n_dims: int, n_samples: int) -> None:
         self.n_samples = n_samples
 
@@ -15,3 +15,7 @@ class SamplingBasedContext(ContextItemSelectionStrategy):
         )
         df = DataFrame(data)
         return df.loc[sample].to_numpy()
+
+
+class ReservoirSamplingBasedContext(ContextItemSelectionStrategy):
+    pass
