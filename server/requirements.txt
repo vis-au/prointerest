@@ -2,6 +2,7 @@ flask==2.0.0
 numpy==1.20.2
 pandas==1.2.4
 matplotlib==3.4.3
+duckdb
 sklearn
 imblearn
 git+git://github.com/haishiro/pyscagnostics.git@master
