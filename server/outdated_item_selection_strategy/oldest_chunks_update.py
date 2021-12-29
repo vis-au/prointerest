@@ -1,5 +1,5 @@
 from .outdated_item_selection_strategy import OutdatedItemSelectionStrategy
-from database import ID, CHUNK, get_from_latest_update
+from database import ID, TIMESTAMP, get_from_latest_update
 
 
 class OldestChunksUpdate(OutdatedItemSelectionStrategy):
@@ -22,12 +22,11 @@ class OldestChunksUpdate(OutdatedItemSelectionStrategy):
         self.max_age = max_age
 
     def get_outdated_ids(self, current_chunk: int):
-        ages = get_from_latest_update(
-            ["TRUE"], dimensions=CHUNK, distinct=True, as_df=True
+        response = get_from_latest_update(
+            ["TRUE"], dimensions=f"MIN({TIMESTAMP})", distinct=True, as_df=True
         )
-        oldest = min(ages[CHUNK.lower()].to_numpy())
+        oldest = response[f"min({TIMESTAMP.lower()})"].to_numpy()[0]
         outdated_ids = get_from_latest_update(
-            [f"{CHUNK}={oldest}"], dimensions=ID, as_df=True
+            [f"{TIMESTAMP}='{oldest}'"], dimensions=ID, as_df=True
         )
-        print(f"oldest chunk is {oldest}")
         return outdated_ids[ID.lower()].to_numpy()

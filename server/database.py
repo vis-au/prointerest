@@ -6,21 +6,23 @@ import random
 TOTAL_SIZE = 112145904
 
 # database constants
-PATH = "./data/nyc_taxis.shuffled_full.csv.gz" # path to the (compressed) csv file
+PATH = "./data/nyc_taxis.shuffled_full.csv.gz"  # path to the (compressed) csv file
 
-CSV_DB = "data" # name of view on the csv file
-PROCESSED_DB = "processed" # name of database containing ids of processed data
-LAST_UPDATE_DB = "last_updated" # name of the
-DOI_DB = "doi" # name of database containing current doi values
+CSV_DB = "data"  # name of view on the csv file
+PROCESSED_DB = "processed"  # name of database containing ids of processed data
+LAST_UPDATE_DB = "last_updated"  # name of the
+DOI_DB = "doi"  # name of database containing current doi values
 
-ID = "tripID" # column in a table containing the id of data items as in the original data
-DOI = "doi" # column in a table containing the doi value
-BIN = "label" # column in a table containing the current label assigned to a doi
-CHUNK = "chunk" # column in a table storing the chunk an item was processed
+ID = "tripID"  # column in a table containing the id of data items as in the original data
+DOI = "doi"  # column in a table containing the doi value
+BIN = "label"  # column in a table containing the current label assigned to a doi
+CHUNK = "chunk"  # column in a table storing the chunk an item was processed
+TIMESTAMP = "timestamp_"  # column in a table storing a timestamp for when a datum was updated
+NOW = "current_timestamp"  # shorthand in duckdb for the current date and time
 
 ID_INDEX = 0
 
-cursor = duckdb.connect() # database connection
+cursor = duckdb.connect()  # database connection
 
 DIMENSION_EXTENTS = {
   "VendorID": {"min": 1, "max": 2 },
@@ -50,7 +52,7 @@ def initialize_db(path=None):
   cursor.execute(f"CREATE VIEW {CSV_DB} AS SELECT * FROM read_csv_auto('{PATH}')")
   cursor.execute(f"CREATE TABLE {PROCESSED_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY, {CHUNK} INTEGER)")
   cursor.execute(f"CREATE TABLE {DOI_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY,{DOI} VARCHAR, {BIN} VARCHAR)")
-  cursor.execute(f"CREATE TABLE {LAST_UPDATE_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY, {CHUNK} INTEGER)")
+  cursor.execute(f"CREATE TABLE {LAST_UPDATE_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY, {TIMESTAMP} TIMESTAMP)")
 
 
 def mark_ids_processed(ids: list):
@@ -63,11 +65,12 @@ def mark_ids_processed(ids: list):
 
   chunk = cursor.execute(f"SELECT MAX({CHUNK}) FROM {PROCESSED_DB}").fetchall()[0]
   chunk = chunk[0] + 1 if chunk[0] is not None else 0
-  values = "('"+f"',{chunk}),('".join(ids)+f"',{chunk})"
+  chunked_values = "('"+f"',{chunk}),('".join(ids)+f"',{chunk})"
+  timestamped_values = "('"+f"',{NOW}),('".join(ids)+f"',{NOW})"
 
-  query = f"INSERT INTO {PROCESSED_DB} ({ID}, {CHUNK}) VALUES {values}"
+  query = f"INSERT INTO {PROCESSED_DB} ({ID}, {CHUNK}) VALUES {chunked_values}"
   cursor.execute(query)
-  query = f"INSERT INTO {LAST_UPDATE_DB} ({ID}, {CHUNK}) VALUES {values}"
+  query = f"INSERT INTO {LAST_UPDATE_DB} ({ID}, {TIMESTAMP}) VALUES {timestamped_values}"
   cursor.execute(query)
 
 # def process_chunk(chunk: list[tuple[float]]):
@@ -94,10 +97,10 @@ def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
   return chunk
 
 
-def update_dois(ids: list[str], values: list[str], chunk: int):
-  for i, id in enumerate(ids):
-    cursor.execute(f"UPDATE {PROCESSED_DB} SET {DOI}={values[i]} WHERE {ID}={id}")
-    cursor.execute(f"UPDATE {LAST_UPDATE_DB} SET {CHUNK}={chunk} WHERE {ID}={id}")
+# def update_dois(ids: list[str], values: list[str], chunk: int):
+#   for i, id in enumerate(ids):
+#     cursor.execute(f"UPDATE {PROCESSED_DB} SET {DOI}={values[i]} WHERE {ID}={id}")
+#     cursor.execute(f"UPDATE {LAST_UPDATE_DB} SET {CHUNK}={chunk} WHERE {ID}={id}")
 
 
 def get_from_db(db_name: str, query_filters: list[str], dimensions: list[str], distinct=False, as_df=False):
@@ -111,8 +114,10 @@ def get_from_db(db_name: str, query_filters: list[str], dimensions: list[str], d
   if len(where_clause) == 0:
     return np.empty(0) if as_df else []
 
+  columns = dimensions if isinstance(dimensions, str) else ",".join(dimensions)
+
   select = "SELECT DISTINCT" if distinct else "SELECT"
-  query = f"{select} {dimensions} FROM {db_name} WHERE {where_clause}"
+  query = f"{select} {columns} FROM {db_name} WHERE {where_clause}"
 
   if as_df:
     return cursor.execute(query).fetchdf()
@@ -149,15 +154,11 @@ def get_next_chunk_from_db(chunk_size: int, as_df=False):
   return next_chunk if as_df else next_chunk.values.tolist()
 
 
-def update_last_update(ids: list, last_chunk=-1):
-  ids_str = f"({','.join(ids)})"
+def update_last_update(ids: list):
+  ids_list_str = list(map(str, ids))
+  ids_str = f"{','.join(ids_list_str)}"
 
-  if last_chunk == -1:
-    subquery = f"SELECT MAX({CHUNK}) FROM {PROCESSED_DB}"
-    query = f"UPDATE {LAST_UPDATE_DB} SET {CHUNK}=({subquery}) WHERE {ID} IN {ids_str} "
-  else:
-    query = f"UPDATE {LAST_UPDATE_DB} SET {CHUNK}={last_chunk} WHERE {ID} IN {ids_str}"
-
+  query = f"UPDATE {LAST_UPDATE_DB} SET {TIMESTAMP}={NOW} WHERE {ID} IN ({ids_str})"
   cursor.execute(query)
 
 
@@ -165,8 +166,9 @@ def save_dois(ids: list, dois: list, bins: list):
   if len(ids) > 10000:
     # optimization: when too many ids get loaded, the query becomes too long. Therefore run this
     # operation recursively in two parts until the threshold is cleared
-    save_dois(ids[:round(len(ids) / 2)], dois[:round(len(ids) / 2)], bins[:round(len(ids) / 2)])
-    save_dois(ids[round(len(ids)/2):], dois[round(len(ids)/2):], bins[round(len(ids)/2):])
+    split = round(len(ids) / 2)
+    save_dois(ids[:split], dois[:split], bins[:split])
+    save_dois(ids[split:], dois[split:], bins[split:])
     return
 
   values = ""
@@ -189,15 +191,13 @@ def get_dois(ids: list):
   return cursor.execute(query).fetchnumpy()
 
 
-def update_doi(id: str, doi: str):
-  query = f"UPDATE {DOI_DB} SET {DOI}={doi} WHERE {ID}={id}"
-  cursor.execute(query)
-  update_last_update([id])
-
-
 def update_dois(ids: list, dois: list):
+  def update_doi(id: str, doi: str):
+    query = f"UPDATE {DOI_DB} SET {DOI}={doi} WHERE {ID}={id}"
+    cursor.execute(query)
+
   for i, id in enumerate(ids):
-    update_doi(id, dois[i])
+    update_doi(str(id), dois[i])
 
   update_last_update(ids)
 

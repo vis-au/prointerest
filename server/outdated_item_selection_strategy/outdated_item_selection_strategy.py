@@ -1,5 +1,6 @@
 from typing import final
 import numpy as np
+import pandas as pd
 from database import get_items_for_ids
 
 
@@ -15,7 +16,7 @@ class OutdatedItemSelectionStrategy:
         return np.empty((0,))
 
     @final
-    def get_outdated_items(self, current_chunk: int) -> np.ndarray:
+    def get_outdated_items(self, current_chunk: int) -> pd.DataFrame:
         """Takes the `ids` of items computed in `get_outdated_ids` and retrieves the actual data from
         the database. Returns an ndarray of shape (n, m).
 
@@ -28,4 +29,4 @@ class OutdatedItemSelectionStrategy:
         if len(outdated_ids) == 0:
             return np.empty((0, self.n_dims))
         outdated_id_list = outdated_ids.tolist()
-        return get_items_for_ids(outdated_id_list)
+        return get_items_for_ids(outdated_id_list, as_df=True)
