@@ -192,12 +192,27 @@ def get_dois(ids: list):
 
 
 def update_dois(ids: list, dois: list):
+  # code below contains the slow approach using upate, which is slowing down the computation
+  # noticably (see delete -> insert alternative below)
   def update_doi(id: str, doi: str):
     query = f"UPDATE {DOI_DB} SET {DOI}={doi} WHERE {ID}={id}"
     cursor.execute(query)
 
+  if len(ids) == 0:
+    return
+
   for i, id in enumerate(ids):
     update_doi(str(id), dois[i])
+
+  # we suspect the code below is faster than individual updates, but because of a bug in duckdb
+  # that leads to primary key inconsistencies when doing insert(a)->delete(a)->insert(a), we fall
+  # back to the slower version
+  # ids_list = map(str, ids)
+  # ids_list = ",".join(ids_list)
+  # query = f"DELETE FROM {DOI_DB} WHERE {ID} IN ({ids_list})"
+  # cursor.execute(query)
+
+  # save_dois(ids, dois, np.zeros_like(ids))
 
   update_last_update(ids)
 
