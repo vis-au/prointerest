@@ -1,7 +1,7 @@
 from typing import final
 import numpy as np
 import pandas as pd
-from database import get_items_for_ids
+from database import ID, get_items_for_ids
 
 
 class OutdatedItemSelectionStrategy:
@@ -27,6 +27,10 @@ class OutdatedItemSelectionStrategy:
         """
         outdated_ids = self.get_outdated_ids(current_chunk)
         if len(outdated_ids) == 0:
-            return np.empty((0, self.n_dims))
+            # dataframe of items, even if empty, is expected to have the id column
+            empty = pd.DataFrame(np.empty((0, self.n_dims)))
+            empty = empty.rename(columns={0: ID})
+            return empty
+
         outdated_id_list = outdated_ids.tolist()
         return get_items_for_ids(outdated_id_list, as_df=True)
