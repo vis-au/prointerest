@@ -1,5 +1,6 @@
 from pyscagnostics import scagnostics
 import pandas as pd
+import numpy as np
 
 from .doi_component import DoiComponent
 
@@ -45,6 +46,9 @@ class ScagnosticsComponent(DoiComponent):
         return pd.DataFrame(all_results).mean()
 
     def compute_doi(self, X: pd.DataFrame):
+        if len(X) == 0:
+            return np.empty((0, ))
+
         X_ = X.drop(columns=["id"])
 
         # get scagnostics for the entire dataset

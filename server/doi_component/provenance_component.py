@@ -51,6 +51,8 @@ class ProvenanceComponent(DoiComponent):
     def compute_doi(self, X: DataFrame):
         if len(self.log) == 0:
             return pd.Series(np.zeros((len(X))))
+        elif len(X) == 0:
+            return np.empty((0, ))
 
         # "flatten" the list of ids into separate rows
         s = self.log.set_index(["timestamp", "mode"])["ids"]

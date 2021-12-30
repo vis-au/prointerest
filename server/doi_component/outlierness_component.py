@@ -28,6 +28,9 @@ class OutliernessComponent(DoiComponent):
         ]
 
     def compute_doi(self, X: pd.DataFrame):
+        if len(X) == 0:
+            return np.empty((0, ))
+
         if self.subspace is not None:
             X_ = X[self.subspace].to_numpy()
         else:
