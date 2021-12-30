@@ -56,6 +56,9 @@ def initialize_db(path=None):
 
 
 def mark_ids_processed(ids: list):
+  if len(ids) == 0:
+    return
+
   if len(ids) > 10000:
     # optimization: when too many ids get loaded, the query becomes too long. Therefore run this
     # operation recursively in two parts until the threshold is cleared
@@ -163,6 +166,9 @@ def update_last_update(ids: list):
 
 
 def save_dois(ids: list, dois: list, bins: list):
+  if len(ids) == 0:
+    return
+
   if len(ids) > 10000:
     # optimization: when too many ids get loaded, the query becomes too long. Therefore run this
     # operation recursively in two parts until the threshold is cleared
