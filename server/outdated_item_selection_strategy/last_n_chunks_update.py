@@ -1,6 +1,5 @@
 from .outdated_item_selection_strategy import OutdatedItemSelectionStrategy
 from database import ID, CHUNK, get_from_processed
-import time
 
 
 class LastNChunksUpdate(OutdatedItemSelectionStrategy):
@@ -18,11 +17,8 @@ class LastNChunksUpdate(OutdatedItemSelectionStrategy):
         self.n_chunks = n_chunks
 
     def get_outdated_ids(self, current_chunk: int):
-        start = time.time()
         res = get_from_processed(
             [f"{CHUNK} >= {current_chunk - self.n_chunks}"], as_df=True
         )
-        print("getting from processed took", time.time() - start)
 
-        print(current_chunk, self.n_chunks)
         return res[ID.lower()].to_numpy()

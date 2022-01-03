@@ -25,7 +25,7 @@ class RegularIntervalUpdate(OutdatedItemSelectionStrategy):
 
     def get_outdated_ids(self, current_chunk: int):
         res = get_from_processed(
-            [f"MOD({CHUNK}, {current_chunk})=0", f"CHUNK < {self.max_age}"], as_df=True
+            [f"MOD({CHUNK}, {current_chunk})=0", f"CHUNK < {current_chunk - self.max_age}"], as_df=True
         )
 
         return res[ID.lower()].to_numpy()

@@ -1,4 +1,5 @@
 from random import randint
+from numpy import empty
 from database import ID, CHUNK, get_from_processed
 from .context_item_selection_strategy import ContextItemSelectionStrategy
 
@@ -33,6 +34,8 @@ class RandomChunkBasedContext(ContextItemSelectionStrategy):
             random_chunk_ids = range(current_chunk)
         else:
             random_chunk_ids = [randint(0, current_chunk) for _ in range(self.n_chunks)]
+        if len(random_chunk_ids) == 0:
+            return empty((0, self.n_dims))
 
         ids_list = [str(id) for id in random_chunk_ids]
         ids_sql = ",".join(ids_list)

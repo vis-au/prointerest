@@ -14,7 +14,7 @@ class RandomSamplingBasedContext(ContextItemSelectionStrategy):
             len(data[ID]), self.n_samples, random_state=0
         )
         df = DataFrame(data)
-        return df.loc[sample].to_numpy()
+        return df.loc[sample]
 
 
 class ReservoirSamplingBasedContext(ContextItemSelectionStrategy):
