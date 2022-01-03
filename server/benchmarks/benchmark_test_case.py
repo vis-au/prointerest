@@ -56,7 +56,7 @@ class BenchmarkTestCase():
     return new_ids, new_dois, new_bins
 
   @final
-  def run(self):
+  def run(self, to_csv=False):
     self.test_case_steps = []
 
     for i in range(self.chunks):
@@ -106,6 +106,11 @@ class BenchmarkTestCase():
       step.total_time = time() - step.total_time
       self.test_case_steps += [step]
 
-  def save(self, path=None):
+    # write the computed doi values to a csv file, so that they can be compared with the baseline
+    # test cases later on
+    if to_csv:
+      get_from_doi(["TRUE"], as_df=True).to_csv(f"{to_csv}/{self.name}.csv", index=False)
+
+  def save_times(self, path=None):
     with open(f"{self.name}.csv", "w") as csv_file:
       csv_file.write(str(self))
