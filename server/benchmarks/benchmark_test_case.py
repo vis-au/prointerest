@@ -11,11 +11,6 @@ from context_item_selection_strategy.context_item_selection_strategy import *
 from outdated_item_selection_strategy.outdated_item_selection_strategy import *
 
 
-def reset():
-  drop_tables()
-  initialize_db("../data/nyc_taxis_sampled100k_shuffled.csv.gz")
-
-
 class BenchmarkTestCaseStep():
   def __init__(self, step_number: int) -> None:
     self.step_number = step_number
