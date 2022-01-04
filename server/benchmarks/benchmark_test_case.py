@@ -37,7 +37,10 @@ class BenchmarkTestCase():
     self.chunk_size = chunk_size
     self.chunks = chunks
     self.test_case_steps = []
+
     self.total_time = -1  # negative value indicates that the test case has not been run, yet
+    self.times_csv_path = None  # set once this test case is run
+    self.doi_csv_path = None  # set once this test case is run
 
   def __str__(self):
     output = "chunk,chunk_time,outdated_time,new_doi_time,old_doi_time,store_new_time,"\
@@ -110,23 +113,27 @@ class BenchmarkTestCase():
     # write the doi values computed by this combination of strategies to a csv file for later
     # analysis
     if doi_csv_path:
+      self.doi_csv_path = doi_csv_path
       if not exists(doi_csv_path):
         mkdir(doi_csv_path)
       get_from_doi(["TRUE"], as_df=True).to_csv(f"{doi_csv_path}/{self.name}.csv", index=False)
 
     # write benchmarking times to a csv file for later analysis
     if times_csv_path:
+      self.times_csv_path = times_csv_path
       if not exists(times_csv_path):
         mkdir(times_csv_path)
       with open(f"{times_csv_path}/{self.name}.csv", "w") as csv_file:
         csv_file.write(str(self))
 
-
-  def doi_histogram(self, path_to_csv: str, bins=10):
-    df = read_csv(path_to_csv)
+  def doi_histogram(self, bins=10):
+    if not self.doi_csv_path:
+      raise Exception("No CSV file for DOI values found. Supply a path during run().")
+    df = read_csv(self.doi_csv_path)
     df.hist(column=DOI, bins=bins)
 
-
-  def times_linecharts(self, path_to_csv: str):
-    df = read_csv(path_to_csv)
+  def times_linecharts(self):
+    if not self.times_csv_path:
+      raise Exception("No CSV file for times found. Supply a path during run().")
+    df = read_csv(self.times_csv_path)
     # TODO: render line charts, with one line per measured time in the test_case
