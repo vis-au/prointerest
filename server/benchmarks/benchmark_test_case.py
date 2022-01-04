@@ -1,7 +1,8 @@
+from os import mkdir
+from os.path import exists
+from pandas import DataFrame, read_csv
 from time import time
 from typing import final
-from numpy import zeros_like
-from pandas import DataFrame
 
 from database import *
 from doi_component.doi_component import *
@@ -18,17 +19,17 @@ def reset():
 class BenchmarkTestCaseStep():
   def __init__(self, step_number: int) -> None:
     self.step_number = step_number
+    self.step_time = 0
     self.chunk_time = 0
     self.outdated_time = 0
     self.new_doi_time = 0
     self.old_doi_time = 0,
     self.store_new_time = 0
     self.update_dois_time = 0
-    self.total_time = 0
 
   def __str__(self) -> str:
     return f"{self.step_number},{self.chunk_time},{self.outdated_time},{self.new_doi_time},"\
-           f"{self.old_doi_time},{self.store_new_time},{self.update_dois_time},{self.total_time}"
+           f"{self.old_doi_time},{self.store_new_time},{self.update_dois_time},{self.step_time}"
 
 
 class BenchmarkTestCase():
@@ -41,6 +42,7 @@ class BenchmarkTestCase():
     self.chunk_size = chunk_size
     self.chunks = chunks
     self.test_case_steps = []
+    self.total_time = -1  # negative value indicates that the test case has not been run, yet
 
   def __str__(self):
     output = "chunk,chunk_time,outdated_time,new_doi_time,old_doi_time,store_new_time,"\
@@ -49,68 +51,87 @@ class BenchmarkTestCase():
       output = f"{output}{step}\n"
     return output
 
-  def apply_test_case_strategy(self, chunk: DataFrame, chunk_no: int):
-    new_ids = zeros_like(chunk)
-    new_dois = zeros_like(chunk)
-    new_bins = zeros_like(chunk)
-    return new_ids, new_dois, new_bins
+  def _apply_context_strategy(self, chunk: DataFrame, step: BenchmarkTestCaseStep, step_no: int):
+    # apply strategy for finding context items
+    context = self.context_strategy.get_context_items(current_chunk=step_no)
+    context = process_chunk(context)
+
+    # compute the doi values for the chunk with context items
+    now = time()
+    chunk_with_context = chunk.append(context)
+    new_doi = self.doi.compute_doi(chunk_with_context)[:len(chunk)]
+    step.new_doi_time = time() - now
+
+    # measure time for storing new values
+    new_ids = chunk[ID].to_list()
+    now = time()
+    save_dois(new_ids, new_doi, np.zeros_like(new_doi))
+    step.store_new_time = time() - now
+
+  def _apply_update_strategy(self, chunk: DataFrame, step: BenchmarkTestCaseStep, step_no: int):
+    # apply strategy for finding outdated items
+    now = time()
+    outdated = self.update_strategy.get_outdated_items(current_chunk=step_no)
+    outdated = process_chunk(DataFrame(outdated))
+    step.outdated_time = time() - now
+
+    # update the doi values for outdated items
+    now = time()
+    chunk_with_outdated = chunk.append(outdated)
+    old_doi = self.doi.compute_doi(chunk_with_outdated)[len(chunk):]
+    step.old_doi_time = time() - now
+
+    # measure time for updating values
+    old_ids = outdated[ID].to_list()
+    now = time()
+    update_dois(old_ids, old_doi)
+    step.update_dois_time = time() - now
 
   @final
-  def run(self, to_csv=False):
+  def run(self, doi_csv_path=None, times_csv_path=None):
     self.test_case_steps = []
+    start_time = time()
 
     for i in range(self.chunks):
       step = BenchmarkTestCaseStep(i)
-      step.total_time = time()
+      step.step_time = time()
 
+      # measure data retrieval time
       now = time()
       chunk = get_next_chunk_from_db(self.chunk_size, as_df=True)
       step.chunk_time = time() - now
 
-      # apply strategy for finding context items
-      context = self.context_strategy.get_context_items(i)
-      context = process_chunk(context)
+      # compute doi using the strategies
+      self._apply_context_strategy(chunk, step, i)
+      self._apply_update_strategy(chunk, step, i)
 
-      # apply strategy for finding outdated items
-      now = time()
-      outdated = self.update_strategy.get_outdated_items(current_chunk=i)
-      outdated = process_chunk(pd.DataFrame(outdated))
-      step.outdated_time = time() - now
-
-      new_ids = chunk[ID].to_list()
-      old_ids = outdated[ID].to_list()
-
-      # compute the doi values for the chunk with context items
-      now = time()
-      chunk_with_context = chunk.append(context)
-      new_doi = self.doi.compute_doi(chunk_with_context)[:len(chunk)]
-      step.new_doi_time = time() - now
-
-      # measure time for storing new values
-      now = time()
-      save_dois(new_ids, new_doi, np.zeros_like(new_doi))
-      step.store_new_time = time() - now
-
-      # update the doi values for outdated items
-      now = time()
-      chunk_with_outdated = chunk.append(outdated)
-      old_doi = self.doi.compute_doi(chunk_with_outdated)[len(chunk):]
-      step.old_doi_time = time() - now
-
-      # measure time for updating values
-      now = time()
-      update_dois(old_ids, old_doi)
-      step.update_dois_time = time() - now
-
-      # measure total time
-      step.total_time = time() - step.total_time
+      # measure step time
+      step.step_time = time() - step.step_time
       self.test_case_steps += [step]
 
-    # write the computed doi values to a csv file, so that they can be compared with the baseline
-    # test cases later on
-    if to_csv:
-      get_from_doi(["TRUE"], as_df=True).to_csv(f"{to_csv}/{self.name}.csv", index=False)
+    # measure test case time
+    self.total_time = time() - start_time
 
-  def save_times(self, path=None):
-    with open(f"{self.name}.csv", "w") as csv_file:
-      csv_file.write(str(self))
+    # write the doi values computed by this combination of strategies to a csv file for later
+    # analysis
+    if doi_csv_path:
+      if not exists(doi_csv_path):
+        mkdir(doi_csv_path)
+      get_from_doi(["TRUE"], as_df=True).to_csv(f"{doi_csv_path}/{self.name}.csv", index=False)
+
+    # write benchmarking times to a csv file for later analysis
+    if times_csv_path:
+      if not exists(times_csv_path):
+        mkdir(times_csv_path)
+      with open(f"{times_csv_path}/{self.name}.csv", "w") as csv_file:
+        csv_file.write(str(self))
+
+
+  def doi_histogram(self, path_to_csv: str, bins=10):
+    df = read_csv(path_to_csv)
+    df.hist(column=DOI, bins=bins)
+
+
+  def times_linecharts(self, path_to_csv: str):
+    df = read_csv(path_to_csv)
+    # TODO: render line charts, with one line per measured time in the test_case
