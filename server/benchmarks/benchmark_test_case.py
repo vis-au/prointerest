@@ -73,6 +73,11 @@ class BenchmarkTestCase():
     outdated = process_chunk(DataFrame(outdated))
     step.outdated_time = time() - now
 
+    if len(outdated) == 0:
+      step.old_doi_time = 0
+      step.update_dois_time = 0
+      return
+
     # update the doi values for outdated items
     now = time()
     chunk_with_outdated = chunk.append(outdated)
