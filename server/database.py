@@ -6,9 +6,13 @@ import random
 TOTAL_SIZE = 112145904
 
 # database constants
-PATH = "./data/nyc_taxis.shuffled_full.csv.gz"  # path to the (compressed) csv file
+# path to the (compressed) data file in row-based format
+PATH = "./data/nyc_taxis.shuffled_full.csv.gz"
+# path to the (compressed) data file in column-based format
+PATH_COLUMN_BASED = "./data/nyc_taxis.shuffled_full.parquet"
 
-CSV_DB = "data"  # name of view on the csv file
+DATA_DB = "data"  # name of view on the data under PATH
+COLUMN_DATA_DB = "column_data"  # name of view on the data under PATH_COLUMN_BASED
 PROCESSED_DB = "processed"  # name of database containing ids of processed data
 LAST_UPDATE_DB = "last_updated"  # name of the
 DOI_DB = "doi"  # name of database containing current doi values
@@ -25,34 +29,57 @@ ID_INDEX = 0
 cursor = duckdb.connect()  # database connection
 
 DIMENSION_EXTENTS = {
-  "VendorID": {"min": 1, "max": 2 },
-  "passenger_count": {"min": 0, "max": 192 },
-  "trip_distance": {"min": 0, "max": 50 },
-  "RatecodeID": {"min": 1, "max": 6 },
-  "PULocationID": {"min": 1, "max": 265 },
-  "DOLocationID": {"min": 1, "max": 265 },
-  "payment_type": {"min": 1, "max": 5 },
-  "fare_amount": {"min": -800, "max": 907070.24 },
-  "extra": {"min": -80, "max": 96.64 },
-  "mta_tax": {"min": -80, "max": 150 },
-  "tip_amount": {"min": 0, "max": 1000 },
-  "toll_amount": {"min": -52.5, "max": 1650 },
-  "improvement_surcharge": {"min": -0.3, "max": 4000.3 },
-  "total_amount": {"min": 0, "max": 300 },
+  "VendorID": {"min": 1, "max": 2},
+  "passenger_count": {"min": 0, "max": 192},
+  "trip_distance": {"min": 0, "max": 50},
+  "RatecodeID": {"min": 1, "max": 6},
+  "PULocationID": {"min": 1, "max": 265},
+  "DOLocationID": {"min": 1, "max": 265},
+  "payment_type": {"min": 1, "max": 5},
+  "fare_amount": {"min": -800, "max": 907070.24},
+  "extra": {"min": -80, "max": 96.64},
+  "mta_tax": {"min": -80, "max": 150},
+  "tip_amount": {"min": 0, "max": 1000},
+  "toll_amount": {"min": -52.5, "max": 1650},
+  "improvement_surcharge": {"min": -0.3, "max": 4000.3},
+  "total_amount": {"min": 0, "max": 300},
   # computed dimensions
   "trip_duration": {"min": 0, "max": 6000},
   "tip_ratio": {"min": 0, "max": 1}
 }
 
 
-def initialize_db(path=None):
+def initialize_db(row_data_path=None, column_data_path=None):
   global PATH
-  if path is not None and len(path) > 0:
-    PATH = path
-  cursor.execute(f"CREATE VIEW {CSV_DB} AS SELECT * FROM read_csv_auto('{PATH}')")
-  cursor.execute(f"CREATE TABLE {PROCESSED_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY, {CHUNK} INTEGER)")
-  cursor.execute(f"CREATE TABLE {DOI_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY,{DOI} VARCHAR, {BIN} VARCHAR)")
-  cursor.execute(f"CREATE TABLE {LAST_UPDATE_DB} ({ID} VARCHAR UNIQUE PRIMARY KEY, {TIMESTAMP} TIMESTAMP)")
+  if row_data_path is not None and len(row_data_path) > 0:
+    PATH = row_data_path
+  if column_data_path is not None and len(column_data_path) > 0:
+    PATH_COLUMN_BASED = column_data_path
+
+  cursor.execute(f"CREATE VIEW {DATA_DB} \
+    AS SELECT * FROM read_csv_auto('{PATH}')")
+  cursor.execute(f"CREATE VIEW {COLUMN_DATA_DB} \
+    AS SELECT * FROM parquet_scan('{PATH_COLUMN_BASED}')")
+  cursor.execute(f"CREATE TABLE {PROCESSED_DB} \
+    ({ID} VARCHAR UNIQUE PRIMARY KEY, {CHUNK} INTEGER)")
+  cursor.execute(f"CREATE TABLE {DOI_DB} \
+    ({ID} VARCHAR UNIQUE PRIMARY KEY,{DOI} VARCHAR, {BIN} VARCHAR)")
+  cursor.execute(f"CREATE TABLE {LAST_UPDATE_DB} \
+    ({ID} VARCHAR UNIQUE PRIMARY KEY, {TIMESTAMP} TIMESTAMP)")
+
+
+def drop_tables():
+  cursor.execute(f"DROP TABLE IF EXISTS {PROCESSED_DB}")
+  cursor.execute(f"DROP TABLE IF EXISTS {LAST_UPDATE_DB}")
+  cursor.execute(f"DROP TABLE IF EXISTS {DOI_DB}")
+  cursor.execute(f"DROP VIEW IF EXISTS {DATA_DB}")
+  cursor.execute(f"DROP VIEW IF EXISTS {COLUMN_DATA_DB}")
+
+
+def reset_progression():
+  cursor.execute(f"DELETE FROM {PROCESSED_DB}")
+  cursor.execute(f"DELETE FROM {LAST_UPDATE_DB}")
+  cursor.execute(f"DELETE FROM {DOI_DB}")
 
 
 def mark_ids_processed(ids: list):
@@ -106,7 +133,8 @@ def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
 #     cursor.execute(f"UPDATE {LAST_UPDATE_DB} SET {CHUNK}={chunk} WHERE {ID}={id}")
 
 
-def get_from_db(db_name: str, query_filters: list[str], dimensions: list[str], distinct=False, as_df=False):
+def get_from_db(db_name: str, query_filters: list[str], dimensions: list[str], distinct=False,
+                as_df=False):
   where_clause = ""
   for filter in query_filters:
     if len(where_clause) == 0:
@@ -129,7 +157,11 @@ def get_from_db(db_name: str, query_filters: list[str], dimensions: list[str], d
 
 
 def get_from_data(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
-  return get_from_db(CSV_DB, query_filters, dimensions, distinct, as_df)
+  return get_from_db(DATA_DB, query_filters, dimensions, distinct, as_df)
+
+
+def get_from_column_data(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+  return get_from_db(COLUMN_DATA_DB, query_filters, dimensions, distinct, as_df)
 
 
 def get_from_processed(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
@@ -145,8 +177,10 @@ def get_from_doi(query_filters: list[str], dimensions="*", distinct=False, as_df
 
 
 def get_next_chunk_from_db(chunk_size: int, as_df=False):
-  query = f"SELECT * FROM {CSV_DB} WHERE {ID} NOT IN (SELECT {ID} FROM {PROCESSED_DB}) LIMIT {chunk_size}"
-  # query = f"SELECT * FROM {CSV_DB} LEFT JOIN (SELECT {ID} FROM {PROCESSED_DB}) ON {ID} LIMIT {chunk_size}"
+  query = f"SELECT * \
+            FROM {DATA_DB} \
+            WHERE {ID} NOT IN (SELECT {ID} FROM {PROCESSED_DB}) \
+            LIMIT {chunk_size}"
 
   next_chunk = cursor.execute(query).fetchdf()
   next_chunk = process_chunk(next_chunk)
@@ -224,7 +258,7 @@ def update_dois(ids: list, dois: list):
 
 
 def get_dimensions_in_data():
-  query = f"SELECT * FROM {CSV_DB} LIMIT 1"
+  query = f"SELECT * FROM {DATA_DB} LIMIT 1"
   item = cursor.execute(query).fetchdf()
   dimensions = list(item.columns)
   dimensions = dimensions + ["trip_duration", "tip_ratio"]
@@ -253,23 +287,10 @@ def get_dimension_extent(dimension: str):
 
 def get_items_for_ids(ids: list[str], as_df=False):
   id_list = "'"+"','".join(ids)+"'"
-  query = f"SELECT * FROM {CSV_DB} WHERE {ID} IN ({id_list})"
+  query = f"SELECT * FROM {COLUMN_DATA_DB} WHERE {ID} IN ({id_list})"
   df = cursor.execute(query).fetchdf()
 
   if as_df:
     return df
   else:
     return df.to_numpy()
-
-
-def drop_tables():
-  cursor.execute(f"DROP TABLE IF EXISTS {PROCESSED_DB}")
-  cursor.execute(f"DROP TABLE IF EXISTS {LAST_UPDATE_DB}")
-  cursor.execute(f"DROP TABLE IF EXISTS {DOI_DB}")
-  cursor.execute(f"DROP VIEW IF EXISTS {CSV_DB}")
-
-
-def reset_progression():
-  cursor.execute(f"DELETE FROM {PROCESSED_DB}")
-  cursor.execute(f"DELETE FROM {LAST_UPDATE_DB}")
-  cursor.execute(f"DELETE FROM {DOI_DB}")
