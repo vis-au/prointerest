@@ -1,8 +1,9 @@
 flask==2.0.0
 numpy==1.20.2
 pandas==1.2.4
-matplotlib==3.4.3
-duckdb
-sklearn
-imblearn
+altair==4.2.0
+altair_data_server==0.4.1
+duckdb==0.3.1
+scikit-learn==1.0.2
+imbalanced-learn==0.8.1
 git+git://github.com/haishiro/pyscagnostics.git@master
