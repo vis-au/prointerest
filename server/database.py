@@ -274,7 +274,7 @@ def get_data_size():
 
 def get_random_sample(chunk_size: int):
   dimensions = 5
-  return [ [random.random() for __ in range(dimensions)] for _ in range(chunk_size) ];
+  return [[random.random() for __ in range(dimensions)] for _ in range(chunk_size)]
 
 
 def get_random_dims(dimensions: int):
