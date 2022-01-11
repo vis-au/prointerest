@@ -31,13 +31,18 @@ class BenchmarkTestCaseStep():
 
 
 class BenchmarkTestCase():
-  def __init__(self, name: str, doi: DoiComponent, context_strategy: ContextItemSelectionStrategy,
+  def __init__(self, name: str, doi: DoiComponent, storage_strategy: StorageStrategy,
+               context_strategy: ContextItemSelectionStrategy,
                update_strategy: OutdatedItemSelectionStrategy, chunk_size: int, chunks: int):
     self.name = name
     self.doi = doi
-    self.storage_strategy = NoStorageStrategy()
+
+    self.storage_strategy = storage_strategy
     self.context_strategy = context_strategy
     self.update_strategy = update_strategy
+    self.context_strategy.storage = self.storage_strategy
+    self.update_strategy.storage = self.storage_strategy
+
     self.chunk_size = chunk_size
     self.chunks = chunks
     self.test_case_steps = []
