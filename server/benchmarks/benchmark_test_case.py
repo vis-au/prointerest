@@ -7,6 +7,7 @@ from typing import final
 from database import *
 from doi_component.doi_component import *
 from doi_component.outlierness_component import *
+from storage_strategy.no_storage_strategy import *
 from context_item_selection_strategy.context_item_selection_strategy import *
 from outdated_item_selection_strategy.outdated_item_selection_strategy import *
 
@@ -34,6 +35,7 @@ class BenchmarkTestCase():
                update_strategy: OutdatedItemSelectionStrategy, chunk_size: int, chunks: int):
     self.name = name
     self.doi = doi
+    self.storage_strategy = NoStorageStrategy()
     self.context_strategy = context_strategy
     self.update_strategy = update_strategy
     self.chunk_size = chunk_size
