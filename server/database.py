@@ -286,4 +286,6 @@ def get_dimension_extent(dimension: str):
 
 
 def get_items_for_ids(ids: list[str], as_df=False):
+  if len(ids) == 1:
+    ids += ids
   return get_from_column_data([f"{ID} IN {tuple(ids)}"], as_df=as_df)

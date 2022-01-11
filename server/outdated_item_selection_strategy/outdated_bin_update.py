@@ -16,6 +16,8 @@ class OutdatedBinUpdate(OutdatedItemSelectionStrategy):
         outdated = self.get_outdated_bins()
         if len(outdated) == 0:
             return np.empty((0,))
+        if len(outdated) == 1:
+            outdated += outdated  # make sure tuple() below works
         res = get_from_processed([f"{CHUNK} IN {tuple(outdated)}"], as_df=True)
 
         return res[ID.lower()].to_numpy()
