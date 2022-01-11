@@ -1,4 +1,5 @@
 from .outdated_item_selection_strategy import OutdatedItemSelectionStrategy
+from storage_strategy.storage_strategy import StorageStrategy
 from database import ID, CHUNK, get_from_processed
 
 
@@ -12,8 +13,8 @@ class LastNChunksUpdate(OutdatedItemSelectionStrategy):
       The fixed (positive) number of chunks to be retrieved when checking for outdated items.
     """
 
-    def __init__(self, n_dims: int, n_chunks: int):
-        super().__init__(n_dims)
+    def __init__(self, storage: StorageStrategy, n_dims: int, n_chunks: int):
+        super().__init__(n_dims, storage)
         self.n_chunks = n_chunks
 
     def get_outdated_ids(self, current_chunk: int):

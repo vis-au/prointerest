@@ -1,4 +1,5 @@
 from .outdated_item_selection_strategy import OutdatedItemSelectionStrategy
+from storage_strategy.storage_strategy import StorageStrategy
 from database import ID, TIMESTAMP, get_from_latest_update
 
 
@@ -16,8 +17,8 @@ class OldestChunksUpdate(OutdatedItemSelectionStrategy):
       here refers to the first time a chunk was processed.
     """
 
-    def __init__(self, n_dims: int, n_chunks: int, max_age: int):
-        super().__init__(n_dims)
+    def __init__(self, n_dims: int, storage: StorageStrategy, n_chunks: int, max_age: int):
+        super().__init__(n_dims, storage)
         self.n_chunks = n_chunks
         self.max_age = max_age
 
