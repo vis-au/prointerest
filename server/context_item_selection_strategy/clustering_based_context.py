@@ -1,13 +1,14 @@
 from pandas import DataFrame
 from numpy import empty
 from sklearn.cluster import MiniBatchKMeans
-from database import ID, CHUNK, get_items_for_ids, get_from_processed
+from database import ID, CHUNK, get_from_processed
+from storage_strategy.storage_strategy import StorageStrategy
 from .context_item_selection_strategy import ContextItemSelectionStrategy
 
 
 class ClusteringBasedContext(ContextItemSelectionStrategy):
-    def __init__(self, n_dims: int, n_clusters: int) -> None:
-        super().__init__(n_dims)
+    def __init__(self, n_dims: int, storage: StorageStrategy, n_clusters: int) -> None:
+        super().__init__(n_dims, storage)
         self.n_clusters = n_clusters
         self.clustering = MiniBatchKMeans(n_clusters=self.n_clusters)
 
@@ -19,7 +20,7 @@ class ClusteringBasedContext(ContextItemSelectionStrategy):
         ids_list = response[ID.lower()].values.tolist()
         ids_list = list(map(str, ids_list))
 
-        data = get_items_for_ids(ids_list, as_df=True)
+        data = self.storage.get_items_for_ids(ids_list, as_df=True)
         numeric = data.select_dtypes(["number"]).to_numpy()
         # clustering = KMeans(n_clusters=self.n_clusters).fit(numeric)
         self.clustering.partial_fit(numeric)
