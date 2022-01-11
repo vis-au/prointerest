@@ -286,11 +286,4 @@ def get_dimension_extent(dimension: str):
 
 
 def get_items_for_ids(ids: list[str], as_df=False):
-  id_list = "'"+"','".join(ids)+"'"
-  query = f"SELECT * FROM {COLUMN_DATA_DB} WHERE {ID} IN ({id_list})"
-  df = cursor.execute(query).fetchdf()
-
-  if as_df:
-    return df
-  else:
-    return df.to_numpy()
+  return get_from_column_data([f"{ID} IN {tuple(ids)}"], as_df=as_df)
