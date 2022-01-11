@@ -16,6 +16,7 @@ class BenchmarkTestCaseStep():
     self.step_number = step_number
     self.step_time = 0
     self.chunk_time = 0
+    self.context_time = 0
     self.outdated_time = 0
     self.new_doi_time = 0
     self.old_doi_time = 0,
@@ -23,8 +24,9 @@ class BenchmarkTestCaseStep():
     self.update_dois_time = 0
 
   def __str__(self) -> str:
-    return f"{self.step_number},{self.chunk_time},{self.outdated_time},{self.new_doi_time},"\
-           f"{self.old_doi_time},{self.store_new_time},{self.update_dois_time},{self.step_time}"
+    return f"{self.step_number},{self.chunk_time},{self.context_time},{self.outdated_time},"\
+           f"{self.new_doi_time},{self.old_doi_time},{self.store_new_time},"\
+           f"{self.update_dois_time},{self.step_time}"
 
 
 class BenchmarkTestCase():
@@ -43,16 +45,18 @@ class BenchmarkTestCase():
     self.doi_csv_path = None  # set once this test case is run
 
   def __str__(self):
-    output = "chunk,chunk_time,outdated_time,new_doi_time,old_doi_time,store_new_time,"\
-             "update_dois_time,total_time\n"
+    output = "chunk,chunk_time,context_time,outdated_time,new_doi_time,old_doi_time,"\
+             "store_new_time,update_dois_time,total_time\n"
     for step in self.test_case_steps:
       output = f"{output}{step}\n"
     return output
 
   def _apply_context_strategy(self, chunk: DataFrame, step: BenchmarkTestCaseStep, step_no: int):
     # apply strategy for finding context items
+    now = time()
     context = self.context_strategy.get_context_items(current_chunk=step_no)
     context = process_chunk(context)
+    step.context_time = time() - now
 
     # compute the doi values for the chunk with context items
     now = time()
