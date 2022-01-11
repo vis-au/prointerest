@@ -15,18 +15,19 @@ from outdated_item_selection_strategy.outdated_item_selection_strategy import *
 class BenchmarkTestCaseStep():
   def __init__(self, step_number: int) -> None:
     self.step_number = step_number
-    self.step_time = 0
-    self.chunk_time = 0
-    self.context_time = 0
-    self.outdated_time = 0
-    self.new_doi_time = 0
-    self.old_doi_time = 0,
-    self.store_new_time = 0
-    self.update_dois_time = 0
+    self.step_time = 0  # time to do all steps in the computation
+    self.chunk_time = 0  # time to retrieve the data
+    self.storage_time = 0  # time to save the data
+    self.context_time = 0  # time to retrieve context data
+    self.outdated_time = 0  # time to retrieve outdated data
+    self.new_doi_time = 0  # time to compute the new doi values
+    self.old_doi_time = 0  # time to recompute the outdated doi values
+    self.store_new_time = 0  # time to store the new doi values
+    self.update_dois_time = 0  # time to update the stored outdated values
 
   def __str__(self) -> str:
-    return f"{self.step_number},{self.chunk_time},{self.context_time},{self.outdated_time},"\
-           f"{self.new_doi_time},{self.old_doi_time},{self.store_new_time},"\
+    return f"{self.step_number},{self.chunk_time},{self.storage_time},{self.context_time},"\
+           f"{self.outdated_time},{self.new_doi_time},{self.old_doi_time},{self.store_new_time},"\
            f"{self.update_dois_time},{self.step_time}"
 
 
@@ -52,7 +53,7 @@ class BenchmarkTestCase():
     self.doi_csv_path = None  # set once this test case is run
 
   def __str__(self):
-    output = "chunk,chunk_time,context_time,outdated_time,new_doi_time,old_doi_time,"\
+    output = "chunk,chunk_time,storage_time,context_time,outdated_time,new_doi_time,old_doi_time,"\
              "store_new_time,update_dois_time,total_time\n"
     for step in self.test_case_steps:
       output = f"{output}{step}\n"
@@ -114,6 +115,11 @@ class BenchmarkTestCase():
       now = time()
       chunk = get_next_chunk_from_db(self.chunk_size, as_df=True)
       step.chunk_time = time() - now
+
+      # measure inserting into storage time
+      now = time()
+      self.storage_strategy.insert_chunk(chunk)
+      step.storage_time = time() - now
 
       # compute doi using the strategies
       self._apply_context_strategy(chunk, step, i)

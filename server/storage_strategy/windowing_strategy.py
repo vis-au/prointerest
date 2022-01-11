@@ -10,7 +10,7 @@ class WindowingStrategy(StorageStrategy):
         self.storage = self.storage.append(chunk)
 
         if len(self.storage) > self.max_size:
-            self.out = self.storage[0 : -self.max_size :]
-            self.storage = self.storage[-self.max_size :]
+            self.out = self.storage[0: -self.max_size:]
+            self.storage = self.storage[-self.max_size:]
         else:
             self.out = pd.DataFrame()
