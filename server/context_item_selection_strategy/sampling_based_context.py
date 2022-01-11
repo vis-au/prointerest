@@ -1,10 +1,12 @@
 from sklearn.utils.random import sample_without_replacement
-from database import ID, get_from_processed
 from .context_item_selection_strategy import ContextItemSelectionStrategy
+from storage_strategy.storage_strategy import StorageStrategy
+from database import ID, get_from_processed
 
 
 class RandomSamplingBasedContext(ContextItemSelectionStrategy):
-    def __init__(self, n_dims: int, n_samples: int) -> None:
+    def __init__(self, n_dims: int, storage: StorageStrategy, n_samples: int) -> None:
+        super().__init__(n_dims, storage)
         self.n_samples = n_samples
 
     def get_context_ids(self, current_chunk: int):

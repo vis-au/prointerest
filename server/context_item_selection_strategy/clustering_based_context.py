@@ -23,6 +23,9 @@ class ClusteringBasedContext(ContextItemSelectionStrategy):
         data = self.storage.get_items_for_ids(ids_list, as_df=True)
         numeric = data.select_dtypes(["number"]).to_numpy()
         # clustering = KMeans(n_clusters=self.n_clusters).fit(numeric)
+
+        if len(numeric) == 0:
+            return DataFrame()
         self.clustering.partial_fit(numeric)
 
         labels = self.clustering.labels_

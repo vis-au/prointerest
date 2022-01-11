@@ -17,9 +17,12 @@ class StorageStrategy:
         return None
 
     def get_items_for_ids(self, ids: list[str], as_df=False):
-        if not self.is_storage_registered:
+        if not self.is_storage_registered and len(self.storage) > 0:
             self.cursor.register(DF, self.storage)
             self.is_storage_registered = True
+            return pd.DataFrame()
+        elif len(self.storage) == 0:
+            return pd.DataFrame()
 
         response = self.cursor.execute(
             f"SELECT * FROM {DF} WHERE {ID} IN {tuple(ids)}"
