@@ -38,6 +38,5 @@ class RandomChunkBasedContext(ContextItemSelectionStrategy):
             return empty((0, self.n_dims))
 
         ids_list = [str(id) for id in random_chunk_ids]
-        ids_sql = ",".join(ids_list)
-        context_ids = get_from_processed([f"{CHUNK} IN ({ids_sql})"], ID, as_df=True)
+        context_ids = get_from_processed([f"{CHUNK} IN {tuple(ids_list)}"], ID, as_df=True)
         return context_ids[ID.lower()].to_numpy()

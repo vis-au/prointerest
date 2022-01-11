@@ -2,6 +2,7 @@ from numpy import empty, ndarray
 from pandas import DataFrame
 from database import get_items_for_ids
 
+
 class ContextItemSelectionStrategy:
   def __init__(self, n_dims: int) -> None:
     self.n_dims = n_dims

@@ -1,7 +1,7 @@
 from pandas import DataFrame
 from numpy import empty
-from sklearn.cluster import KMeans, MiniBatchKMeans
-from database import ID, CHUNK, get_from_column_data, get_from_processed
+from sklearn.cluster import MiniBatchKMeans
+from database import ID, CHUNK, get_items_for_ids, get_from_processed
 from .context_item_selection_strategy import ContextItemSelectionStrategy
 
 
@@ -18,12 +18,8 @@ class ClusteringBasedContext(ContextItemSelectionStrategy):
         )
         ids_list = response[ID.lower()].values.tolist()
         ids_list = list(map(str, ids_list))
-        ids_sql = ",".join(ids_list)
 
-        data = get_from_column_data(
-            [f"{ID} IN ({ids_sql})"],
-            as_df=True
-        )
+        data = get_items_for_ids(ids_list, as_df=True)
         numeric = data.select_dtypes(["number"]).to_numpy()
         # clustering = KMeans(n_clusters=self.n_clusters).fit(numeric)
         self.clustering.partial_fit(numeric)

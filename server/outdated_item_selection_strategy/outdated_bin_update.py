@@ -4,7 +4,8 @@ from database import ID, CHUNK, get_from_processed
 
 
 class OutdatedBinUpdate(OutdatedItemSelectionStrategy):
-    """Outdated item detection strategy that compares binnings before and after the computation of
+    """
+    Outdated item detection strategy that compares binnings before and after the computation of
     the doi value to determine items that are outdated, as their bin has changed significantly.
     """
 
@@ -15,6 +16,6 @@ class OutdatedBinUpdate(OutdatedItemSelectionStrategy):
         outdated = self.get_outdated_bins()
         if len(outdated) == 0:
             return np.empty((0,))
-        res = get_from_processed([f"{CHUNK} IN {str(tuple(outdated))}"], as_df=True)
+        res = get_from_processed([f"{CHUNK} IN {tuple(outdated)}"], as_df=True)
 
         return res[ID.lower()].to_numpy()
