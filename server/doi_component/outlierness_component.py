@@ -8,11 +8,12 @@ from sklearn.neighbors import LocalOutlierFactor
 
 from .doi_component import DoiComponent
 
+
 # adapted from https://scikit-learn.org/stable/modules/outlier_detection.html
 class OutliernessComponent(DoiComponent):
     def __init__(self, subspace: list[int] = None) -> None:
         super().__init__()
-        self.outliers_fraction = 0.15
+        self.outliers_fraction = 0.01
         self.outlierness_measures = self._generate_measures()
         self.current_interest: pd.DataFrame = None
         # the columns of the dataframe to be considered for outlierness
@@ -24,7 +25,7 @@ class OutliernessComponent(DoiComponent):
             EllipticEnvelope(contamination=self.outliers_fraction),
             svm.OneClassSVM(nu=self.outliers_fraction, kernel="rbf", gamma=0.1),
             IsolationForest(contamination=self.outliers_fraction, random_state=0),
-            # LocalOutlierFactor(n_neighbors=35, contamination=self.outliers_fraction)
+            LocalOutlierFactor(n_neighbors=35, contamination=self.outliers_fraction)
         ]
 
     def compute_doi(self, X: pd.DataFrame):
