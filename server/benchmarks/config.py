@@ -148,6 +148,11 @@ def get_doi_bin_error_df(doi_bin_labels_a: pd.DataFrame, doi_bin_labels_b: pd.Da
   return diff_df
 
 
+def get_doi_error_df(doi_df_a: pd.DataFrame, doi_df_b: pd.DataFrame):
+  diff = pd.DataFrame(doi_df_a["doi"] - doi_df_b["doi"]).abs()
+  return diff
+
+
 # wipe the databases that track doi, processed, update chunks, etc.
 def reset():
   drop_tables()
