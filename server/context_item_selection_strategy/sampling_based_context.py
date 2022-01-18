@@ -12,7 +12,13 @@ class RandomSamplingBasedContext(ContextItemSelectionStrategy):
     def get_context_ids(self, current_chunk: int):
         processed_ids = get_from_processed(["TRUE"], ID, as_df=True)[ID.lower()]
 
-        sample = sample_without_replacement(len(processed_ids), self.n_samples, random_state=0)
+        processed = len(processed_ids)
+        sample_size = processed if processed < self.n_samples else self.n_samples
+        sample = sample_without_replacement(
+            len(processed_ids),
+            sample_size,
+            random_state=0
+        )
         sampled_ids = processed_ids[sample]
         return sampled_ids
 
