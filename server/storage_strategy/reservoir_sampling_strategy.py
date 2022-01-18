@@ -37,4 +37,4 @@ class ReservoirSamplingStrategy(StorageStrategy):
         else:
             self.reservoir_sample(chunk)
 
-        self.storage = self.storage.reset_index(drop=True)
+        self.storage.reset_index(drop=True, inplace=True)

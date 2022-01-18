@@ -8,6 +8,7 @@ class WindowingStrategy(StorageStrategy):
             return
 
         self.storage = self.storage.append(chunk)
+        self.storage.reset_index(drop=True, inplace=True)
 
         if len(self.storage) > self.max_size:
             self.out = self.storage[0: -self.max_size:]
