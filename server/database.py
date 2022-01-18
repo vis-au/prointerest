@@ -2,14 +2,23 @@ import duckdb
 import numpy as np
 import pandas as pd
 import random
+from typing import Callable
 
-TOTAL_SIZE = 112145904
+# TOTAL_SIZE = 112145904
+TOTAL_SIZE: int = None
 
 # database constants
 # path to the (compressed) data file in row-based format
-PATH = "./data/nyc_taxis.shuffled_full.csv.gz"
+# PATH = "./data/nyc_taxis.shuffled_full.csv.gz"
+PATH: str = None
+
 # path to the (compressed) data file in column-based format
-PATH_COLUMN_BASED = "./data/nyc_taxis.shuffled_full.parquet"
+# PATH_COLUMN_BASED = "./data/nyc_taxis.shuffled_full.parquet"
+PATH_COLUMN_BASED: str = None
+
+# column in a table containing the id of data items as in the original data
+
+PROCESS_CHUNK_CALLBACK: Callable[[pd.DataFrame], pd.DataFrame] = None
 
 DATA_DB = "data"  # name of view on the data under PATH
 COLUMN_DATA_DB = "column_data"  # name of view on the data under PATH_COLUMN_BASED
@@ -49,23 +58,29 @@ DIMENSION_EXTENTS = {
 }
 
 
-def initialize_db(row_data_path=None, column_data_path=None):
-  global PATH
-  if row_data_path is not None and len(row_data_path) > 0:
-    PATH = row_data_path
-  if column_data_path is not None and len(column_data_path) > 0:
-    PATH_COLUMN_BASED = column_data_path
+def initialize_db(row_data_path: str, column_data_path: str, id_column: str, total_size: int,
+                  process_chunk_callback=None):
+  global PATH, PATH_COLUMN_BASED, ID, TOTAL_SIZE, PROCESS_CHUNK_CALLBACK
 
-  cursor.execute(f"CREATE VIEW {DATA_DB} \
-    AS SELECT * FROM read_csv_auto('{PATH}')")
-  cursor.execute(f"CREATE VIEW {COLUMN_DATA_DB} \
-    AS SELECT * FROM parquet_scan('{PATH_COLUMN_BASED}')")
-  cursor.execute(f"CREATE TABLE {PROCESSED_DB} \
-    ({ID} VARCHAR UNIQUE PRIMARY KEY, {CHUNK} INTEGER)")
-  cursor.execute(f"CREATE TABLE {DOI_DB} \
-    ({ID} VARCHAR UNIQUE PRIMARY KEY,{DOI} VARCHAR, {BIN} VARCHAR)")
-  cursor.execute(f"CREATE TABLE {LAST_UPDATE_DB} \
-    ({ID} VARCHAR UNIQUE PRIMARY KEY, {TIMESTAMP} TIMESTAMP)")
+  if None in [row_data_path, column_data_path, id_column, total_size]:
+    raise Exception("missing parameter when initializing database")
+
+  PATH = row_data_path
+  PATH_COLUMN_BASED = column_data_path
+  ID = id_column
+  TOTAL_SIZE = total_size
+  PROCESS_CHUNK_CALLBACK = process_chunk_callback  # if None, no processing is applied
+
+  cursor.execute(f"CREATE VIEW {DATA_DB} "
+                 f"AS SELECT * FROM read_csv_auto('{PATH}')")
+  cursor.execute(f"CREATE VIEW {COLUMN_DATA_DB} "
+                 f"AS SELECT * FROM parquet_scan('{PATH_COLUMN_BASED}')")
+  cursor.execute(f"CREATE TABLE {PROCESSED_DB} "
+                 f"({ID} VARCHAR UNIQUE PRIMARY KEY, {CHUNK} INTEGER)")
+  cursor.execute(f"CREATE TABLE {DOI_DB} "
+                 f"({ID} VARCHAR UNIQUE PRIMARY KEY,{DOI} VARCHAR, {BIN} VARCHAR)")
+  cursor.execute(f"CREATE TABLE {LAST_UPDATE_DB} "
+                 f"({ID} VARCHAR UNIQUE PRIMARY KEY, {TIMESTAMP} TIMESTAMP)")
 
 
 def drop_tables():
@@ -103,34 +118,14 @@ def mark_ids_processed(ids: list):
   query = f"INSERT INTO {LAST_UPDATE_DB} ({ID}, {TIMESTAMP}) VALUES {timestamped_values}"
   cursor.execute(query)
 
-# def process_chunk(chunk: list[tuple[float]]):
-#   extended_chunk = []
-#   for tuple in chunk:
-#     pickup_datetime = tuple[2]
-#     dropoff_datetime = tuple[3]
-#     duration = (dropoff_datetime-pickup_datetime).total_seconds()
-#     tuple = tuple + (duration, )
-#     ratio = tuple[15] / tuple[17]
-#     tuple = tuple + (ratio, )
-#     extended_chunk.append(tuple)
-#   return extended_chunk
-
 
 def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
   if len(chunk) == 0:
     return chunk
-  dropoff = chunk["tpep_dropoff_datetime"]
-  pickup = chunk["tpep_pickup_datetime"]
-  chunk["duration"] = dropoff - pickup
-  chunk["duration"] = chunk["duration"].apply(lambda x: x.total_seconds())
-  chunk["ratio"] = chunk["tip_amount"] / chunk["total_amount"]
-  return chunk
+  elif PROCESS_CHUNK_CALLBACK is None:
+    return chunk
 
-
-# def update_dois(ids: list[str], values: list[str], chunk: int):
-#   for i, id in enumerate(ids):
-#     cursor.execute(f"UPDATE {PROCESSED_DB} SET {DOI}={values[i]} WHERE {ID}={id}")
-#     cursor.execute(f"UPDATE {LAST_UPDATE_DB} SET {CHUNK}={chunk} WHERE {ID}={id}")
+  return PROCESS_CHUNK_CALLBACK(chunk)
 
 
 def get_from_db(db_name: str, query_filters: list[str], dimensions: list[str], distinct=False,

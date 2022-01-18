@@ -161,6 +161,29 @@ def get_prediction():
   return cors_response([])
 
 
+data_path = "../data/nyc_taxis.shuffled_full.csv.gz"
+column_data_path = "../data/nyc_taxis.shuffled_full.parquet"
+id_column = "tripID"
+total_db_size = 112145904  # full size of database
+n_dims = 17  # number of dimensions in the data
+
+
+def taxi_process_chunk(chunk: pd.DataFrame):
+  dropoff = chunk["tpep_dropoff_datetime"]
+  pickup = chunk["tpep_pickup_datetime"]
+  chunk["duration"] = dropoff - pickup
+  chunk["duration"] = chunk["duration"].apply(lambda x: x.total_seconds())
+  chunk["ratio"] = chunk["tip_amount"] / chunk["total_amount"]
+  return chunk
+
+
 if __name__ == "__main__":
-  initialize_db()
+  drop_tables()
+  initialize_db(
+    row_data_path=data_path,
+    column_data_path=column_data_path,
+    id_column=id_column,
+    total_size=total_db_size,
+    process_chunk_callback=taxi_process_chunk
+  )
   app.run(debug=True)
