@@ -19,7 +19,8 @@ class LastNChunksUpdate(OutdatedItemSelectionStrategy):
 
     def get_outdated_ids(self, current_chunk: int):
         res = get_from_processed(
-            [f"{CHUNK} >= {current_chunk - self.n_chunks}"], as_df=True
+            [f"{CHUNK} >= {current_chunk - self.n_chunks}", f"{CHUNK} < {current_chunk}"],
+            as_df=True
         )
 
         return res[ID.lower()].to_numpy()
