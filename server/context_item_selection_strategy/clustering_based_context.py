@@ -7,7 +7,7 @@ from .context_item_selection_strategy import ContextItemSelectionStrategy
 
 
 class ClusteringBasedContext(ContextItemSelectionStrategy):
-    def __init__(self, n_dims: int, storage: StorageStrategy, n_clusters: int, n_samples_per_cluster) -> None:
+    def __init__(self, n_dims: int, storage: StorageStrategy, n_clusters: int, n_samples_per_cluster: int) -> None:
         super().__init__(n_dims, storage)
         self.n_clusters = n_clusters
         self.n_samples_per_cluster = n_samples_per_cluster
