@@ -3,6 +3,7 @@ from os.path import exists
 from sys import path
 import numpy as np
 import pandas as pd
+import altair as alt
 
 # make this script "top level"
 cwd = os.getcwd()
@@ -35,7 +36,7 @@ from context_item_selection_strategy.clustering_based_context import *
 # --- BENCHMARK CONFIGURATION
 # doi = OutliernessComponent(["0", "1"])
 # doi_label = "outlierness"
-# doi = SortComponent(["0"])
+# doi = SortComponent(["0", "1"])
 # doi_label = "sort"
 doi = DensityComponent(bandwidth=5)
 doi_label = "density"
@@ -50,11 +51,15 @@ max_age = 20  # maximal age of the considered chunks
 storage_size = chunk_size * max_age  # maximum size of storages
 
 # --- USE CASE CONFIGURATION
+# data_label = "taxis"
 # data_path = "../data/nyc_taxis.shuffled_full.csv.gz"
 # column_data_path = "../data/nyc_taxis.shuffled_full.parquet"
-data_path = "../data/blobs.csv"
-column_data_path = "../data/nyc_taxis.shuffled_full.parquet"  # not needed here
-data_label = "blobs"
+# data_label = "blobs"
+# data_path = "../data/blobs.csv"
+# column_data_path = "../data/nyc_taxis.shuffled_full.parquet"  # not used, but required
+data_label = "swiss_roll"
+data_path = "../data/swiss_roll.csv"
+column_data_path = "../data/nyc_taxis.shuffled_full.parquet"  # not used, but required
 
 id_column = "tripID"
 # total_db_size = 112145904  # full size of database
@@ -82,7 +87,7 @@ update_strategies = [
     n_dims=n_dims, storage=None, n_chunks=n_chunks
   )),
   ("regular intervals", RegularIntervalUpdate(
-    n_dims=n_dims, storage=None, interval=n_chunks, max_age=max_age
+    n_dims=n_dims, storage=None, n_chunks=n_chunks, max_age=max_age
   )),
   # ("outdated bins", OutdatedBinUpdate(n_dims=n_dims, storage=None))
 ]
@@ -91,7 +96,10 @@ context_strategies = [
   ("no context", NoContext(
     n_dims=n_dims, storage=None
   )),
-  ("chunk based", RandomChunkBasedContext(
+  ("random chunk based", RandomChunkBasedContext(
+    n_dims=n_dims, n_chunks=n_chunks, storage=None
+  )),
+  ("most recent chunk based", MostRecentChunkBasedContext(
     n_dims=n_dims, n_chunks=n_chunks, storage=None
   )),
   ("sampling based", RandomSamplingBasedContext(
@@ -101,6 +109,9 @@ context_strategies = [
     n_dims=n_dims, n_clusters=chunk_size, n_samples_per_cluster=n_chunks, storage=None
   ))
 ]
+
+# altair visualizations use the data server extension to reduce notebook size
+alt.data_transformers.enable("data_server")
 
 # create the path for storing the benchmark results if they do not exist
 path = f"./out/{data_label}/{doi_label}/{total_size}/{chunk_size}"
