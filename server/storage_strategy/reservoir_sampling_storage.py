@@ -3,7 +3,7 @@ from numpy.random import randint, rand
 from .storage_strategy import DF, StorageStrategy
 
 
-class ReservoirSamplingStrategy(StorageStrategy):
+class ReservoirSamplingStorage(StorageStrategy):
     def __init__(self, max_size) -> None:
         super().__init__(max_size)
         self.next_replacement = self.max_size

@@ -4,7 +4,7 @@ from sklearn.cluster import KMeans
 from .storage_strategy import StorageStrategy
 
 
-class CompressionStrategy(StorageStrategy):
+class CompressionStorage(StorageStrategy):
     def __init__(self, max_size) -> None:
         super().__init__(max_size)
         self.kmeans = KMeans(n_clusters=self.max_size, random_state=0)

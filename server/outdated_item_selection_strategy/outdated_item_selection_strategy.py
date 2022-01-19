@@ -1,6 +1,7 @@
 from typing import final
 import numpy as np
 import pandas as pd
+
 from database import ID
 from storage_strategy.storage_strategy import StorageStrategy
 

@@ -2,7 +2,7 @@ from .storage_strategy import StorageStrategy
 from database import get_items_for_ids
 
 
-class NoStorageStrategy(StorageStrategy):
+class NoStorage(StorageStrategy):
   def __init__(self) -> None:
       super().__init__(-1)
 

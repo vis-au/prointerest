@@ -6,8 +6,7 @@ from typing import final
 
 from database import *
 from doi_component.doi_component import *
-from doi_component.outlierness_component import *
-from storage_strategy.no_storage_strategy import *
+from storage_strategy.storage_strategy import *
 from context_item_selection_strategy.context_item_selection_strategy import *
 from outdated_item_selection_strategy.outdated_item_selection_strategy import *
 

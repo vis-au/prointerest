@@ -11,13 +11,14 @@ path.append(f"{cwd}/..")
 from doi_component.sort_component import SortComponent
 from doi_component.outlierness_component import OutliernessComponent
 from doi_component.density_component import DensityComponent
+
 from database import initialize_db, drop_tables
 
-from storage_strategy.no_storage_strategy import *
-from storage_strategy.compression_strategy import *
+from storage_strategy.no_storage import *
+from storage_strategy.compression_storage import *
 from storage_strategy.progressive_bin_sampler import *
-from storage_strategy.reservoir_sampling_strategy import *
-from storage_strategy.windowing_strategy import *
+from storage_strategy.reservoir_sampling_storage import *
+from storage_strategy.windowing_storage import *
 
 from outdated_item_selection_strategy.no_update import *
 from outdated_item_selection_strategy.oldest_chunks_update import *
@@ -63,11 +64,11 @@ n_dims = 2
 
 
 storage_strategies = [
-  ("no_storage_strategy", NoStorageStrategy()),
-  ("compression_strategy", CompressionStrategy(max_size=storage_size)),
+  ("no_storage_strategy", NoStorage()),
+  ("compression_strategy", CompressionStorage(max_size=storage_size)),
   ("progressive_bin_sampler", ProgressiveBinSampler()),
-  ("reservoir_sampling_strategy", ReservoirSamplingStrategy(max_size=storage_size)),
-  ("windowing_strategy", WindowingStrategy(max_size=storage_size))
+  ("reservoir_sampling_strategy", ReservoirSamplingStorage(max_size=storage_size)),
+  ("windowing_strategy", WindowingStorage(max_size=storage_size))
 ]
 
 update_strategies = [

@@ -2,7 +2,7 @@ import pandas as pd
 from .storage_strategy import DF, StorageStrategy
 
 
-class WindowingStrategy(StorageStrategy):
+class WindowingStorage(StorageStrategy):
     def insert_chunk(self, chunk: pd.DataFrame):
         if len(self.storage) > 0 and self.storage.shape[1] != chunk.shape[1]:
             return

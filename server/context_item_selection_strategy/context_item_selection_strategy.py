@@ -1,14 +1,13 @@
 from numpy import empty, ndarray
 from pandas import DataFrame
 
-from storage_strategy.no_storage_strategy import NoStorageStrategy
 from storage_strategy.storage_strategy import StorageStrategy
 
 
 class ContextItemSelectionStrategy:
   def __init__(self, n_dims: int, storage: StorageStrategy) -> None:
     self.n_dims = n_dims
-    self.storage = storage if storage else NoStorageStrategy()
+    self.storage = storage
 
   def get_context_ids(self, current_chunk: int) -> ndarray:
     return empty(0)
