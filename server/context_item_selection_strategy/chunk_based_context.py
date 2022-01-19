@@ -1,7 +1,9 @@
-from random import randint
 from numpy import empty
+from sklearn.utils.random import sample_without_replacement
+
 from database import ID, CHUNK, get_from_processed
 from storage_strategy.storage_strategy import StorageStrategy
+
 from .context_item_selection_strategy import ContextItemSelectionStrategy
 
 
@@ -19,27 +21,30 @@ class MostRecentChunkBasedContext(ContextItemSelectionStrategy):
             # return the last n_chunks chunks
             latest_chunk = current_chunk - self.n_chunks
 
+        # assuming that storage is greater or equal in size as n_chunks * chunk_size
         context_ids = get_from_processed([f"{CHUNK} > {latest_chunk}"], ID, as_df=True)
         return context_ids[ID.lower()].to_numpy()
 
 
 class RandomChunkBasedContext(ContextItemSelectionStrategy):
-    def __init__(self, n_dims: int, storage: StorageStrategy, n_chunks: int) -> None:
+    def __init__(self, n_dims: int, storage: StorageStrategy, n_chunks: int):
         super().__init__(n_dims, storage)
         self.n_chunks = n_chunks  # how many most recent chunks should be returned as context?
 
-    def get_context_ids(self, current_chunk: int):
+    def get_context_ids(self, current_chunk=None):
         # if the number of processed chunks is lower than the number of chunks that should be
         # returned as context, just return all chunks.
-        if current_chunk < self.n_chunks:
-            random_chunk_ids = range(current_chunk)
-        else:
-            random_chunk_ids = [randint(0, current_chunk) for _ in range(self.n_chunks)]
-        if len(random_chunk_ids) == 0:
-            return empty((0, self.n_dims))
+        all_chunks = self.storage.get_available_chunks()
+        n_population = len(all_chunks)
 
-        ids_list = [str(id) for id in random_chunk_ids]
-        if len(ids_list) == 1:
-            ids_list += ids_list  # make sure tuple() below works
-        context_ids = get_from_processed([f"{CHUNK} IN {tuple(ids_list)}"], ID, as_df=True)
-        return context_ids[ID.lower()].to_numpy()
+        if n_population == 0:
+            return empty((0, self.n_dims))
+        if current_chunk < self.n_chunks:
+            chunks = all_chunks
+        else:
+            sampled_indeces = sample_without_replacement(n_population, self.n_chunks)
+            chunks = all_chunks[sampled_indeces]
+
+        items_in_chunks = self.storage.get_items_for_chunks(chunks, as_df=True)
+        context_ids = items_in_chunks[ID].to_numpy()
+        return context_ids
