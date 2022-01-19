@@ -22,10 +22,13 @@ default_parameters = {
   "blobs": {
     "n_samples": n_samples,
     "n_features": 2,
-    "centers": 1
+    "centers": 1,
+    "cluster_std": 2.0,
+    "random_state": 0,
   },
   "swiss_roll": {
     "n_samples": n_samples,
+    "random_state": 0
   }
 }
 
