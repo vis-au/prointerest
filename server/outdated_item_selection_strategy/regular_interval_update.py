@@ -19,15 +19,18 @@ class RegularIntervalUpdate(OutdatedItemSelectionStrategy):
       The maximum age of considered chunks, thus the lower `max_age`, the faster the retrieval.
     """
 
-    def __init__(self, n_dims: int, storage: StorageStrategy, interval: int, max_age: int):
+    def __init__(self, n_dims: int, storage: StorageStrategy, n_chunks: int, max_age: int):
         super().__init__(n_dims, storage)
-        self.interval = interval
         self.max_age = max_age
+        self.interval = max_age // n_chunks
 
     def get_outdated_ids(self, current_chunk: int):
-        res = get_from_processed(
-            [f"MOD({CHUNK}, {current_chunk})=0", f"CHUNK < {current_chunk - self.max_age}"],
-            as_df=True
+        res = get_from_processed([
+            f"({current_chunk}-{CHUNK}) % {self.interval}=0",
+            f"{CHUNK} >= {current_chunk - self.max_age}",
+            f"{CHUNK} < {current_chunk}"
+          ],
+          as_df=True
         )
 
         return res[ID.lower()].to_numpy()
