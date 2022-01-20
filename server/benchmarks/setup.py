@@ -1,6 +1,7 @@
 import os
 from os.path import exists
 from sys import path
+import json
 import numpy as np
 import pandas as pd
 import altair as alt
@@ -33,41 +34,50 @@ from context_item_selection_strategy.sampling_based_context import *
 from context_item_selection_strategy.clustering_based_context import *
 
 
-# --- BENCHMARK CONFIGURATION
-# doi = OutliernessComponent(["0", "1"])
-# doi_label = "outlierness"
-# doi = SortComponent(["0", "1"])
-# doi_label = "sort"
-doi = DensityComponent(bandwidth=5)
-doi_label = "density"
+# load benchmark configuration
+config = json.load(open("./config.json"))
 
-total_size = 10200  # total number of processed items, not nec. the size of the data
-chunk_size = 100  # number of new items retrieved per step
+# --- DATASET CONFIGURATION
+DATASET = config["datasets"][0]
+data_label = DATASET["data_label"]
+data_path = DATASET["data_path"]
+column_data_path = DATASET["column_data_path"]
+total_db_size = DATASET["total_db_size"]  # full size of database
+n_dims = DATASET["n_dims"]  # number of dimensions in the data
+numeric_columns = DATASET["numeric_columns"]  # columns used in the doi functions
+id_column = "tripID"  # TODO: fixed for now
+
+# --- DOI CONFIGURATION
+doi_label = config["doi_functions"][0]
+doi = DensityComponent(bandwidth=5) if doi_label == "density"\
+  else SortComponent(numeric_columns) if doi_label == "sort"\
+  else OutliernessComponent(numeric_columns)
+
+# --- REMAINING PARAMETERS OF THE BENCHMARKS
+PARAMETERS = config["parameters"][0]
+total_size = PARAMETERS["total_size"]  # total number of processed items, not nec. the size of the data
+chunk_size = PARAMETERS["chunk_size"]  # number of new items retrieved per step
+no_bins = PARAMETERS["no_bins"]  # number of bins used in doi histograms
+n_chunks = PARAMETERS["n_chunks"]  # number of chunks considered for context/updating
+max_age = PARAMETERS["max_age"]  # maximal age of the considered chunks
+
 chunks = round(total_size / chunk_size)  # number of steps
-no_bins = 10  # number of bins used in doi histograms
-
-n_chunks = 3  # number of chunks considered for context/updating
-max_age = 20  # maximal age of the considered chunks
 storage_size = chunk_size * max_age  # maximum size of storages
 
-# --- USE CASE CONFIGURATION
-# data_label = "taxis"
-# data_path = "../data/nyc_taxis.shuffled_full.csv.gz"
-# column_data_path = "../data/nyc_taxis.shuffled_full.parquet"
-# data_label = "blobs"
-# data_path = "../data/blobs.csv"
-# column_data_path = "../data/nyc_taxis.shuffled_full.parquet"  # not used, but required
-data_label = "swiss_roll"
-data_path = "../data/swiss_roll.csv"
-column_data_path = "../data/nyc_taxis.shuffled_full.parquet"  # not used, but required
+# create the path for storing the benchmark results if they do not exist
+path = f"./out/{data_label}/{doi_label}/{total_size}/{chunk_size}"
+if not exists("./out"):
+  os.mkdir("./out")
+if not exists(f"./out/{data_label}"):
+  os.mkdir(f"./out/{data_label}")
+if not exists(f"./out/{data_label}/{doi_label}"):
+  os.mkdir(f"./out/{data_label}/{doi_label}")
+if not exists(f"./out/{data_label}/{doi_label}/{total_size}"):
+  os.mkdir(f"./out/{data_label}/{doi_label}/{total_size}")
+if not exists(path):
+  os.mkdir(path)
 
-id_column = "tripID"
-# total_db_size = 112145904  # full size of database
-total_db_size = 1000000  # full size of database
-# n_dims = 17  # number of dimensions in the data
-n_dims = 2
-
-
+# all strategies are below
 storage_strategies = [
   ("no_storage_strategy", NoStorage()),
   ("compression_strategy", CompressionStorage(max_size=storage_size)),
@@ -112,19 +122,6 @@ context_strategies = [
 
 # altair visualizations use the data server extension to reduce notebook size
 alt.data_transformers.enable("data_server")
-
-# create the path for storing the benchmark results if they do not exist
-path = f"./out/{data_label}/{doi_label}/{total_size}/{chunk_size}"
-if not exists("./out"):
-  os.mkdir("./out")
-if not exists(f"./out/{data_label}"):
-  os.mkdir(f"./out/{data_label}")
-if not exists(f"./out/{data_label}/{doi_label}"):
-  os.mkdir(f"./out/{data_label}/{doi_label}")
-if not exists(f"./out/{data_label}/{doi_label}/{total_size}"):
-  os.mkdir(f"./out/{data_label}/{doi_label}/{total_size}")
-if not exists(path):
-  os.mkdir(path)
 
 
 # helper function that bins the doi column
