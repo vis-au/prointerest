@@ -14,6 +14,7 @@ from doi_component.sort_component import SortComponent
 from doi_component.outlierness_component import OutliernessComponent
 from doi_component.density_component import DensityComponent
 from doi_component.averageness_component import AveragenessComponent
+from doi_component.scagnostics_component import ScagnosticsComponent
 
 from database import initialize_db, drop_tables
 
@@ -49,14 +50,15 @@ numeric_columns = DATASET["numeric_columns"]  # columns used in the doi function
 id_column = "tripID"  # TODO: fixed for now
 
 # --- DOI CONFIGURATION
-doi_label = config["doi_functions"][3]
+doi_label = config["doi_functions"][4]
 doi = DensityComponent(bandwidth=5) if doi_label == "density"\
   else SortComponent(numeric_columns) if doi_label == "sort"\
   else OutliernessComponent(numeric_columns) if doi_label == "outlierness"\
-  else AveragenessComponent(numeric_columns)
+  else AveragenessComponent(numeric_columns) if doi_label == "averageness"\
+  else ScagnosticsComponent(numeric_columns)
 
 # --- REMAINING PARAMETERS OF THE BENCHMARKS
-PARAMETERS = config["parameters"][0]
+PARAMETERS = config["parameters"][1]
 total_size = PARAMETERS["total_size"]  # total number of processed items, not nec. the size of the data
 chunk_size = PARAMETERS["chunk_size"]  # number of new items retrieved per step
 no_bins = PARAMETERS["no_bins"]  # number of bins used in doi histograms

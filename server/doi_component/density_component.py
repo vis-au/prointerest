@@ -5,7 +5,7 @@ from sklearn.neighbors import KDTree
 
 
 class DensityComponent(DoiComponent):
-  def __init__(self, subspace=[], bandwidth=1) -> None:
+  def __init__(self, subspace: list[str], bandwidth=1) -> None:
       super().__init__()
       self.subspace: list[str] = subspace
       self.bandwidth: int = bandwidth

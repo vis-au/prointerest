@@ -20,8 +20,9 @@ SCATTERPLOT_AXES: dict[str, str] = {"x": None, "y": None}
 
 
 class ScagnosticsComponent(DoiComponent):
-    def __init__(self) -> None:
+    def __init__(self, subspace: list[str]) -> None:
         super().__init__()
+        self.subspace = subspace
         self.weights = {
             "outlying": 0.11,
             "skewed": 0.11,
@@ -49,7 +50,7 @@ class ScagnosticsComponent(DoiComponent):
         if len(X) == 0:
             return np.empty((0, ))
 
-        X_ = X.drop(columns=["id"])
+        X_ = X.select_dtypes(["number"]) if len(self.subspace) == 0 else X[self.subspace]
 
         # get scagnostics for the entire dataset
         results = scagnostics(X_)
