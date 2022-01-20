@@ -2,14 +2,15 @@
   "doi_functions": [
     "density",
     "sort",
-    "outlierness"
+    "outlierness",
+    "averageness"
   ],
   "parameters": [
     {
-      "total_size": 10200,
-      "chunk_size": 100,
-      "no_bins": 10,
+      "total_size": 12000,
+      "chunk_size": 1000,
       "n_chunks": 3,
+      "no_bins": 10,
       "max_age": 20
     }
   ],

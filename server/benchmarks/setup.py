@@ -13,6 +13,7 @@ path.append(f"{cwd}/..")
 from doi_component.sort_component import SortComponent
 from doi_component.outlierness_component import OutliernessComponent
 from doi_component.density_component import DensityComponent
+from doi_component.averageness_component import AveragenessComponent
 
 from database import initialize_db, drop_tables
 
@@ -38,7 +39,7 @@ from context_item_selection_strategy.clustering_based_context import *
 config = json.load(open("./config.json"))
 
 # --- DATASET CONFIGURATION
-DATASET = config["datasets"][0]
+DATASET = config["datasets"][1]
 data_label = DATASET["data_label"]
 data_path = DATASET["data_path"]
 column_data_path = DATASET["column_data_path"]
@@ -48,10 +49,11 @@ numeric_columns = DATASET["numeric_columns"]  # columns used in the doi function
 id_column = "tripID"  # TODO: fixed for now
 
 # --- DOI CONFIGURATION
-doi_label = config["doi_functions"][0]
+doi_label = config["doi_functions"][3]
 doi = DensityComponent(bandwidth=5) if doi_label == "density"\
   else SortComponent(numeric_columns) if doi_label == "sort"\
-  else OutliernessComponent(numeric_columns)
+  else OutliernessComponent(numeric_columns) if doi_label == "outlierness"\
+  else AveragenessComponent(numeric_columns)
 
 # --- REMAINING PARAMETERS OF THE BENCHMARKS
 PARAMETERS = config["parameters"][0]
@@ -116,7 +118,7 @@ context_strategies = [
     n_dims=n_dims, n_samples=chunk_size * n_chunks, storage=None
   )),
   ("clustering based", lambda: ClusteringBasedContext(
-    n_dims=n_dims, n_clusters=chunk_size, n_samples_per_cluster=n_chunks, storage=None
+    n_dims=n_dims, n_clusters=n_chunks, n_samples_per_cluster=chunk_size, storage=None
   ))
 ]
 
