@@ -13,16 +13,23 @@ class MostRecentChunkBasedContext(ContextItemSelectionStrategy):
         self.n_chunks = n_chunks  # how many most recent chunks should be returned as context?
 
     def get_context_ids(self, current_chunk: int):
-        # if the number of processed chunks is lower than the number of chunks that should be
-        # returned as context, just return all chunks.
-        if current_chunk < self.n_chunks:
-            latest_chunk = 0
-        else:
-            # return the last n_chunks chunks
-            latest_chunk = current_chunk - self.n_chunks
+        available_chunks = self.storage.get_available_chunks().tolist()
 
-        # assuming that storage is greater or equal in size as n_chunks * chunk_size
-        context_ids = get_from_processed([f"{CHUNK} > {latest_chunk}"], ID, as_df=True)
+        if len(available_chunks) == 0:
+            return empty((0, self.n_dims))
+        elif len(available_chunks) == 1:
+            available_chunks += available_chunks
+
+        # get the n most recent chunks from the database that are available in storage
+        context_ids = get_from_processed(
+            [
+                f"{CHUNK} > {current_chunk - self.n_chunks}",
+                f"{CHUNK} IN {tuple(available_chunks)}"
+            ],
+            ID,
+            as_df=True
+        )
+
         return context_ids[ID.lower()].to_numpy()
 
 
@@ -39,6 +46,7 @@ class RandomChunkBasedContext(ContextItemSelectionStrategy):
 
         if n_population == 0:
             return empty((0, self.n_dims))
+
         if current_chunk < self.n_chunks:
             chunks = all_chunks
         else:
