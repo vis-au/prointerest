@@ -23,6 +23,19 @@ class StorageStrategy:
 
         return self.storage[ID]
 
+    def get_chunks_for_ids(self, ids: list[str]) -> np.ndarray:
+        if len(ids) == 0:
+            return np.empty(0)
+        elif len(ids) == 1:
+            ids += ids
+
+        return get_from_processed(
+            [f"{ID} IN {tuple(ids)}"],
+            dimensions=CHUNK,
+            distinct=True,
+            as_df=True
+        )[CHUNK.lower()].to_numpy()
+
     def get_available_chunks(self) -> np.ndarray:
         ids = self.get_available_ids().to_numpy()
 
@@ -57,7 +70,7 @@ class StorageStrategy:
 
         return response.fetchdf() if as_df else response.fetchall()
 
-    def get_items_for_chunks(self, chunks: list[str], as_df=False):
+    def get_items_for_chunks(self, chunks: list[str], as_df=False) -> pd.DataFrame:
         if len(chunks) == 0:
             return pd.DataFrame()
 
