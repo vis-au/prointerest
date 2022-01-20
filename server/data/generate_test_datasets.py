@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from sklearn.datasets import make_blobs, make_swiss_roll
 
 
@@ -13,6 +14,11 @@ def generate_dataset(label: str, path: str, args):
     # write to file
     df = pd.DataFrame(dataset)
     df.to_csv(path, index_label="tripID")  # HACK until use case config is made globally available.
+
+
+def generate_sorted_dataset(size: int, path: str):
+  df = pd.DataFrame(np.arange(size))
+  df.to_csv(path, index_label="tripID")
 
 
 n_samples = 1000000
@@ -36,3 +42,4 @@ default_parameters = {
 if __name__ == "__main__":
   for key in default_parameters:
     generate_dataset(key, f"{path}/{key}.csv", default_parameters[key])
+  generate_sorted_dataset(1000000, f"{path}/sorted1M.csv")
