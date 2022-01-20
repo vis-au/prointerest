@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from numpy import empty
+from sklearn.utils.random import sample_without_replacement
 from sklearn.cluster import MiniBatchKMeans
 from database import ID, CHUNK, get_from_processed
 from storage_strategy.storage_strategy import StorageStrategy
@@ -32,7 +32,7 @@ class ClusteringBasedContext(ContextItemSelectionStrategy):
 
         self.clustering.partial_fit(numeric)
         labels = self.clustering.labels_
-        representatives = []
+        representatives = DataFrame()
 
         # sample a representative for every class
         for i in range(self.n_clusters):
@@ -44,7 +44,8 @@ class ClusteringBasedContext(ContextItemSelectionStrategy):
                 continue
 
             # pick the first elements in that class as a representative (could also pick randomly)
-            next_representatives = [data[labels == i].iloc[j] for j in range(no_picks)]
-            representatives += next_representatives
+            picks = sample_without_replacement(len(data[labels == i]), no_picks)
+            next_representatives = data[labels == i].iloc[picks]
+            representatives = representatives.append(next_representatives)
 
-        return DataFrame(representatives)
+        return representatives.reset_index(drop=True)
