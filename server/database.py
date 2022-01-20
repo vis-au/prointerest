@@ -217,13 +217,12 @@ def save_dois(ids: list, dois: list, bins: list):
 
 
 def get_dois(ids: list):
-  id_list = ""
-  for id in ids:
-    id_list += str(id)
-    if id != ids[-1]:
-      id_list += ","
-  query = f"SELECT {DOI} FROM {DOI_DB} WHERE {ID} IN ({id_list})"
-  return cursor.execute(query).fetchnumpy()
+  if len(ids) == 0:
+    return np.empty()
+  if len(ids) == 1:
+    ids += ids
+  query = f"SELECT {DOI} FROM {DOI_DB} WHERE {ID} IN {tuple(ids)}"
+  return cursor.execute(query).fetchnumpy()[DOI.lower()]
 
 
 def update_dois(ids: list, dois: list):

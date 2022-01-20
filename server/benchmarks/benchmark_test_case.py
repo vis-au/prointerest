@@ -68,8 +68,18 @@ class BenchmarkTestCase():
     # compute the doi values for the chunk with context items
     now = time()
     chunk_with_context = chunk.append(context)
-    new_doi = self.doi.compute_doi(chunk_with_context)[:len(chunk)]
+    doi = self.doi.compute_doi(chunk_with_context)
+    new_doi = doi[:len(chunk)]
     step.new_doi_time = time() - now
+
+    # get the current doi values for the context and add the newly computed doi as mean
+    if len(context) > 0:
+      new_context_doi = doi[len(chunk):]
+      context_ids = context[ID]
+      context_ids = context_ids.tolist()
+      old_context_doi = get_dois(context_ids).astype(np.float)
+      updated_context_doi = (new_context_doi + old_context_doi) / 2
+      update_dois(context_ids, updated_context_doi)
 
     # measure time for storing new values
     new_ids = chunk[ID].to_list()
@@ -115,14 +125,14 @@ class BenchmarkTestCase():
       chunk = get_next_chunk_from_db(self.chunk_size, as_df=True)
       step.chunk_time = time() - now
 
+      # compute doi using the strategies
+      self._apply_context_strategy(chunk, step, i)
+      self._apply_update_strategy(chunk, step, i)
+
       # measure inserting into storage time
       now = time()
       self.storage_strategy.insert_chunk(chunk)
       step.storage_time = time() - now
-
-      # compute doi using the strategies
-      self._apply_context_strategy(chunk, step, i)
-      self._apply_update_strategy(chunk, step, i)
 
       # measure step time
       step.step_time = time() - step.step_time
