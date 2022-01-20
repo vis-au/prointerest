@@ -18,8 +18,13 @@ class StorageStrategy:
         return None
 
     def get_available_ids(self) -> pd.Series:
-        if not self.is_storage_registered:
-            return pd.Series()
+        if not self.is_storage_registered and len(self.storage) > 0:
+            self.cursor.register(DF, self.storage)
+            self.is_storage_registered = True
+            return pd.DataFrame()
+        elif len(self.storage) == 0:
+            print("nothing in storage")
+            return pd.DataFrame()
 
         return self.storage[ID]
 
@@ -40,7 +45,7 @@ class StorageStrategy:
         ids = self.get_available_ids().to_numpy()
 
         if len(ids) == 0:
-            return pd.DataFrame()
+            return np.empty(0)
         elif len(ids) == 1:
             ids += ids
 
