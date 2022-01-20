@@ -77,35 +77,35 @@ storage_strategies = [
 ]
 
 update_strategies = [
-  ("no update", NoUpdate(
+  ("no update", lambda: NoUpdate(
     n_dims=n_dims, storage=None
   )),
-  ("oldest n chunks", OldestChunksUpdate(
+  ("oldest n chunks", lambda: OldestChunksUpdate(
     n_dims=n_dims, storage=None, n_chunks=n_chunks, max_age=max_age
   )),
-  ("last n chunks", LastNChunksUpdate(
+  ("last n chunks", lambda: LastNChunksUpdate(
     n_dims=n_dims, storage=None, n_chunks=n_chunks
   )),
-  ("regular intervals", RegularIntervalUpdate(
+  ("regular intervals", lambda: RegularIntervalUpdate(
     n_dims=n_dims, storage=None, n_chunks=n_chunks, max_age=max_age
   )),
   # ("outdated bins", OutdatedBinUpdate(n_dims=n_dims, storage=None))
 ]
 
 context_strategies = [
-  ("no context", NoContext(
+  ("no context", lambda: NoContext(
     n_dims=n_dims, storage=None
   )),
-  ("random chunk based", RandomChunkBasedContext(
+  ("random chunk based", lambda: RandomChunkBasedContext(
     n_dims=n_dims, n_chunks=n_chunks, storage=None
   )),
-  ("most recent chunk based", MostRecentChunkBasedContext(
+  ("most recent chunk based", lambda: MostRecentChunkBasedContext(
     n_dims=n_dims, n_chunks=n_chunks, storage=None
   )),
-  ("sampling based", RandomSamplingBasedContext(
+  ("sampling based", lambda: RandomSamplingBasedContext(
     n_dims=n_dims, n_samples=chunk_size * n_chunks, storage=None
   )),
-  ("clustering based", ClusteringBasedContext(
+  ("clustering based", lambda: ClusteringBasedContext(
     n_dims=n_dims, n_clusters=chunk_size, n_samples_per_cluster=n_chunks, storage=None
   ))
 ]
