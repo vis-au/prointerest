@@ -38,9 +38,11 @@ from context_item_selection_strategy.clustering_based_context import *
 
 # load benchmark configuration
 config = json.load(open("./config.json"))
+doi_label = config["doi_functions"][1]
+DATASET = config["datasets"][0]
+PARAMETERS = config["parameters"][1]
 
 # --- DATASET CONFIGURATION
-DATASET = config["datasets"][3]
 data_label = DATASET["data_label"]
 data_path = DATASET["data_path"]
 column_data_path = DATASET["column_data_path"]
@@ -50,7 +52,6 @@ numeric_columns = DATASET["numeric_columns"]  # columns used in the doi function
 id_column = "tripID"  # TODO: fixed for now
 
 # --- DOI CONFIGURATION
-doi_label = config["doi_functions"][1]
 doi = DensityComponent(bandwidth=5) if doi_label == "density"\
   else SortComponent(numeric_columns) if doi_label == "sort"\
   else OutliernessComponent(numeric_columns) if doi_label == "outlierness"\
@@ -58,7 +59,6 @@ doi = DensityComponent(bandwidth=5) if doi_label == "density"\
   else ScagnosticsComponent(numeric_columns)
 
 # --- REMAINING PARAMETERS OF THE BENCHMARKS
-PARAMETERS = config["parameters"][0]
 total_size = PARAMETERS["total_size"]  # total number of processed items, not nec. the size of the data
 chunk_size = PARAMETERS["chunk_size"]  # number of new items retrieved per step
 no_bins = PARAMETERS["no_bins"]  # number of bins used in doi histograms
@@ -174,7 +174,7 @@ def reset():
     column_data_path=column_data_path,
     id_column=id_column,
     total_size=total_db_size,
-    # process_chunk_callback=taxi_process_chunk
+    process_chunk_callback=taxi_process_chunk if "taxis" in data_label else None
   )
 
 
