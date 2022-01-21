@@ -17,6 +17,9 @@ class StorageStrategy:
     def insert_chunk(self, chunk: pd.DataFrame) -> None:
         return None
 
+    def get_available_items(self) -> pd.DataFrame:
+        return self.storage
+
     def get_available_ids(self) -> pd.Series:
         if not self.is_storage_registered and len(self.storage) > 0:
             self.cursor.register(DF, self.storage)
