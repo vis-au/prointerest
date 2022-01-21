@@ -38,8 +38,8 @@ from context_item_selection_strategy.clustering_based_context import *
 
 # load benchmark configuration
 config = json.load(open("./config.json"))
-doi_label = config["doi_functions"][1]
-DATASET = config["datasets"][0]
+doi_label = config["doi_functions"][0]
+DATASET = config["datasets"][1]
 PARAMETERS = config["parameters"][1]
 
 # --- DATASET CONFIGURATION
@@ -52,7 +52,7 @@ numeric_columns = DATASET["numeric_columns"]  # columns used in the doi function
 id_column = "tripID"  # TODO: fixed for now
 
 # --- DOI CONFIGURATION
-doi = DensityComponent(bandwidth=5) if doi_label == "density"\
+doi = DensityComponent(numeric_columns, bandwidth=5) if doi_label == "density"\
   else SortComponent(numeric_columns) if doi_label == "sort"\
   else OutliernessComponent(numeric_columns) if doi_label == "outlierness"\
   else AveragenessComponent(numeric_columns) if doi_label == "averageness"\
@@ -67,6 +67,11 @@ max_age = PARAMETERS["max_age"]  # maximal age of the considered chunks
 
 chunks = round(total_size / chunk_size)  # number of steps
 storage_size = chunk_size * max_age  # maximum size of storages
+
+short_test_case_title = f"doi: {doi_label}, items: {total_size}, chunk size: {chunk_size}"
+full_test_case_title = f"{short_test_case_title}, data: {data_label},\n"\
+                       f"chunk/strat.: {n_chunks}, bins: {no_bins}, max age: {max_age}\n"
+
 
 # create the path for storing the benchmark results if they do not exist
 path = f"./out/{data_label}/{doi_label}/{total_size}/{chunk_size}"
