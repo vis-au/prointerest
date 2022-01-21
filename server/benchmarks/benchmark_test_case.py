@@ -18,6 +18,7 @@ class BenchmarkTestCaseStep():
     self.chunk_time = 0  # time to retrieve the data
     self.storage_time = 0  # time to save the data
     self.context_time = 0  # time to retrieve context data
+    self.update_context_dois_time = 0  # time to update context dois
     self.outdated_time = 0  # time to retrieve outdated data
     self.new_doi_time = 0  # time to compute the new doi values
     self.old_doi_time = 0  # time to recompute the outdated doi values
@@ -26,8 +27,8 @@ class BenchmarkTestCaseStep():
 
   def __str__(self) -> str:
     return f"{self.step_number},{self.chunk_time},{self.storage_time},{self.context_time},"\
-           f"{self.outdated_time},{self.new_doi_time},{self.old_doi_time},{self.store_new_time},"\
-           f"{self.update_dois_time},{self.step_time}"
+           f"{self.update_context_dois_time},{self.outdated_time},{self.new_doi_time},"\
+           f"{self.old_doi_time},{self.store_new_time},{self.update_dois_time},{self.step_time}"
 
 
 class BenchmarkTestCase():
@@ -52,8 +53,8 @@ class BenchmarkTestCase():
     self.doi_csv_path = None  # set once this test case is run
 
   def __str__(self):
-    output = "chunk,chunk_time,storage_time,context_time,outdated_time,new_doi_time,old_doi_time,"\
-             "store_new_time,update_dois_time,total_time\n"
+    output = "chunk,chunk_time,storage_time,context_time,update_context_dois_time,outdated_time,"\
+             "new_doi_time,old_doi_time,store_new_time,update_dois_time,total_time\n"
     for step in self.test_case_steps:
       output = f"{output}{step}\n"
     return output
@@ -73,6 +74,7 @@ class BenchmarkTestCase():
     step.new_doi_time = time() - now
 
     # get the current doi values for the context and add the newly computed doi as mean
+    now = time()
     if len(context) > 0:
       new_context_doi = doi[len(chunk):]
       context_ids = context[ID]
@@ -80,6 +82,7 @@ class BenchmarkTestCase():
       old_context_doi = get_dois(context_ids).astype(np.float)
       updated_context_doi = (new_context_doi + old_context_doi) / 2
       update_dois(context_ids, updated_context_doi)
+    step.update_context_doi_time = time() - now
 
     # measure time for storing new values
     new_ids = chunk[ID].to_list()
