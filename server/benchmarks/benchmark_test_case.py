@@ -102,16 +102,18 @@ class BenchmarkTestCase():
       step.update_dois_time = 0
       return
 
-    # update the doi values for outdated items
+    # recompute the doi values for outdated items
     now = time()
     chunk_with_outdated = chunk.append(outdated)
-    old_doi = self.doi.compute_doi(chunk_with_outdated)[len(chunk):]
+    new_outdated_doi = self.doi.compute_doi(chunk_with_outdated)[len(chunk):]
     step.old_doi_time = time() - now
 
     # measure time for updating values
-    old_ids = outdated[ID].to_list()
+    outdated_ids = outdated[ID].to_list()
     now = time()
-    update_dois(old_ids, old_doi)
+    old_outdated_doi = get_dois(outdated_ids).astype(np.float)
+    updated_context_doi = (new_outdated_doi + old_outdated_doi) / 2
+    update_dois(outdated_ids, updated_context_doi)
     step.update_dois_time = time() - now
 
   @final
