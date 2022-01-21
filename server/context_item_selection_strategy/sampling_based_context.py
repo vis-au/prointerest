@@ -1,9 +1,6 @@
-from os import listdir
-from numpy import empty
 from sklearn.utils.random import sample_without_replacement
 from .context_item_selection_strategy import ContextItemSelectionStrategy
 from storage_strategy.storage_strategy import StorageStrategy
-from database import ID, get_from_processed
 
 
 class RandomSamplingBasedContext(ContextItemSelectionStrategy):

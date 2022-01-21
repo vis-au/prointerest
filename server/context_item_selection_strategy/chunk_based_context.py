@@ -1,7 +1,7 @@
 from numpy import empty
 from sklearn.utils.random import sample_without_replacement
 
-from database import ID, CHUNK, get_from_processed
+from database import ID
 from storage_strategy.storage_strategy import StorageStrategy
 
 from .context_item_selection_strategy import ContextItemSelectionStrategy
@@ -13,24 +13,20 @@ class MostRecentChunkBasedContext(ContextItemSelectionStrategy):
         self.n_chunks = n_chunks  # how many most recent chunks should be returned as context?
 
     def get_context_ids(self, current_chunk: int):
-        available_chunks = self.storage.get_available_chunks().tolist()
-
-        if len(available_chunks) == 0:
-            return empty((0, self.n_dims))
-        elif len(available_chunks) == 1:
-            available_chunks += available_chunks
-
         # get the n most recent chunks from the database that are available in storage
-        context_ids = get_from_processed(
-            [
-                f"{CHUNK} > {current_chunk - self.n_chunks}",
-                f"{CHUNK} IN {tuple(available_chunks)}"
-            ],
-            ID,
+        stored_chunks = self.storage.get_available_chunks()
+        most_recent_chunks = stored_chunks[-self.n_chunks:]
+
+        most_recent_items = self.storage.get_items_for_chunks(
+            most_recent_chunks.tolist(),
             as_df=True
         )
 
-        return context_ids[ID.lower()].to_numpy()
+        if len(most_recent_items) == 0:
+            return empty(0)
+
+        most_recent_ids = most_recent_items[ID].to_numpy()
+        return most_recent_ids
 
 
 class RandomChunkBasedContext(ContextItemSelectionStrategy):
@@ -47,7 +43,7 @@ class RandomChunkBasedContext(ContextItemSelectionStrategy):
         if n_population == 0:
             return empty((0, self.n_dims))
 
-        if current_chunk < self.n_chunks:
+        if n_population < self.n_chunks:
             chunks = all_chunks
         else:
             sampled_indeces = sample_without_replacement(n_population, self.n_chunks)
