@@ -3,7 +3,7 @@ from .storage_strategy import DF, ID, CHUNK, StorageStrategy
 
 
 class WindowingStorage(StorageStrategy):
-    def insert_chunk(self, chunk: pd.DataFrame, chunk_no: int = -1):
+    def insert_chunk(self, chunk: pd.DataFrame, chunk_no: int):
         if len(self.storage) > 0 and self.storage.shape[1] != chunk.shape[1]:
             print("chunk does not match shape of data in storage. aborting ...")
             return
