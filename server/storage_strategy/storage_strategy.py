@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import duckdb
 
-from database import ID, CHUNK, get_from_processed
+from database import ID, CHUNK
 
 DF = "stored_db"
 
