@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import duckdb
 
-from database import ID, CHUNK
+from database import ID, CHUNK, get_dois
 
 DF = "stored_db"
 
@@ -25,18 +25,21 @@ class StorageStrategy:
         if not self.is_storage_registered and len(self.storage) > 0:
             self.cursor.register(DF, self.storage)
             self.is_storage_registered = True
-            return pd.DataFrame()
+            return pd.Series()
         elif len(self.storage) == 0:
             print("nothing in storage")
-            return pd.DataFrame()
+            return pd.Series()
 
         return self.storage[ID]
 
-    def get_chunks_for_ids(self, ids: list[str]) -> np.ndarray:
-        if len(ids) == 0:
-            return np.empty(0)
+    def get_available_dois(self, with_ids=False) -> np.ndarray:
+        available_ids = self.get_available_ids().tolist()
+        available_dois = get_dois(available_ids)
 
-        return self.chunk_storage[self.chunk_storage[ID].isin(ids)][CHUNK].to_numpy()
+        if with_ids:
+            return np.array([available_ids, available_dois]).T
+        else:
+            return available_dois
 
     def get_available_chunks(self) -> np.ndarray:
         if len(self.chunk_storage) == 0:
@@ -70,3 +73,15 @@ class StorageStrategy:
         items_for_ids = self.storage[self.storage[ID].isin(ids_for_chunks[ID].tolist())]
 
         return items_for_ids if as_df else items_for_ids.to_numpy()
+
+    def get_doi_for_ids(self, ids: list) -> np.ndarray:
+        if len(ids) == 0:
+            return np.empty(0)
+
+        return get_dois(ids)
+
+    def get_chunks_for_ids(self, ids: list[str]) -> np.ndarray:
+        if len(ids) == 0:
+            return np.empty(0)
+
+        return self.chunk_storage[self.chunk_storage[ID].isin(ids)][CHUNK].to_numpy()

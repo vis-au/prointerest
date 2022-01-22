@@ -218,7 +218,7 @@ def save_dois(ids: list, dois: list, bins: list):
 
 def get_dois(ids: list):
   if len(ids) == 0:
-    return np.empty()
+    return np.empty(0)
   if len(ids) == 1:
     ids += ids
   query = f"SELECT {DOI} FROM {DOI_DB} WHERE {ID} IN {tuple(ids)}"
