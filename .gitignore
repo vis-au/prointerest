@@ -5,3 +5,4 @@ node_modules
 /package
 __pycache__
 *.pyc
+venv/
