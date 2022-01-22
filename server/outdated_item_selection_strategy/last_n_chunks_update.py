@@ -1,6 +1,7 @@
+from numpy import empty
 from .outdated_item_selection_strategy import OutdatedItemSelectionStrategy
 from storage_strategy.storage_strategy import StorageStrategy
-from database import ID, CHUNK, get_from_processed
+from database import ID
 
 
 class LastNChunksUpdate(OutdatedItemSelectionStrategy):
@@ -18,12 +19,13 @@ class LastNChunksUpdate(OutdatedItemSelectionStrategy):
         self.n_chunks = n_chunks
 
     def get_outdated_ids(self, current_chunk: int):
-        res = get_from_processed(
-            [
-                f"{CHUNK} >= {current_chunk - self.n_chunks}",
-                f"{CHUNK} < {current_chunk}"
-            ],
-            as_df=True
-        )
+        self.storage.get_available_chunks()
+        last_n_chunks = list(range(current_chunk, current_chunk - self.n_chunks))
+        outdated_items = self.storage.get_items_for_chunks(last_n_chunks, as_df=True)
 
-        return res[ID.lower()].to_numpy()
+        if len(outdated_items) == 0:
+            return empty((0, self.n_dims))
+
+        outdated_ids = outdated_items[ID]
+
+        return outdated_ids
