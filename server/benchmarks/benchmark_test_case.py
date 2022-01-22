@@ -136,7 +136,7 @@ class BenchmarkTestCase():
 
       # measure inserting into storage time
       now = time()
-      self.storage_strategy.insert_chunk(chunk)
+      self.storage_strategy.insert_chunk(chunk, i)
       step.storage_time = time() - now
 
       # measure step time
