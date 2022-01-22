@@ -42,14 +42,14 @@ class ClusteringBasedContext(ContextItemSelectionStrategy):
         # sample a representative for every class
         for i in range(self.n_clusters):
             # determine how many items to pick from this cluster
-            no_picks = min(self.n_samples_per_cluster, len(stored_items[labels == i]))
+            n_picks = min(self.n_samples_per_cluster, len(stored_items[labels == i]))
 
             # if no item can be found in that class, skip
-            if no_picks == 0:
+            if n_picks == 0:
                 continue
 
             # pick the first elements in that class as a representative (could also pick randomly)
-            picks = sample_without_replacement(len(stored_items[labels == i]), no_picks)
+            picks = sample_without_replacement(len(stored_items[labels == i]), n_picks)
             next_representatives = stored_items[labels == i].iloc[picks]
             representatives = representatives.append(next_representatives)
 

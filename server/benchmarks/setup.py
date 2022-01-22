@@ -34,12 +34,13 @@ from context_item_selection_strategy.no_context import *
 from context_item_selection_strategy.chunk_based_context import *
 from context_item_selection_strategy.sampling_based_context import *
 from context_item_selection_strategy.clustering_based_context import *
+from context_item_selection_strategy.doi_based_context import DoiBasedContext
 
 
 # load benchmark configuration
 config = json.load(open("./config.json"))
 doi_label = config["doi_functions"][0]
-DATASET = config["datasets"][1]
+DATASET = config["datasets"][2]
 PARAMETERS = config["parameters"][1]
 
 # --- DATASET CONFIGURATION
@@ -59,9 +60,9 @@ doi = DensityComponent(numeric_columns, bandwidth=5) if doi_label == "density"\
   else ScagnosticsComponent(numeric_columns)
 
 # --- REMAINING PARAMETERS OF THE BENCHMARKS
-total_size = PARAMETERS["total_size"]  # total number of processed items, not nec. the size of the data
+total_size = PARAMETERS["total_size"]  # total number of processed items, not nec. the dataset size
 chunk_size = PARAMETERS["chunk_size"]  # number of new items retrieved per step
-no_bins = PARAMETERS["no_bins"]  # number of bins used in doi histograms
+n_bins = PARAMETERS["n_bins"]  # number of bins used in doi histograms
 n_chunks = PARAMETERS["n_chunks"]  # number of chunks considered for context/updating
 max_age = PARAMETERS["max_age"]  # maximal age of the considered chunks
 
@@ -70,7 +71,7 @@ storage_size = chunk_size * max_age  # maximum size of storages
 
 short_test_case_title = f"doi: {doi_label}, items: {total_size}, chunk size: {chunk_size}"
 full_test_case_title = f"{short_test_case_title}, data: {data_label},\n"\
-                       f"chunk/strat.: {n_chunks}, bins: {no_bins}, max age: {max_age}\n"
+                       f"chunk/strat.: {n_chunks}, bins: {n_bins}, max age: {max_age}\n"
 
 
 # create the path for storing the benchmark results if they do not exist
@@ -126,7 +127,10 @@ context_strategies = [
   )),
   ("clustering based", lambda: ClusteringBasedContext(
     n_dims=n_dims, n_clusters=n_chunks, n_samples_per_cluster=chunk_size, storage=None
-  ))
+  )),
+  ("doi based", lambda: DoiBasedContext(
+    n_dims=n_dims, n_bins=n_bins, n_samples=n_chunks*chunk_size, storage=None
+  )),
 ]
 
 # altair visualizations use the data server extension to reduce notebook size
@@ -135,7 +139,7 @@ alt.data_transformers.enable("data_server")
 
 # helper function that bins the doi column
 def get_doi_bins_df(doi_df: pd.DataFrame, with_labels=False) -> pd.DataFrame:
-  histogram, edges = np.histogram(doi_df["doi"], bins=no_bins, range=(0, 1))
+  histogram, edges = np.histogram(doi_df["doi"], bins=n_bins, range=(0, 1))
   bins_df = pd.DataFrame(histogram.transpose())
 
   if with_labels:
@@ -154,7 +158,7 @@ def get_doi_delta_bins_df(doi_bins_a: pd.DataFrame, doi_bins_b: pd.DataFrame):
   # delta_bins["delta"] = bins_a[0]
 
   # add context info
-  delta_bins["bin"] = delta_bins.index / no_bins
+  delta_bins["bin"] = delta_bins.index / n_bins
   return delta_bins
 
 
