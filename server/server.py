@@ -8,7 +8,6 @@ from doi_component.scagnostics_component import SCATTERPLOT_AXES
 app = Flask(__name__)
 
 
-
 def cors_response(payload):
   response = jsonify(payload)
   response.headers.add("Access-Control-Allow-Origin", "*")
@@ -135,7 +134,7 @@ def send_configuration(component):
 def send_interaction():
   res = json.loads(request.data)
   ids = res["ids"]
-  mode = res["mode"] # "brush", "zoom", "selection"
+  mode = res["mode"]  # "brush", "zoom", "selection"
 
   log_interaction(mode, ids)
 
@@ -161,8 +160,8 @@ def get_prediction():
   return cors_response([])
 
 
-data_path = "../data/nyc_taxis.shuffled_full.csv.gz"
-column_data_path = "../data/nyc_taxis.shuffled_full.parquet"
+data_path = "./data/nyc_taxis.shuffled_full.csv.gz"
+column_data_path = "./data/nyc_taxis.shuffled_full.parquet"
 id_column = "tripID"
 total_db_size = 112145904  # full size of database
 n_dims = 17  # number of dimensions in the data

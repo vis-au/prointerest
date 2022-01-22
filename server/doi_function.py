@@ -35,22 +35,28 @@ def set_component_weights(weights: dict[str, list[float]]):
   COMPONENT_WEIGHTS["prior"] = weights["prior"]
   COMPONENT_WEIGHTS["posterior"] = weights["posterior"]
 
+
 def set_prior_weights(weights: dict[str, list[float]]):
   global PRIOR_WEIGHTS
   PRIOR_WEIGHTS = weights
+
 
 def set_posterior_weights(weights: dict[str, float]):
   global POSTERIOR_WEIGHTS
   POSTERIOR_WEIGHTS = weights
 
+
 def set_scagnostic_weights(weights: dict[str, float]):
   scagnostics_comp.weights = weights
+
 
 def set_provenance_weights(weights: dict[str, float]):
   provenance_comp.weights = weights
 
+
 def set_outlierness_weights(weights: dict[str, float]):
   outlierness_comp.weights = weights
+
 
 def set_doi_classes(classes: int):
   global DOI_CLASSES
@@ -61,9 +67,11 @@ def set_dimensions_of_interest(dimensions: list[str]):
   global dimensions_of_interest
   dimensions_of_interest = dimensions
 
+
 def set_dimension_range_of_interest(dimension: str, min_value: float, max_value: float):
   global ranges_of_interest
   ranges_of_interest[dimension] = [min_value, max_value]
+
 
 def set_outlierness_metric(metric: str):
   global outlierness_metric
@@ -77,7 +85,7 @@ current_interactions = 0
 progressive_sampler = ProgressiveBinSampler(n_dims=20) # taxi dataset has 20 dimensions
 outlierness_comp = OutliernessComponent([5, 17])
 provenance_comp = ProvenanceComponent()
-scagnostics_comp = ScagnosticsComponent()
+scagnostics_comp = ScagnosticsComponent([5, 17])
 
 
 def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: list[any]):
@@ -91,6 +99,7 @@ def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: 
   df["id"] = df.index
 
   current_interactions += 1
+
 
 def doi_f(X: np.ndarray):
   df = pd.DataFrame(X)
@@ -108,6 +117,7 @@ def doi_f(X: np.ndarray):
 
 doi_module = ActualDoiEvaluator(doi=doi_f, n_dims=20)
 items_processed = 0
+
 
 def compute_dois(items: list[list[Any]]):
   global current_chunk
