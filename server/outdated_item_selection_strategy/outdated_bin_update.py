@@ -1,6 +1,5 @@
-import numpy as np
+from numpy import empty
 from .outdated_item_selection_strategy import OutdatedItemSelectionStrategy
-from database import ID, CHUNK, get_from_processed
 
 
 class OutdatedBinUpdate(OutdatedItemSelectionStrategy):
@@ -15,9 +14,8 @@ class OutdatedBinUpdate(OutdatedItemSelectionStrategy):
     def get_outdated_ids(self, current_chunk: int):
         outdated = self.get_outdated_bins()
         if len(outdated) == 0:
-            return np.empty((0,))
+            return empty((0,))
         if len(outdated) == 1:
             outdated += outdated  # make sure tuple() below works
-        res = get_from_processed([f"{CHUNK} IN {tuple(outdated)}"], as_df=True)
 
-        return res[ID.lower()].to_numpy()
+        return empty((0,))
