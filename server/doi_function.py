@@ -24,7 +24,7 @@ POSTERIOR_WEIGHTS = {
   "scagnostics": .5
 }
 
-DOI_CLASSES = 10 # number of clusters the doi values are grouped into
+DOI_CLASSES = 10  # number of clusters the doi values are grouped into
 
 dimensions_of_interest: list[str] = []
 ranges_of_interest: dict[str, float] = {}
@@ -82,7 +82,7 @@ def set_outlierness_metric(metric: str):
 current_chunk = 0
 current_interactions = 0
 
-progressive_sampler = ProgressiveBinSampler(n_dims=20) # taxi dataset has 20 dimensions
+progressive_sampler = ProgressiveBinSampler(n_dims=20)  # taxi dataset has 20 dimensions
 outlierness_comp = OutliernessComponent([5, 17])
 provenance_comp = ProvenanceComponent()
 scagnostics_comp = ScagnosticsComponent([5, 17])
@@ -91,7 +91,7 @@ scagnostics_comp = ScagnosticsComponent([5, 17])
 def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: list[any]):
   global current_interactions
   provenance_comp.add_interaction([
-    current_interactions, mode, np.array(items)[:,0]
+    current_interactions, mode, np.array(items)[:, 0]
   ])
   df = pd.DataFrame(items)
   df = df.drop(columns=[2, 3, 7, 18, 19])

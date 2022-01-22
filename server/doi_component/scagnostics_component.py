@@ -1,6 +1,6 @@
-from pyscagnostics import scagnostics
 import pandas as pd
 import numpy as np
+# from pyscagnostics import scagnostics
 
 from .doi_component import DoiComponent
 
@@ -36,7 +36,8 @@ class ScagnosticsComponent(DoiComponent):
         }
 
     def _compute_scagnostics(self, df):
-        return scagnostics(df)
+        # return scagnostics(df)
+        return np.zeros((len(df), ))  # pyscagnostics does not work with python version >= 3.9
 
     def _get_mean_scangostics(self, result_generator):
         all_results = []
@@ -53,12 +54,12 @@ class ScagnosticsComponent(DoiComponent):
         X_ = X.select_dtypes(["number"]) if len(self.subspace) == 0 else X[self.subspace]
 
         # get scagnostics for the entire dataset
-        results = scagnostics(X_)
+        results = self._compute_scagnostics(X_)
         mean_all = self._get_mean_scangostics(results)
 
         # compute scagnostics without each item
         generators = X_.apply(
-            lambda item: scagnostics(X_[X_.index != item.name]), axis=1
+            lambda item: self._compute_scagnostics(X_[X_.index != item.name]), axis=1
         )
         mean_per_item = generators.apply(self._get_mean_scangostics)
 
