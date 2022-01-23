@@ -39,12 +39,12 @@ from context_item_selection_strategy.doi_based_context import DoiBasedContext
 
 # load benchmark configuration
 config = json.load(open("./config.json"))
-doi_label = config["doi_functions"][0]
-DATASET = config["datasets"][2]
+doi_label = "sort"
+data_label = "sorted1M"
 PARAMETERS = config["parameters"][1]
 
 # --- DATASET CONFIGURATION
-data_label = DATASET["data_label"]
+DATASET = config["datasets"][data_label]
 data_path = DATASET["data_path"]
 column_data_path = DATASET["column_data_path"]
 total_db_size = DATASET["total_db_size"]  # full size of database

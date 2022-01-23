@@ -29,8 +29,8 @@
       "max_age": 20
     }
   ],
-  "datasets": [
-    {
+  "datasets": {
+    "taxis-shuffled": {
       "data_label": "taxis-shuffled",
       "data_path": "../data/nyc_taxis.shuffled_full.csv.gz",
       "column_data_path": "../data/nyc_taxis.shuffled_full.parquet",
@@ -38,15 +38,15 @@
       "n_dims": 17,
       "numeric_columns": ["duration", "ratio"]
     },
-    {
+    "taxis-unshuffled": {
       "data_label": "taxis-unshuffled",
       "data_path": "../data/nyc_taxis.unshuffled_full.csv.gz",
-      "column_data_path": "../data/nyc_taxis.shuffled_full.parquet",
+      "column_data_path": "../data/nyc_taxis.unshuffled_full.parquet",
       "total_db_size": 112145904,
       "n_dims": 17,
       "numeric_columns": ["duration", "ratio"]
     },
-    {
+    "swiss_roll": {
       "data_label": "swiss_roll",
       "data_path": "../data/swiss_roll.csv",
       "column_data_path": "../data/nyc_taxis.shuffled_full.parquet",
@@ -54,7 +54,7 @@
       "n_dims": 2,
       "numeric_columns": ["0", "1"]
     },
-    {
+    "blobs": {
       "data_label": "blobs",
       "data_path": "../data/blobs.csv",
       "column_data_path": "../data/nyc_taxis.shuffled_full.parquet",
@@ -62,7 +62,7 @@
       "n_dims": 2,
       "numeric_columns": ["0", "1"]
     },
-    {
+    "sorted1M": {
       "data_label": "sorted1M",
       "data_path": "../data/sorted1M.csv",
       "column_data_path": "../data/nyc_taxis.shuffled_full.parquet",
@@ -70,5 +70,5 @@
       "n_dims": 1,
       "numeric_columns": ["0"]
     }
-  ]
+  }
 }
