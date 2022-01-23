@@ -10,37 +10,17 @@ import altair as alt
 cwd = os.getcwd()
 path.append(f"{cwd}/..")
 
-from doi_component.sort_component import SortComponent
-from doi_component.outlierness_component import OutliernessComponent
-from doi_component.density_component import DensityComponent
-from doi_component.averageness_component import AveragenessComponent
-from doi_component.scagnostics_component import ScagnosticsComponent
-
+from doi_components import *
+from storage_strategies import *
+from context_strategies import *
+from update_strategies import *
 from database import initialize_db, drop_tables
-
-from storage_strategy.no_storage import *
-from storage_strategy.compression_storage import *
-from storage_strategy.progressive_bin_sampler import *
-from storage_strategy.reservoir_sampling_storage import *
-from storage_strategy.windowing_storage import *
-
-from outdated_item_selection_strategy.no_update import *
-from outdated_item_selection_strategy.oldest_chunks_update import *
-from outdated_item_selection_strategy.last_n_chunks_update import *
-from outdated_item_selection_strategy.regular_interval_update import *
-from outdated_item_selection_strategy.outdated_bin_update import *
-
-from context_item_selection_strategy.no_context import *
-from context_item_selection_strategy.chunk_based_context import *
-from context_item_selection_strategy.sampling_based_context import *
-from context_item_selection_strategy.clustering_based_context import *
-from context_item_selection_strategy.doi_based_context import DoiBasedContext
 
 
 # load benchmark configuration
 config = json.load(open("./config.json"))
-doi_label = "sort"
-data_label = "sorted1M"
+doi_label = "density"
+data_label = "4blobs"
 PARAMETERS = config["parameters"][1]
 
 # --- DATASET CONFIGURATION
@@ -53,11 +33,7 @@ numeric_columns = DATASET["numeric_columns"]  # columns used in the doi function
 id_column = "tripID"  # TODO: fixed for now
 
 # --- DOI CONFIGURATION
-doi = DensityComponent(numeric_columns, bandwidth=5) if doi_label == "density"\
-  else SortComponent(numeric_columns) if doi_label == "sort"\
-  else OutliernessComponent(numeric_columns) if doi_label == "outlierness"\
-  else AveragenessComponent(numeric_columns) if doi_label == "averageness"\
-  else ScagnosticsComponent(numeric_columns)
+doi = get_doi_component(doi_label, numeric_columns)
 
 # --- REMAINING PARAMETERS OF THE BENCHMARKS
 total_size = PARAMETERS["total_size"]  # total number of processed items, not nec. the dataset size
@@ -68,6 +44,11 @@ max_age = PARAMETERS["max_age"]  # maximal age of the considered chunks
 
 chunks = round(total_size / chunk_size)  # number of steps
 storage_size = chunk_size * max_age  # maximum size of storages
+
+# load strategies
+storage_strategies = get_storage_strategies(storage_size)
+context_strategies = get_context_strategies(n_dims, n_chunks, chunk_size, n_bins)
+update_strategies = get_update_strategies(n_dims, n_chunks, max_age)
 
 short_test_case_title = f"doi: {doi_label}, items: {total_size}, chunk size: {chunk_size}"
 full_test_case_title = f"{short_test_case_title}, data: {data_label},\n"\
@@ -86,52 +67,6 @@ if not exists(f"./out/{data_label}/{doi_label}/{total_size}"):
   os.mkdir(f"./out/{data_label}/{doi_label}/{total_size}")
 if not exists(path):
   os.mkdir(path)
-
-# all strategies are below
-storage_strategies = [
-  ("no_storage_strategy", NoStorage()),
-  ("compression_strategy", CompressionStorage(max_size=storage_size)),
-  ("progressive_bin_sampler", ProgressiveBinSampler()),
-  ("reservoir_sampling_strategy", ReservoirSamplingStorage(max_size=storage_size)),
-  ("windowing_strategy", WindowingStorage(max_size=storage_size))
-]
-
-update_strategies = [
-  ("no update", lambda: NoUpdate(
-    n_dims=n_dims, storage=None
-  )),
-  ("oldest n chunks", lambda: OldestChunksUpdate(
-    n_dims=n_dims, storage=None, n_chunks=n_chunks, max_age=max_age
-  )),
-  ("last n chunks", lambda: LastNChunksUpdate(
-    n_dims=n_dims, storage=None, n_chunks=n_chunks
-  )),
-  ("regular intervals", lambda: RegularIntervalUpdate(
-    n_dims=n_dims, storage=None, n_chunks=n_chunks, max_age=max_age
-  )),
-  # ("outdated bins", OutdatedBinUpdate(n_dims=n_dims, storage=None))
-]
-
-context_strategies = [
-  ("no context", lambda: NoContext(
-    n_dims=n_dims, storage=None
-  )),
-  ("random chunk based", lambda: RandomChunkBasedContext(
-    n_dims=n_dims, n_chunks=n_chunks, storage=None
-  )),
-  ("most recent chunk based", lambda: MostRecentChunkBasedContext(
-    n_dims=n_dims, n_chunks=n_chunks, storage=None
-  )),
-  ("sampling based", lambda: RandomSamplingBasedContext(
-    n_dims=n_dims, n_samples=chunk_size * n_chunks, storage=None
-  )),
-  ("clustering based", lambda: ClusteringBasedContext(
-    n_dims=n_dims, n_clusters=n_chunks, n_samples_per_cluster=chunk_size, storage=None
-  )),
-  ("doi based", lambda: DoiBasedContext(
-    n_dims=n_dims, n_bins=n_bins, n_samples=n_chunks*chunk_size, storage=None
-  )),
-]
 
 # altair visualizations use the data server extension to reduce notebook size
 alt.data_transformers.enable("data_server")
