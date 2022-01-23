@@ -5,7 +5,7 @@ from sklearn.datasets import make_blobs, make_swiss_roll
 
 def generate_dataset(label: str, path: str, args):
   dataset = None
-  if label == "blobs":
+  if "blobs" in label:
     dataset, _ = make_blobs(**args)
   elif label == "swiss_roll":
     dataset, _ = make_swiss_roll(**args)
@@ -30,6 +30,13 @@ default_parameters = {
     "n_features": 2,
     "centers": 1,
     "cluster_std": 2.0,
+    "random_state": 0,
+  },
+  "4blobs": {
+    "n_samples": n_samples,
+    "n_features": 2,
+    "centers": 4,
+    "cluster_std": 0.75,
     "random_state": 0,
   },
   "swiss_roll": {
