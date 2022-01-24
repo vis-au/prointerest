@@ -10,21 +10,24 @@
     {
       "total_size": 140000,
       "chunk_size": 1000,
-      "n_chunks": 3,
+      "update_size": 3000,
+      "context_size": 3000,
       "n_bins": 10,
       "max_age": 20
     },
     {
       "total_size": 14000,
       "chunk_size": 1000,
-      "n_chunks": 3,
+      "update_size": 3000,
+      "context_size": 3000,
       "n_bins": 10,
       "max_age": 20
     },
     {
       "total_size": 140,
       "chunk_size": 10,
-      "n_chunks": 3,
+      "update_size": 30,
+      "context_size": 30,
       "n_bins": 10,
       "max_age": 20
     }

@@ -19,9 +19,9 @@ from database import initialize_db, drop_tables
 
 # load benchmark configuration
 config = json.load(open("./config.json"))
-doi_label = "outlierness"
-data_label = "4blobs"
-PARAMETERS = config["parameters"][2]
+doi_label = "sort"
+data_label = "sorted1M"
+PARAMETERS = config["parameters"][1]
 
 # --- DATASET CONFIGURATION
 DATASET = config["datasets"][data_label]
@@ -41,8 +41,8 @@ chunk_size = PARAMETERS["chunk_size"]  # number of new items retrieved per step
 n_bins = PARAMETERS["n_bins"]  # number of bins used in doi histograms
 update_size = PARAMETERS["update_size"]
 context_size = PARAMETERS["context_size"]
-n_chunks_context = update_size / chunk_size  # number of chunks considered for context
-n_chunks_update = context_size / chunk_size  # number of chunks considered for updating
+n_chunks_context = update_size // chunk_size  # number of chunks considered for context
+n_chunks_update = context_size // chunk_size  # number of chunks considered for updating
 max_age = PARAMETERS["max_age"]  # maximal age of the considered chunks
 
 chunks = round(total_size / chunk_size)  # number of steps
@@ -50,7 +50,7 @@ storage_size = chunk_size * max_age  # maximum size of storages
 
 # load strategies
 storage_strategies = get_storage_strategies(storage_size)
-context_strategies = get_context_strategies(n_dims, n_chunks_context, chunk_size, n_bins)
+context_strategies = get_context_strategies(n_dims, n_chunks_context, n_bins)
 update_strategies = get_update_strategies(n_dims, n_chunks_update, max_age)
 
 short_test_case_title = f"doi: {doi_label}, items: {total_size}, chunk size: {chunk_size}"

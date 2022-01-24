@@ -18,11 +18,10 @@ from .context_item_selection_strategy import ContextItemSelectionStrategy
 #    context is the same as in storage
 
 class DoiBasedContext(ContextItemSelectionStrategy):
-  def __init__(self, n_dims: int, storage: StorageStrategy, n_bins: int, n_samples: int,
+  def __init__(self, n_dims: int, storage: StorageStrategy, n_bins: int,
                strategy: str = "min_max") -> None:
     super().__init__(n_dims, storage)
     self.n_bins = n_bins
-    self.n_samples = n_samples
     self.strategy = strategy
 
   def _get_doi_bins_from_storage(self) -> pd.DataFrame:
@@ -38,14 +37,14 @@ class DoiBasedContext(ContextItemSelectionStrategy):
     id_dois_df["bin"] = bin_per_id
     return id_dois_df
 
-  def _get_samples_per_bin(self):
+  def _get_samples_per_bin(self, total_samples: int):
     # from every bin, we draw the same number of ids
     if self.strategy == "uniform":
-      samples_per_bin = np.ones((self.n_bins, )) * (self.n_samples // self.n_bins)
+      samples_per_bin = np.ones((self.n_bins, )) * (total_samples // self.n_bins)
     # otherwise, use a normal distribution to decide on the sample frequency per bin
     elif self.strategy == "normal" or self.strategy == "min_max":
       rng = np.random.default_rng()
-      draw = rng.normal(size=self.n_samples)
+      draw = rng.normal(size=total_samples)
       samples_per_bin = np.histogram(draw, bins=self.n_bins)[0]
     else:
       raise Exception("unknown sampling strategy in doi based context")
@@ -56,14 +55,14 @@ class DoiBasedContext(ContextItemSelectionStrategy):
 
     return samples_per_bin
 
-  def get_context_ids(self, current_chunk: int) -> np.ndarray:
+  def get_context_ids(self, n: int, current_chunk: int) -> np.ndarray:
     bin_per_id_df = self._get_doi_bins_from_storage()
 
     if len(bin_per_id_df) == 0:
       return np.empty((0, self.n_dims))
 
     outdated_ids = np.array([])
-    samples_per_bin = self._get_samples_per_bin()
+    samples_per_bin = self._get_samples_per_bin(total_samples=n)
     # from every bin, get a number of ids from the stored data, according to samples_per_bin
     for i in range(self.n_bins):
       ids_in_bin = bin_per_id_df[bin_per_id_df["bin"] == i]
@@ -75,7 +74,7 @@ class DoiBasedContext(ContextItemSelectionStrategy):
 
     # some bins may be smaller than the number of samples we want to draw from them, so there can be
     # "open spots" that we can fill randomly
-    n_open_spots = self.n_samples - len(outdated_ids)
+    n_open_spots = n - len(outdated_ids)
     if n_open_spots > 0:
       remaining_ids = bin_per_id_df[~bin_per_id_df[ID].isin(outdated_ids)][ID]
       if len(remaining_ids) > 0:
