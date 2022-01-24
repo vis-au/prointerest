@@ -10,20 +10,16 @@ class OldestChunksUpdate(OutdatedItemSelectionStrategy):
 
     Properties
     ----------
-    n_chunks : int
-      The fixed (positive) number of chunks to be retrieved when checking for outdated items.
-
     max_age : int
-      The number of latest chunks that should be considered when checking for outdated items. "Latest"
-      here refers to the first time a chunk was processed.
+      The number of latest chunks that should be considered when checking for outdated items.
+      "Latest" here refers to the chunk number time a chunk was initially processed.
     """
 
-    def __init__(self, n_dims: int, storage: StorageStrategy, n_chunks: int, max_age: int):
+    def __init__(self, n_dims: int, storage: StorageStrategy, max_age: int):
         super().__init__(n_dims, storage)
-        self.n_chunks = n_chunks
         self.max_age = max_age
 
-    def get_outdated_ids(self, current_chunk: int):
+    def get_outdated_ids(self, n: int, current_chunk: int):
         # get all available ids from storage
         all_ids = self.storage.get_available_ids()
         if len(all_ids) == 0:
@@ -41,18 +37,11 @@ class OldestChunksUpdate(OutdatedItemSelectionStrategy):
             as_df=True
         )
 
-        # find all chunks that belong to those timestamps (might be more than n_chunks!)
-        # since the data comes back in order, we can just take the last n_chunks (except latest)
-        oldest_timestamps = response[TIMESTAMP].unique()[-self.n_chunks:-1]
-        oldest_timestamps_ids = response[response[TIMESTAMP].isin(oldest_timestamps)][ID.lower()]
-        oldest_ts_ids_list = oldest_timestamps_ids.tolist()
+        # find all chunks that belong to those timestamps (MIGHT BE MORE THAN n!)
+        # since the data comes back in order, we can just take the last n (except latest)
+        outdated_ids = response[ID.lower()].iloc[-n:]
 
-        oldest_timestamps_chunks = self.storage.get_chunks_for_ids(oldest_ts_ids_list).tolist()
-        outdated_items = self.storage.get_items_for_chunks(
-          oldest_timestamps_chunks[-self.n_chunks:],
-          as_df=True
-        )
-        if len(outdated_items) == 0:
+        if len(outdated_ids) == 0:
           return empty((0, self.n_dims))
-        outdated_ids = outdated_items[ID]
+
         return outdated_ids

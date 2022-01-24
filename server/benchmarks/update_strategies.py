@@ -11,13 +11,13 @@ def get_update_strategies(n_dims: int, n_chunks: int, max_age: int):
       n_dims=n_dims, storage=None
     )),
     ("oldest n chunks", lambda: OldestChunksUpdate(
-      n_dims=n_dims, storage=None, n_chunks=n_chunks, max_age=max_age
+      n_dims=n_dims, storage=None, max_age=max_age
     )),
     ("last n chunks", lambda: LastNChunksUpdate(
-      n_dims=n_dims, storage=None, n_chunks=n_chunks
+      n_dims=n_dims, n_chunks=n_chunks, storage=None
     )),
     ("regular intervals", lambda: RegularIntervalUpdate(
-      n_dims=n_dims, storage=None, n_chunks=n_chunks, max_age=max_age
+      n_dims=n_dims, n_chunks=n_chunks, storage=None, max_age=max_age
     )),
     # ("outdated bins", OutdatedBinUpdate(n_dims=n_dims, storage=None))
   ]

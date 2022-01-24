@@ -19,9 +19,9 @@ from database import initialize_db, drop_tables
 
 # load benchmark configuration
 config = json.load(open("./config.json"))
-doi_label = "density"
+doi_label = "outlierness"
 data_label = "4blobs"
-PARAMETERS = config["parameters"][1]
+PARAMETERS = config["parameters"][2]
 
 # --- DATASET CONFIGURATION
 DATASET = config["datasets"][data_label]
@@ -39,7 +39,10 @@ doi = get_doi_component(doi_label, numeric_columns)
 total_size = PARAMETERS["total_size"]  # total number of processed items, not nec. the dataset size
 chunk_size = PARAMETERS["chunk_size"]  # number of new items retrieved per step
 n_bins = PARAMETERS["n_bins"]  # number of bins used in doi histograms
-n_chunks = PARAMETERS["n_chunks"]  # number of chunks considered for context/updating
+update_size = PARAMETERS["update_size"]
+context_size = PARAMETERS["context_size"]
+n_chunks_context = update_size / chunk_size  # number of chunks considered for context
+n_chunks_update = context_size / chunk_size  # number of chunks considered for updating
 max_age = PARAMETERS["max_age"]  # maximal age of the considered chunks
 
 chunks = round(total_size / chunk_size)  # number of steps
@@ -47,12 +50,13 @@ storage_size = chunk_size * max_age  # maximum size of storages
 
 # load strategies
 storage_strategies = get_storage_strategies(storage_size)
-context_strategies = get_context_strategies(n_dims, n_chunks, chunk_size, n_bins)
-update_strategies = get_update_strategies(n_dims, n_chunks, max_age)
+context_strategies = get_context_strategies(n_dims, n_chunks_context, chunk_size, n_bins)
+update_strategies = get_update_strategies(n_dims, n_chunks_update, max_age)
 
 short_test_case_title = f"doi: {doi_label}, items: {total_size}, chunk size: {chunk_size}"
 full_test_case_title = f"{short_test_case_title}, data: {data_label},\n"\
-                       f"chunk/strat.: {n_chunks}, bins: {n_bins}, max age: {max_age}\n"
+                       f"upd. size.: {update_size}, cont. size: {context_size} bins: {n_bins},\n"\
+                       f"max age: {max_age}\n"
 
 
 # create the path for storing the benchmark results if they do not exist

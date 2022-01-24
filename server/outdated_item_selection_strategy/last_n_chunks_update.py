@@ -18,7 +18,7 @@ class LastNChunksUpdate(OutdatedItemSelectionStrategy):
         super().__init__(n_dims, storage)
         self.n_chunks = n_chunks
 
-    def get_outdated_ids(self, current_chunk: int):
+    def get_outdated_ids(self, n: int, current_chunk: int):
         self.storage.get_available_chunks()
         last_n_chunks = list(range(current_chunk, current_chunk - self.n_chunks))
         outdated_items = self.storage.get_items_for_chunks(last_n_chunks, as_df=True)
@@ -26,6 +26,6 @@ class LastNChunksUpdate(OutdatedItemSelectionStrategy):
         if len(outdated_items) == 0:
             return empty((0, self.n_dims))
 
-        outdated_ids = outdated_items[ID]
+        outdated_ids = outdated_items[ID].iloc[:n]
 
         return outdated_ids

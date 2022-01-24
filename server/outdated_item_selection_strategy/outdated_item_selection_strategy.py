@@ -11,7 +11,7 @@ class OutdatedItemSelectionStrategy:
         self.n_dims = n_dims
         self.storage = storage
 
-    def get_outdated_ids(self, current_chunk: int) -> np.ndarray:
+    def get_outdated_ids(self, n: int, current_chunk: int) -> np.ndarray:
         """This function is to be overwritten by the particular subclass strategy. It computes the
         `ids` of items that are outdated, based on some heuristic.
 
@@ -19,16 +19,18 @@ class OutdatedItemSelectionStrategy:
         return np.empty((0,))
 
     @final
-    def get_outdated_items(self, current_chunk: int) -> pd.DataFrame:
+    def get_outdated_items(self, n: int, current_chunk: int) -> pd.DataFrame:
         """Takes the `ids` of items computed in `get_outdated_ids` and retrieves the actual data
         from the database. Returns an ndarray of shape (n, m).
 
         Parameters
         ----------
+        n : int
+            The number of context items to be retrieved.
         current_chunk : int
-          The index of the current chunk.
+            The index of the current chunk.
         """
-        outdated_ids = self.get_outdated_ids(current_chunk)
+        outdated_ids = self.get_outdated_ids(n, current_chunk)
         if len(outdated_ids) == 0:
             # dataframe of items, even if empty, is expected to have the id column
             empty = pd.DataFrame(np.empty((0, self.n_dims)))

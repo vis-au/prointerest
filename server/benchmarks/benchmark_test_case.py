@@ -34,7 +34,8 @@ class BenchmarkTestCaseStep():
 class BenchmarkTestCase():
   def __init__(self, name: str, doi: DoiComponent, storage_strategy: StorageStrategy,
                context_strategy: ContextItemSelectionStrategy,
-               update_strategy: OutdatedItemSelectionStrategy, chunk_size: int, chunks: int):
+               update_strategy: OutdatedItemSelectionStrategy, chunk_size: int, chunks: int,
+               context_size: int = -1, update_size: int = -1):
     self.name = name
     self.doi = doi
 
@@ -45,6 +46,8 @@ class BenchmarkTestCase():
     self.update_strategy.storage = self.storage_strategy
 
     self.chunk_size = chunk_size
+    self.context_size = context_size if context_size >= 0 else self.chunk_size
+    self.update_size = update_size if update_size >= 0 else self.chunk_size
     self.chunks = chunks
     self.test_case_steps = []
 
@@ -93,7 +96,8 @@ class BenchmarkTestCase():
   def _apply_update_strategy(self, chunk: DataFrame, step: BenchmarkTestCaseStep, step_no: int):
     # apply strategy for finding outdated items
     now = time()
-    outdated = self.update_strategy.get_outdated_items(current_chunk=step_no)
+    n = self.update_size * self.chunk_size
+    outdated = self.update_strategy.get_outdated_items(n=n, current_chunk=step_no)
     outdated = process_chunk(DataFrame(outdated))
     step.outdated_time = time() - now
 
@@ -116,8 +120,45 @@ class BenchmarkTestCase():
     update_dois(outdated_ids, updated_context_doi)
     step.update_dois_time = time() - now
 
+  def run_synchronously(self, update_interval: int, doi_csv_path: str = None,
+                        times_csv_path: str = None):
+    self.test_case_steps = []
+    start_time = time()
+
+    for i in range(self.chunks):
+      step = BenchmarkTestCaseStep(i)
+      step.step_time = time()
+
+      if i % update_interval == 0:
+        pass
+      else:
+        # measure data retrieval time
+        now = time()
+
+        chunk_size = self.chunk_size
+        chunk = get_next_chunk_from_db(chunk_size, as_df=True)
+        step.chunk_time = time() - now
+
+        # compute doi using the strategies
+        self._apply_context_strategy(chunk, step, i)
+        self._apply_update_strategy(chunk, step, i)
+
+        # measure inserting into storage time
+        now = time()
+        self.storage_strategy.insert_chunk(chunk, i)
+        step.storage_time = time() - now
+
+      # measure step time
+      step.step_time = time() - step.step_time
+      self.test_case_steps += [step]
+
+    # measure test case time
+    self.total_time = time() - start_time
+    self.save_doi(doi_csv_path)
+    self.save_times(times_csv_path)
+
   @final
-  def run(self, doi_csv_path=None, times_csv_path=None):
+  def run(self, doi_csv_path: str = None, times_csv_path: str = None):
     self.test_case_steps = []
     start_time = time()
 
@@ -145,31 +186,24 @@ class BenchmarkTestCase():
 
     # measure test case time
     self.total_time = time() - start_time
+    self.save_doi(doi_csv_path)
+    self.save_times(times_csv_path)
 
-    # write the doi values computed by this combination of strategies to a csv file for later
-    # analysis
-    if doi_csv_path:
-      self.doi_csv_path = doi_csv_path
-      if not exists(doi_csv_path):
-        mkdir(doi_csv_path)
-      get_from_doi(["TRUE"], as_df=True).to_csv(f"{doi_csv_path}/{self.name}.csv", index=False)
+  # write the doi values computed by this combination of strategies to a csv file for later analysis
+  def save_doi(self, path: str):
+    if path is None:
+      return
 
-    # write benchmarking times to a csv file for later analysis
-    if times_csv_path:
-      self.times_csv_path = times_csv_path
-      if not exists(times_csv_path):
-        mkdir(times_csv_path)
-      with open(f"{times_csv_path}/{self.name}.csv", "w") as csv_file:
-        csv_file.write(str(self))
+    if not exists(path):
+      mkdir(path)
+    get_from_doi(["TRUE"], as_df=True).to_csv(f"{path}/{self.name}.csv", index=False)
 
-  def doi_histogram(self, bins=10):
-    if not self.doi_csv_path:
-      raise Exception("No CSV file for DOI values found. Supply a path during run().")
-    df = read_csv(self.doi_csv_path)
-    df.hist(column=DOI, bins=bins)
+  # write benchmarking times to a csv file for later analysis
+  def save_times(self, path: str):
+    if path is None:
+      return
 
-  def times_linecharts(self):
-    if not self.times_csv_path:
-      raise Exception("No CSV file for times found. Supply a path during run().")
-    df = read_csv(self.times_csv_path)
-    # TODO: render line charts, with one line per measured time in the test_case
+    if not exists(path):
+      mkdir(path)
+    with open(f"{path}/{self.name}.csv", "w") as csv_file:
+      csv_file.write(str(self))

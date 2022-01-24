@@ -25,7 +25,7 @@ class RegularIntervalUpdate(OutdatedItemSelectionStrategy):
         self.max_age = max_age
         self.n_chunks = n_chunks
 
-    def get_outdated_ids(self, current_chunk: int):
+    def get_outdated_ids(self, n: int, current_chunk: int):
         available_chunks = self.storage.get_available_chunks()
         if len(available_chunks) == 0:
           return empty((0, self.n_dims))
@@ -47,5 +47,5 @@ class RegularIntervalUpdate(OutdatedItemSelectionStrategy):
         if len(outdated_items) == 0:
           return empty((0, self.n_dims))
 
-        outdated_ids = outdated_items[ID].to_numpy()
+        outdated_ids = outdated_items[ID].iloc[:n].to_numpy()
         return outdated_ids

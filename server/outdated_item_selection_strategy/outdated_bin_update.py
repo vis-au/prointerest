@@ -11,7 +11,7 @@ class OutdatedBinUpdate(OutdatedItemSelectionStrategy):
     def get_outdated_bins(self):
         return ()  # TODO: given bins before and after an update, find those that need updating.
 
-    def get_outdated_ids(self, current_chunk: int):
+    def get_outdated_ids(self, n: int, current_chunk: int):
         outdated = self.get_outdated_bins()
         if len(outdated) == 0:
             return empty((0,))
