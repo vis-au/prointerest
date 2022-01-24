@@ -27,7 +27,6 @@ class StorageStrategy:
             self.is_storage_registered = True
             return pd.Series()
         elif len(self.storage) == 0:
-            print("nothing in storage")
             return pd.Series()
 
         return self.storage[ID]
@@ -53,7 +52,6 @@ class StorageStrategy:
             self.is_storage_registered = True
             return pd.DataFrame()
         elif len(self.storage) == 0:
-            print("nothing in storage")
             return pd.DataFrame()
 
         response = self.cursor.execute(
