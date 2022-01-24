@@ -62,6 +62,14 @@
       "n_dims": 2,
       "numeric_columns": ["0", "1"]
     },
+    "4blobs": {
+      "data_label": "4blobs",
+      "data_path": "../data/4blobs.csv",
+      "column_data_path": "../data/nyc_taxis.shuffled_full.parquet",
+      "total_db_size": 1000000,
+      "n_dims": 2,
+      "numeric_columns": ["0", "1"]
+    },
     "sorted1M": {
       "data_label": "sorted1M",
       "data_path": "../data/sorted1M.csv",
