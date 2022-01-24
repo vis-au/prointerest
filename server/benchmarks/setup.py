@@ -41,8 +41,8 @@ chunk_size = PARAMETERS["chunk_size"]  # number of new items retrieved per step
 n_bins = PARAMETERS["n_bins"]  # number of bins used in doi histograms
 update_size = PARAMETERS["update_size"]
 context_size = PARAMETERS["context_size"]
-n_chunks_context = update_size // chunk_size  # number of chunks considered for context
-n_chunks_update = context_size // chunk_size  # number of chunks considered for updating
+n_chunks_context = max(context_size // chunk_size, 1)  # number of chunks considered for context
+n_chunks_update = max(update_size // chunk_size, 1)  # number of chunks considered for updating
 max_age = PARAMETERS["max_age"]  # maximal age of the considered chunks
 
 chunks = round(total_size / chunk_size)  # number of steps
@@ -109,8 +109,11 @@ def get_doi_bin_error_df(doi_bin_labels_a: pd.DataFrame, doi_bin_labels_b: pd.Da
   return diff_df
 
 
-def get_doi_error_df(doi_df_a: pd.DataFrame, doi_df_b: pd.DataFrame):
-  diff = pd.DataFrame(doi_df_a["doi"] - doi_df_b["doi"]).abs()
+def get_doi_error_df(doi_df_a: pd.DataFrame, doi_df_b: pd.DataFrame, absolute=True):
+  if absolute:
+    diff = pd.DataFrame(doi_df_a["doi"] - doi_df_b["doi"]).abs()
+  else:
+    diff = pd.DataFrame(doi_df_a["doi"] - doi_df_b["doi"])
   return diff
 
 
