@@ -8,28 +8,31 @@
   ],
   "parameters": [
     {
-      "total_size": 140000,
+      "total_size": 120000,
       "chunk_size": 1000,
-      "update_size": 3000,
-      "context_size": 3000,
+      "update_size": 2000,
+      "context_size": 1000,
       "n_bins": 10,
-      "max_age": 20
+      "max_age": 20,
+      "update_interval": 3
     },
     {
-      "total_size": 14000,
+      "total_size": 12000,
       "chunk_size": 1000,
-      "update_size": 3000,
-      "context_size": 3000,
+      "update_size": 2000,
+      "context_size": 1000,
       "n_bins": 10,
-      "max_age": 20
+      "max_age": 20,
+      "update_interval": 3
     },
     {
-      "total_size": 140,
+      "total_size": 120,
       "chunk_size": 10,
-      "update_size": 30,
-      "context_size": 30,
+      "update_size": 20,
+      "context_size": 10,
       "n_bins": 10,
-      "max_age": 20
+      "max_age": 20,
+      "update_interval": 3
     }
   ],
   "datasets": {

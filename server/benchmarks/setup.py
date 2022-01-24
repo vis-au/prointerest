@@ -19,8 +19,8 @@ from database import initialize_db, drop_tables
 
 # load benchmark configuration
 config = json.load(open("./config.json"))
-doi_label = "sort"
-data_label = "sorted1M"
+doi_label = "outlierness"
+data_label = "4blobs"
 PARAMETERS = config["parameters"][1]
 
 # --- DATASET CONFIGURATION
@@ -44,6 +44,7 @@ context_size = PARAMETERS["context_size"]
 n_chunks_context = max(context_size // chunk_size, 1)  # number of chunks considered for context
 n_chunks_update = max(update_size // chunk_size, 1)  # number of chunks considered for updating
 max_age = PARAMETERS["max_age"]  # maximal age of the considered chunks
+update_interval = PARAMETERS["update_interval"]  # number of chunks before a full update occurs
 
 chunks = round(total_size / chunk_size)  # number of steps
 storage_size = chunk_size * max_age  # maximum size of storages
