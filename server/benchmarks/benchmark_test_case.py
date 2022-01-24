@@ -1,6 +1,7 @@
+from concurrent.futures import process
 from os import mkdir
 from os.path import exists
-from pandas import DataFrame, read_csv
+from pandas import DataFrame
 from time import time
 from typing import final
 
@@ -35,7 +36,7 @@ class BenchmarkTestCase():
   def __init__(self, name: str, doi: DoiComponent, storage_strategy: StorageStrategy,
                context_strategy: ContextItemSelectionStrategy,
                update_strategy: OutdatedItemSelectionStrategy, chunk_size: int, chunks: int,
-               context_size: int = -1, update_size: int = -1):
+               context_size: int = 0, update_size: int = 0):
     self.name = name
     self.doi = doi
 
@@ -46,8 +47,8 @@ class BenchmarkTestCase():
     self.update_strategy.storage = self.storage_strategy
 
     self.chunk_size = chunk_size
-    self.context_size = context_size if context_size >= 0 else self.chunk_size
-    self.update_size = update_size if update_size >= 0 else self.chunk_size
+    self.context_size = context_size
+    self.update_size = update_size
     self.chunks = chunks
     self.test_case_steps = []
 
@@ -65,7 +66,7 @@ class BenchmarkTestCase():
   def _apply_context_strategy(self, chunk: DataFrame, step: BenchmarkTestCaseStep, step_no: int):
     # apply strategy for finding context items
     now = time()
-    context = self.context_strategy.get_context_items(current_chunk=step_no)
+    context = self.context_strategy.get_context_items(n=self.context_size, current_chunk=step_no)
     context = process_chunk(context)
     step.context_time = time() - now
 
@@ -96,8 +97,7 @@ class BenchmarkTestCase():
   def _apply_update_strategy(self, chunk: DataFrame, step: BenchmarkTestCaseStep, step_no: int):
     # apply strategy for finding outdated items
     now = time()
-    n = self.update_size * self.chunk_size
-    outdated = self.update_strategy.get_outdated_items(n=n, current_chunk=step_no)
+    outdated = self.update_strategy.get_outdated_items(n=self.update_size, current_chunk=step_no)
     outdated = process_chunk(DataFrame(outdated))
     step.outdated_time = time() - now
 
@@ -120,45 +120,49 @@ class BenchmarkTestCase():
     update_dois(outdated_ids, updated_context_doi)
     step.update_dois_time = time() - now
 
-  def run_synchronously(self, update_interval: int, doi_csv_path: str = None,
-                        times_csv_path: str = None):
+  def _run_synchronously(self, update_interval: int):
     self.test_case_steps = []
     start_time = time()
 
-    for i in range(self.chunks):
+    processed_items = 0
+    i = 0
+    while processed_items < self.chunk_size*self.chunks:
+      # run an update, using as much data as possible without retrieving any new data
       step = BenchmarkTestCaseStep(i)
       step.step_time = time()
+      i += 1
+      n_unprocessed_items = self.chunk_size*self.chunks - processed_items
 
       if i % update_interval == 0:
-        pass
-      else:
-        # measure data retrieval time
+        # update as much data as possible without retrieving any new data
         now = time()
-
-        chunk_size = self.chunk_size
-        chunk = get_next_chunk_from_db(chunk_size, as_df=True)
+        n = min(self.update_size, n_unprocessed_items)
+        chunk = self.update_strategy.get_outdated_items(n=n, current_chunk=i)
+        chunk = process_chunk(DataFrame(chunk))
+        doi = self.doi.compute_doi(chunk)
+        if len(chunk) > 0:
+          update_dois(chunk[ID].to_list(), doi)
+        step.outdated_time = time() - now
+      else:
+        # process the next chunk without an update
+        now = time()
+        n = min(self.chunk_size, n_unprocessed_items)
+        chunk = get_next_chunk_from_db(n, as_df=True)
+        processed_items += n
         step.chunk_time = time() - now
 
         # compute doi using the strategies
         self._apply_context_strategy(chunk, step, i)
-        self._apply_update_strategy(chunk, step, i)
 
         # measure inserting into storage time
         now = time()
         self.storage_strategy.insert_chunk(chunk, i)
         step.storage_time = time() - now
 
-      # measure step time
-      step.step_time = time() - step.step_time
-      self.test_case_steps += [step]
-
     # measure test case time
     self.total_time = time() - start_time
-    self.save_doi(doi_csv_path)
-    self.save_times(times_csv_path)
 
-  @final
-  def run(self, doi_csv_path: str = None, times_csv_path: str = None):
+  def _run_mixed(self, doi_csv_path: str = None, times_csv_path: str = None):
     self.test_case_steps = []
     start_time = time()
 
@@ -186,6 +190,14 @@ class BenchmarkTestCase():
 
     # measure test case time
     self.total_time = time() - start_time
+
+  @final
+  def run(self, doi_csv_path: str = None, times_csv_path: str = None, update_interval: int = 0):
+    if update_interval > 0:
+      self._run_synchronously(update_interval)
+    else:
+      self._run_mixed()
+
     self.save_doi(doi_csv_path)
     self.save_times(times_csv_path)
 
