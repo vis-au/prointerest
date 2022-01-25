@@ -8,6 +8,7 @@
   ],
   "parameters": [
     {
+      "parameter_label": "120k",
       "total_size": 120000,
       "chunk_size": 1000,
       "update_size": 2000,
@@ -17,6 +18,7 @@
       "update_interval": 3
     },
     {
+      "parameter_label": "12k",
       "total_size": 12000,
       "chunk_size": 1000,
       "update_size": 2000,
@@ -26,6 +28,7 @@
       "update_interval": 3
     },
     {
+      "parameter_label": "120",
       "total_size": 120,
       "chunk_size": 10,
       "update_size": 20,
