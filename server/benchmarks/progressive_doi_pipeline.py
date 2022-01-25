@@ -1,4 +1,3 @@
-from concurrent.futures import process
 from os import mkdir
 from os.path import exists
 from pandas import DataFrame
@@ -12,7 +11,7 @@ from context_item_selection_strategy.context_item_selection_strategy import *
 from outdated_item_selection_strategy.outdated_item_selection_strategy import *
 
 
-class BenchmarkTestCaseStep():
+class DoiComputationTimeStep():
   def __init__(self, step_number: int) -> None:
     self.step_number = step_number
     self.step_time = 0  # time to do all steps in the computation
@@ -32,7 +31,7 @@ class BenchmarkTestCaseStep():
            f"{self.old_doi_time},{self.store_new_time},{self.update_dois_time},{self.step_time}"
 
 
-class BenchmarkTestCase():
+class ProgressiveDoiPipeline():
   def __init__(self, name: str, doi: DoiComponent, storage_strategy: StorageStrategy,
                context_strategy: ContextItemSelectionStrategy,
                update_strategy: OutdatedItemSelectionStrategy, chunk_size: int, chunks: int,
@@ -63,7 +62,7 @@ class BenchmarkTestCase():
       output = f"{output}{step}\n"
     return output
 
-  def _apply_context_strategy(self, chunk: DataFrame, step: BenchmarkTestCaseStep, step_no: int):
+  def _apply_context_strategy(self, chunk: DataFrame, step: DoiComputationTimeStep, step_no: int):
     # apply strategy for finding context items
     now = time()
     context = self.context_strategy.get_context_items(n=self.context_size, current_chunk=step_no)
@@ -94,7 +93,7 @@ class BenchmarkTestCase():
     save_dois(new_ids, new_doi, np.zeros_like(new_doi))
     step.store_new_time = time() - now
 
-  def _apply_update_strategy(self, chunk: DataFrame, step: BenchmarkTestCaseStep, step_no: int):
+  def _apply_update_strategy(self, chunk: DataFrame, step: DoiComputationTimeStep, step_no: int):
     # apply strategy for finding outdated items
     now = time()
     outdated = self.update_strategy.get_outdated_items(n=self.update_size, current_chunk=step_no)
@@ -128,7 +127,7 @@ class BenchmarkTestCase():
     i = 0
     while processed_items < self.chunk_size*self.chunks:
       # run an update, using as much data as possible without retrieving any new data
-      step = BenchmarkTestCaseStep(i)
+      step = DoiComputationTimeStep(i)
       step.step_time = time()
       i += 1
       n_unprocessed_items = self.chunk_size*self.chunks - processed_items
@@ -162,12 +161,12 @@ class BenchmarkTestCase():
     # measure test case time
     self.total_time = time() - start_time
 
-  def _run_mixed(self, doi_csv_path: str = None, times_csv_path: str = None):
+  def _run_mixed(self):
     self.test_case_steps = []
     start_time = time()
 
     for i in range(self.chunks):
-      step = BenchmarkTestCaseStep(i)
+      step = DoiComputationTimeStep(i)
       step.step_time = time()
 
       # measure data retrieval time
