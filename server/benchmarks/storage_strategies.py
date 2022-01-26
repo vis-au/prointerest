@@ -7,9 +7,9 @@ from storage_strategy.reservoir_sampling_storage import *
 from storage_strategy.windowing_storage import *
 
 STORAGE_STRATEGY_LABELS = [
-  "no_storage",
+  "no storage",
   "compression",
-  "bin_sampling",
+  # "bin sampling",
   "reservoir",
   "windowing"
 ]
