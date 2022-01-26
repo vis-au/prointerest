@@ -5,9 +5,9 @@ from dataclasses import dataclass, field
 from database import initialize_db, drop_tables
 from doi_components import get_doi_component
 from progressive_doi_pipeline import ProgressiveDoiPipeline
-from context_strategies import get_context_strategies
-from update_strategies import get_update_strategies
-from storage_strategies import get_storage_strategies
+from context_strategies import *
+from update_strategies import *
+from storage_strategies import *
 
 from doi_component.doi_component import DoiComponent
 from context_item_selection_strategy.context_item_selection_strategy import *
@@ -235,6 +235,19 @@ def get_parameters_config(parameter_label: str) -> ParametersConfiguration:
   return ParametersConfiguration(parameter_label, chunks, total_size, chunk_size, context_size,
                                  update_size, storage_size, max_age, update_interval, n_bins)
 
+
+def get_strategy_config(context_label: str, update_label: str, storage_label: str,
+                        params: ParametersConfiguration, data: DatasetConfiguration):
+  context_ = get_context_strategy(context_label, data.n_dims, params.chunks, params.n_bins)
+  update_ = get_update_strategy(update_label, data.n_dims, params.chunks, params.max_age)
+  storage_ = get_storage_strategy(storage_label, params.max_age*params.chunk_size)
+
+  return StrategiesConfiguration(
+    name=f"{context_label}-{update_label}-{storage_label}",
+    context_strategy=context_,
+    update_strategy=update_,
+    storage_strategy=storage_
+  )
 
 def generate_strategies(data: DatasetConfiguration, params: ParametersConfiguration):
   context_size = params.context_size

@@ -1,27 +1,21 @@
 import os
 from sys import path
-import json
 import altair as alt
 
-# make this script "top level"
-cwd = os.getcwd()
-path.append(f"{cwd}/..")
-
+# make this script "top level" to allow importing database module, etc.
+if True:
+  cwd = os.getcwd()
+  path.append(f"{cwd}/..")
 
 from test_case import (DatasetConfiguration, DoiConfiguration, ParametersConfiguration,
                        get_dataset_config, get_doi_config, get_parameters_config, get_path,
                        generate_strategies)
 
 
-def load_test_case(index: int):
-  TEST_CASES = json.load(open("./test_cases.json"))
-  test_case = TEST_CASES["test_cases"][index]
-
-
 # load benchmark configuration
 doi_label = "averageness"
 data_label = "blobs"
-parameter_label = "12k"
+parameter_label = "120"
 
 DATA: DatasetConfiguration = get_dataset_config(data_label)
 DOI_CONFIG: DoiConfiguration = get_doi_config(doi_label, DATA)

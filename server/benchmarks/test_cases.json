@@ -1,0 +1,26 @@
+{
+  "ground_truth": [
+    {
+      "name": "__bigger_chunks__",
+      "datasets": "*",
+      "doi": "*",
+      "storage_strategy": "window",
+      "context_strategy": "*",
+      "update_strategy": "*",
+      "parameters": "*"
+    }
+  ],
+  "bigger_chunks": [
+
+  ],
+  "test_cases": [
+    {
+      "datasets": "blobs",
+      "doi": "averageness",
+      "storage_strategy": "windowing",
+      "context_strategy": "doi based",
+      "update_strategy": "last n chunks",
+      "parameters": "12k"
+    }
+  ]
+}
