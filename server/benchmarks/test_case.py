@@ -70,9 +70,8 @@ class TestCase:
   times_csv_path: str = field(default_factory=lambda: None)
   pipeline: ProgressiveDoiPipeline = None
 
-  def run(self) -> None:
-    self.initialize_database()
-    self.pipeline = ProgressiveDoiPipeline(
+  def _generate_pipeline(self) -> ProgressiveDoiPipeline:
+    return ProgressiveDoiPipeline(
       name=self.name,
       doi=self.doi.doi,
       storage_strategy=self.strategies.storage_strategy,
@@ -83,6 +82,10 @@ class TestCase:
       update_size=self.params.update_size,
       chunks=self.params.chunks
     )
+
+  def run(self) -> None:
+    self.initialize_database()
+    self.pipeline = self._generate_pipeline()
     self.pipeline.run(
       doi_csv_path=self.doi_csv_path,
       times_csv_path=self.times_csv_path,
@@ -121,7 +124,7 @@ def create_test_case(name: str, strategies: StrategiesConfiguration,
 
 
 def create_ground_truth_test_case(data: DatasetConfiguration, doi: DoiConfiguration,
-                               params: ParametersConfiguration, path: str) -> TestCase:
+                                  params: ParametersConfiguration, path: str) -> TestCase:
 
   s = NoStorage()
   name = "__ground_truth__"
@@ -159,7 +162,7 @@ def create_ground_truth_test_case(data: DatasetConfiguration, doi: DoiConfigurat
 
 
 def create_bigger_chunks_test_case(data: DatasetConfiguration, doi: DoiConfiguration,
-                                params: ParametersConfiguration, path: str) -> TestCase:
+                                   params: ParametersConfiguration, path: str) -> TestCase:
 
   s = NoStorage()
   name = "__bigger_chunks__"
