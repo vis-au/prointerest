@@ -15,13 +15,13 @@ from update_strategies import *
 
 
 # load benchmark configuration
-config = json.load(open("./config.json"))
+PRESETS = json.load(open("./presets.json"))
 doi_label = "averageness"
 data_label = "blobs"
-PARAMETERS = config["parameters"][1]
+PARAMETERS = PRESETS["parameters"][1]
 
 # --- DATASET CONFIGURATION
-DATASET = config["datasets"][data_label]
+DATASET = PRESETS["datasets"][data_label]
 data_path = DATASET["data_path"]
 column_data_path = DATASET["column_data_path"]
 total_db_size = DATASET["total_db_size"]  # full size of database
