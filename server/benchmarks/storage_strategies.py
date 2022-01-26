@@ -5,7 +5,7 @@ from storage_strategy.reservoir_sampling_storage import *
 from storage_strategy.windowing_storage import *
 
 
-def get_storage_strategies(storage_size: int):
+def get_storage_strategies(storage_size: int) -> list[StorageStrategy]:
   return [
     ("no_storage_strategy", NoStorage()),
     ("compression_strategy", CompressionStorage(max_size=storage_size)),

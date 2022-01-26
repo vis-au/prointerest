@@ -5,7 +5,8 @@ from context_item_selection_strategy.clustering_based_context import *
 from context_item_selection_strategy.doi_based_context import *
 
 
-def get_context_strategies(n_dims: int, n_chunks: int, n_bins: int):
+def get_context_strategies(n_dims: int, n_chunks: int,
+                           n_bins: int) -> list[ContextItemSelectionStrategy]:
   return [
     ("no context", lambda: NoContext(
       n_dims=n_dims, storage=None

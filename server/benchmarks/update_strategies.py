@@ -5,7 +5,8 @@ from outdated_item_selection_strategy.regular_interval_update import *
 from outdated_item_selection_strategy.outdated_bin_update import *
 
 
-def get_update_strategies(n_dims: int, n_chunks: int, max_age: int):
+def get_update_strategies(n_dims: int, n_chunks: int,
+                          max_age: int) -> list[OutdatedItemSelectionStrategy]:
   return [
     ("no update", lambda: NoUpdate(
       n_dims=n_dims, storage=None
