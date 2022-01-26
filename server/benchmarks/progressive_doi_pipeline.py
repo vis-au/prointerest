@@ -62,10 +62,13 @@ class ProgressiveDoiPipeline():
       output = f"{output}{step}\n"
     return output
 
-  def _apply_context_strategy(self, chunk: DataFrame, step: DoiComputationTimeStep, step_no: int):
+  def _apply_context_strategy(self, chunk: DataFrame, step: DoiComputationTimeStep):
     # apply strategy for finding context items
     now = time()
-    context = self.context_strategy.get_context_items(n=self.context_size, current_chunk=step_no)
+    context = self.context_strategy.get_context_items(
+      n=self.context_size,
+      current_chunk=step.step_number
+    )
     context = process_chunk(context)
     step.context_time = time() - now
 
@@ -93,10 +96,13 @@ class ProgressiveDoiPipeline():
     save_dois(new_ids, new_doi, np.zeros_like(new_doi))
     step.store_new_time = time() - now
 
-  def _apply_update_strategy(self, chunk: DataFrame, step: DoiComputationTimeStep, step_no: int):
+  def _apply_update_strategy(self, chunk: DataFrame, step: DoiComputationTimeStep):
     # apply strategy for finding outdated items
     now = time()
-    outdated = self.update_strategy.get_outdated_items(n=self.update_size, current_chunk=step_no)
+    outdated = self.update_strategy.get_outdated_items(
+      n=self.update_size,
+      current_chunk=step.step_number
+    )
     outdated = process_chunk(DataFrame(outdated))
     step.outdated_time = time() - now
 
@@ -119,6 +125,49 @@ class ProgressiveDoiPipeline():
     update_dois(outdated_ids, updated_context_doi)
     step.update_dois_time = time() - now
 
+  def _get_next_chunk(self, n: int, step: DoiComputationTimeStep):
+    # measure data retrieval time
+    now = time()
+    chunk = get_next_chunk_from_db(n, as_df=True)
+    step.chunk_time = time() - now
+    return chunk
+
+  def _insert_into_storage(self, chunk: DataFrame, step: DoiComputationTimeStep):
+    # measure inserting into storage time
+    now = time()
+    self.storage_strategy.insert_chunk(chunk, step.step_number)
+    step.storage_time = time() - now
+
+  def _run_next_synchronous_step(self, update_interval: int, processed_items: int,
+                                 step: DoiComputationTimeStep):
+    step.step_time = time()
+    n_unprocessed_items = self.chunk_size*self.chunks - processed_items
+
+    if step.step_number % update_interval == 0:
+      # update as much data as possible without retrieving any new data
+      now = time()
+      n = min(self.update_size, n_unprocessed_items)
+      chunk = self.update_strategy.get_outdated_items(n=n, current_chunk=step.step_number)
+      chunk = process_chunk(DataFrame(chunk))
+      if len(chunk) > 0:
+        doi = self.doi.compute_doi(chunk)
+        update_dois(chunk[ID].to_list(), doi)
+      step.outdated_time = time() - now
+    else:
+      # process the next chunk without an update
+      n = min(self.chunk_size, n_unprocessed_items)
+      chunk = self._get_next_chunk(n, step)
+      processed_items += n
+
+      # compute doi using the strategies
+      self._apply_context_strategy(chunk, step)
+
+      # measure inserting into storage time
+      self._insert_into_storage(chunk, step)
+
+    step.step_time = time() - step.step_time
+    return processed_items
+
   def _run_synchronously(self, update_interval: int):
     self.test_case_steps = []
     start_time = time()
@@ -127,39 +176,29 @@ class ProgressiveDoiPipeline():
     i = 0
     while processed_items < self.chunk_size*self.chunks:
       # run an update, using as much data as possible without retrieving any new data
-      step = DoiComputationTimeStep(i)
-      step.step_time = time()
       i += 1
-      n_unprocessed_items = self.chunk_size*self.chunks - processed_items
-
-      if i % update_interval == 0:
-        # update as much data as possible without retrieving any new data
-        now = time()
-        n = min(self.update_size, n_unprocessed_items)
-        chunk = self.update_strategy.get_outdated_items(n=n, current_chunk=i)
-        chunk = process_chunk(DataFrame(chunk))
-        doi = self.doi.compute_doi(chunk)
-        if len(chunk) > 0:
-          update_dois(chunk[ID].to_list(), doi)
-        step.outdated_time = time() - now
-      else:
-        # process the next chunk without an update
-        now = time()
-        n = min(self.chunk_size, n_unprocessed_items)
-        chunk = get_next_chunk_from_db(n, as_df=True)
-        processed_items += n
-        step.chunk_time = time() - now
-
-        # compute doi using the strategies
-        self._apply_context_strategy(chunk, step, i)
-
-        # measure inserting into storage time
-        now = time()
-        self.storage_strategy.insert_chunk(chunk, i)
-        step.storage_time = time() - now
+      step = DoiComputationTimeStep(i)
+      processed_items = self._run_next_synchronous_step(update_interval, processed_items, step)
+      self.test_case_steps += [step]
 
     # measure test case time
     self.total_time = time() - start_time
+
+  def _run_next_mixed_step(self, step: DoiComputationTimeStep):
+    step.step_time = time()
+
+    chunk = self._get_next_chunk(self.chunk_size, step)
+
+    # compute the doi function given the strategies
+    self._apply_context_strategy(chunk, step)
+    self._apply_update_strategy(chunk, step)
+
+    # measure inserting into storage time
+    self._insert_into_storage(chunk, step)
+
+    # measure step time
+    step.step_time = time() - step.step_time
+    return step
 
   def _run_mixed(self):
     self.test_case_steps = []
@@ -167,24 +206,7 @@ class ProgressiveDoiPipeline():
 
     for i in range(self.chunks):
       step = DoiComputationTimeStep(i)
-      step.step_time = time()
-
-      # measure data retrieval time
-      now = time()
-      chunk = get_next_chunk_from_db(self.chunk_size, as_df=True)
-      step.chunk_time = time() - now
-
-      # compute doi using the strategies
-      self._apply_context_strategy(chunk, step, i)
-      self._apply_update_strategy(chunk, step, i)
-
-      # measure inserting into storage time
-      now = time()
-      self.storage_strategy.insert_chunk(chunk, i)
-      step.storage_time = time() - now
-
-      # measure step time
-      step.step_time = time() - step.step_time
+      self._run_next_mixed_step(step)
       self.test_case_steps += [step]
 
     # measure test case time
