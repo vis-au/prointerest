@@ -10,14 +10,15 @@ import json
 from copy import copy
 from test_case import (get_dataset_config, get_doi_config, get_parameters_config, get_path,
                        get_strategy_config, create_test_case, generate_strategies,
-                       StrategiesConfiguration)
+                       StrategiesConfiguration, TestCase)
 
 
-def load_test_case(index: int):
+# load a test case from test_cases.json and parse it into the TestCase format
+def load_test_case(index: int) -> TestCase:
   TEST_CASES = json.load(open("./test_cases.json"))
   test_case_config = TEST_CASES["test_cases"][index]
   doi_label = test_case_config["doi"]
-  data_label = test_case_config["datasets"]
+  data_label = test_case_config["dataset"]
   parameter_label = test_case_config["parameters"]
 
   params_config = get_parameters_config(parameter_label)
@@ -41,13 +42,30 @@ def load_test_case(index: int):
     path=PATH
   )
 
+
+# load a test case with index _index_ from test_cases.json and run it
 def run_single_test_case(index: int):
   tc = load_test_case(index)
   print(tc.name, tc.doi_csv_path)
   tc.run()
+  print(f"done ({tc.pipeline.total_time})s")
 
 
-def run_test_case_for_all_strategies(index: int, all_storages: bool = False):
+# n datasets : 1 parameter : 1 pipeline
+def run_pipeline_on_all_datasets(strategy: StrategiesConfiguration):
+  TEST_CASES = json.load(open("./test_cases.json"))
+  test_cases = TEST_CASES["test_cases"]
+
+  for index in enumerate(test_cases):
+    test_case = load_test_case(index)
+    test_case.strategies = strategy
+    print(f"({index}/{len(test_cases)}): {test_case.name}")
+    test_case.run()
+    print(f"done ({test_case.pipeline.total_time})s")
+
+
+# 1 dataset : 1 parameter : n pipelines
+def run_test_case_for_all_pipelines(index: int, all_storages: bool = False):
   tc = load_test_case(index)
 
   contexts_, updates_, storages_ = generate_strategies(tc.data, tc.params)
@@ -73,8 +91,6 @@ def run_test_case_for_all_strategies(index: int, all_storages: bool = False):
 
         completed_tcs += 1
         print(f"({completed_tcs}/{total_tcs}): {tc_.name}")
+
         tc_.run()
-
-
-# run_single_test_case(0)
-run_test_case_for_all_strategies(0)
+        print(f"done ({tc_.pipeline.total_time})s")

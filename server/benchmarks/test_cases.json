@@ -15,7 +15,7 @@
   ],
   "test_cases": [
     {
-      "datasets": "blobs",
+      "dataset": "blobs",
       "doi": "averageness",
       "storage_strategy": "windowing",
       "context_strategy": "doi based",

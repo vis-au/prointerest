@@ -70,6 +70,16 @@ class TestCase:
   times_csv_path: str = field(default_factory=lambda: None)
   pipeline: ProgressiveDoiPipeline = None
 
+  def __copy__(self):
+    return TestCase(
+      self.name,
+      self.strategies,
+      self.data,
+      self.doi,
+      self.params,
+      self.doi_csv_path
+    )
+
   def _generate_pipeline(self) -> ProgressiveDoiPipeline:
     return ProgressiveDoiPipeline(
       name=self.name,
