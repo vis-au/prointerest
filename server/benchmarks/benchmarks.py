@@ -80,6 +80,7 @@ def run_test_case_on_all_datasets(index: int, datasets: dict = None) -> None:
     tc = copy(test_case)
     data_config = get_dataset_config(data_label)
     tc.data = data_config
+    tc.name = f"{tc.name}-{data_label}"
     print(f"({i}/{len(datasets.keys())}): {test_case.name}")
     tc.run()
     print(f"done: {tc.pipeline.total_time}s")
@@ -96,6 +97,7 @@ def run_test_case_on_all_parameters(index: int, parameters: dict = None) -> None
     tc = copy(test_case)
     parameter_config = get_parameters_config(parameter_label)
     tc.params = parameter_config
+    tc.name = f"{tc.name}-{parameter_label}"
     print(f"({i}/{len(parameters.keys())}): {test_case.name}")
     tc.run()
     print(f"done: {tc.pipeline.total_time}s")
@@ -112,6 +114,7 @@ def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = No
     tc = copy(test_case)
     doi_config = get_doi_config(doi_function, tc.data)
     tc.doi = doi_config
+    tc.name = f"{tc.name}-{doi_function}"
     print(f"({i}/{len(doi_functions.keys())}): {test_case.name}")
     tc.run()
     print(f"done: {tc.pipeline.total_time}s")
@@ -128,7 +131,7 @@ def run_test_case_for_all_strategies(index: int, all_storages: bool = False) -> 
   if all_storages:
     total_tcs *= len(storages_)
   else:
-    storages_ = [storages_[0]]  # first element is windowing strategy
+    storages_ = [s for s in storages_ if s[0] == "windowing"]
 
   print(f"data: {tc.data.name}, {get_short_title(tc.doi, tc.params)}\n####")
 
@@ -137,13 +140,14 @@ def run_test_case_for_all_strategies(index: int, all_storages: bool = False) -> 
     for u in updates_:
       for s in storages_:
         strategy_config = StrategiesConfiguration(
-          name=f"{s[0]}-{u[0]}-{c[0]}",
+          name=f"{s[0]}-{u[0]}-{c[0]}" if all_storages else f"{u[0]}-{c[0]}",
           context_strategy=c[1](),
           update_strategy=u[1](),
           storage_strategy=s[1]()
         )
         tc_ = copy(tc)
         tc_.strategies = strategy_config
+        tc_.name = strategy_config.name
 
         completed_tcs += 1
         print(f"({completed_tcs}/{total_tcs}): {tc_.name}")
