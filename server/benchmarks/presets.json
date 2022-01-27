@@ -3,8 +3,7 @@
     "density",
     "sort",
     "outlierness",
-    "averageness",
-    "scagnostics"
+    "averageness"
   ],
   "parameters": {
     "120k": {
