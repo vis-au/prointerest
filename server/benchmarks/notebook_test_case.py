@@ -1,30 +1,34 @@
-import os
-from sys import path
 import altair as alt
 
-# make this script "top level" to allow importing database module, etc.
-if True:
-  cwd = os.getcwd()
-  path.append(f"{cwd}/..")
-
-from test_case import (DatasetConfiguration, DoiConfiguration, ParametersConfiguration,
-                       get_dataset_config, get_doi_config, get_parameters_config, get_path,
-                       generate_strategies)
-
+from benchmarks import load_test_case, DATASET_SUBDIR, DOI_SUBDIR, PARAMETER_SUBDIR, STRATEGY_SUBDIR
+from context_strategies import get_context_strategies
+from update_strategies import get_update_strategies
+from test_case import get_path
 
 # load benchmark configuration
-doi_label = "averageness"
-data_label = "blobs"
-parameter_label = "120"
+modes = ["strategies", "dois", "datasets", "parameters"]
+MODE = "strategies"  # which variable the benchmarks are run over / results are shown by
+TEST_CASE_INDEX = 0
 
-DATA: DatasetConfiguration = get_dataset_config(data_label)
-DOI_CONFIG: DoiConfiguration = get_doi_config(doi_label, DATA)
-PARAMETERS: ParametersConfiguration = get_parameters_config(parameter_label)
+tc = load_test_case(TEST_CASE_INDEX)
+DATA = tc.data
+PARAMETERS = tc.params
+DOI_CONFIG = tc.doi
 
-# create the path for storing the benchmark results if they do not exist
-PATH = get_path(data_label, doi_label, PARAMETERS.total_size, PARAMETERS.chunk_size)
+subdir = ""
+if MODE == "strategies":
+  subdir = STRATEGY_SUBDIR
+elif MODE == "dois":
+  subdir = DOI_SUBDIR
+elif MODE == "datasets":
+  subdir = DATASET_SUBDIR
+elif MODE == "parameters":
+  subdir = PARAMETER_SUBDIR
 
-context_strategies, update_strategies, storage_strategies = generate_strategies(DATA, PARAMETERS)
+PATH = get_path(DATA.name, DOI_CONFIG.name, PARAMETERS.total_size, PARAMETERS.chunk_size, subdir)
+
+CONTEXT_STRATEGIES = get_context_strategies(DATA.n_dims, PARAMETERS.chunks, PARAMETERS.n_bins)
+UPDATE_STRATEGIES = get_update_strategies(DATA.n_dims, PARAMETERS.chunks, PARAMETERS.max_age)
 
 # altair visualizations use the data server extension to reduce notebook size
 alt.data_transformers.enable("data_server")

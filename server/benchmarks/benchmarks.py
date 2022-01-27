@@ -22,7 +22,7 @@ STRATEGY_SUBDIR = "strategies"
 
 
 # load a test case from test_cases.json and parse it into the TestCase format
-def load_test_case(index: int, subdir: str = None) -> TestCase:
+def load_test_case(index: int, mode: str = None) -> TestCase:
   test_cases = get_all_test_cases()
   test_case_config = test_cases[index]
   doi_label = test_case_config["doi"]
@@ -39,7 +39,7 @@ def load_test_case(index: int, subdir: str = None) -> TestCase:
   strategy_config = get_strategy_config(c, u, s, params_config, data_config)
   name = strategy_config.name
 
-  PATH = get_path(data_label, doi_label, params_config.total_size, params_config.chunk_size, subdir)
+  PATH = get_path(data_label, doi_label, params_config.total_size, params_config.chunk_size, mode)
 
   return create_test_case(
     name=name,
@@ -68,17 +68,51 @@ def get_doi_function_presets():
 
 
 # load a test case with index _index_ from test_cases.json and run it
-def run_test_case_config(index: int):
+def run_test_case(index: int):
   tc = load_test_case(index)
   print(tc.name, tc.doi_csv_path)
   tc.run()
   print(f"done: {tc.pipeline.total_time}s")
 
 
+# load test case with index __index__ from test_cases.json and run it in mixed mode
+def run_test_case_mixed(index: int, mode: str = None):
+  tc = load_test_case(index)
+  tc.params.update_interval = 0  # update interval 0 --> mixed update, i.e., updates at every chunk
+  tc.run()
+  print(f"done: {tc.pipeline.total_time}s")
+
+
+# load test case with index __index__ from test_cases.json and run its ground truth
+def run_test_case_ground_truth(index: int, mode: str = None):
+  tc = load_test_case(index)
+  data = tc.data
+  params = tc.params
+  doi = tc.doi
+  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
+  ground_truth_tc = create_ground_truth_test_case(tc.data, tc.doi, tc.params, PATH)
+  print(ground_truth_tc.name, ground_truth_tc.doi_csv_path)
+  ground_truth_tc.run()
+  print(f"done: {ground_truth_tc.pipeline.total_time}s")
+
+
+# load test case with index __index__ from test_cases.json, run it, and use all "space" for new data
+def run_test_case_bigger_chunks(index: int, mode: str = None):
+  tc = load_test_case(index)
+  data = tc.data
+  params = tc.params
+  doi = tc.doi
+  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
+  bigger_chunks_tc = create_bigger_chunks_test_case(tc.data, tc.doi, tc.params, PATH)
+  print(bigger_chunks_tc.name, bigger_chunks_tc.doi_csv_path)
+  bigger_chunks_tc.run()
+  print(f"done: {bigger_chunks_tc.pipeline.total_time}s")
+
+
 # n datasets : 1 parameter set : 1 doi : 1 set of strategies
 def run_test_case_on_all_datasets(index: int, datasets: dict = None) -> None:
   datasets = get_dataset_presets() if datasets is None else datasets
-  test_case = load_test_case(index, subdir=DATASET_SUBDIR)
+  test_case = load_test_case(index, mode=DATASET_SUBDIR)
 
   i = 1
   for data_label in datasets:
@@ -95,7 +129,7 @@ def run_test_case_on_all_datasets(index: int, datasets: dict = None) -> None:
 # 1 dataset : n parameter sets : 1 doi : 1 set of strategies
 def run_test_case_on_all_parameters(index: int, parameters: dict = None) -> None:
   parameters = get_parameter_presets() if parameters is None else parameters
-  test_case = load_test_case(index, subdir=PARAMETER_SUBDIR)
+  test_case = load_test_case(index, mode=PARAMETER_SUBDIR)
 
   i = 1
   for parameter_label in parameters:
@@ -112,7 +146,7 @@ def run_test_case_on_all_parameters(index: int, parameters: dict = None) -> None
 # 1 dataset : 1 parameter set : n dois : 1 set of strategies
 def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = None) -> None:
   doi_functions = get_doi_function_presets() if doi_functions is None else doi_functions
-  test_case = load_test_case(index, subdir=DOI_SUBDIR)
+  test_case = load_test_case(index, mode=DOI_SUBDIR)
 
   i = 1
   for doi_function in doi_functions:
@@ -128,7 +162,7 @@ def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = No
 
 # 1 dataset : 1 parameter set : 1 doi : n sets of strategies
 def run_test_case_for_all_strategies(index: int, all_storages: bool = False) -> None:
-  tc = load_test_case(index, subdir=STRATEGY_SUBDIR)
+  tc = load_test_case(index, mode=STRATEGY_SUBDIR)
 
   contexts_, updates_, storages_ = generate_strategies(tc.data, tc.params)
   total_tcs = len(contexts_)*len(updates_)
@@ -166,4 +200,4 @@ def run_all_test_cases() -> None:
   n_test_cases = len(get_all_test_cases())
 
   for i in range(n_test_cases):
-    run_test_case_config(i)
+    run_test_case(i)
