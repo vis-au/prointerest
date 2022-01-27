@@ -2,21 +2,24 @@ if True:
   import os
   from sys import path
 
-  # make this script "top level"
+  # make all files of the parent directory part of the path of this script, so that imports work
+  # from notebooks and when running this script as __main__
   cwd = os.getcwd()
   path.append(f"{cwd}/..")
 
 import json
 from copy import copy
-from test_case import (get_dataset_config, get_doi_config, get_parameters_config, get_path,
-                       get_strategy_config, create_test_case, generate_strategies,
-                       StrategiesConfiguration, TestCase)
+from test_case import *
+
+
+PRESETS_PATH = "./presets.json"
+TEST_CASES_PATH = "./test_cases.json"
 
 
 # load a test case from test_cases.json and parse it into the TestCase format
 def load_test_case(index: int) -> TestCase:
-  TEST_CASES = json.load(open("./test_cases.json"))
-  test_case_config = TEST_CASES["test_cases"][index]
+  test_cases = get_all_test_cases()
+  test_case_config = test_cases[index]
   doi_label = test_case_config["doi"]
   data_label = test_case_config["dataset"]
   parameter_label = test_case_config["parameters"]
@@ -43,29 +46,80 @@ def load_test_case(index: int) -> TestCase:
   )
 
 
+def get_all_test_cases():
+  return json.load(open(TEST_CASES_PATH))["test_cases"]
+
+
+def get_dataset_presets():
+  return json.load(open(PRESETS_PATH))["datasets"]
+
+
+def get_parameter_presets():
+  return json.load(open(PRESETS_PATH))["parameters"]
+
+
+def get_doi_function_presets():
+  return json.load(open(PRESETS_PATH))["doi_functions"]
+
+
 # load a test case with index _index_ from test_cases.json and run it
-def run_single_test_case(index: int):
+def run_test_case_config(index: int):
   tc = load_test_case(index)
   print(tc.name, tc.doi_csv_path)
   tc.run()
-  print(f"done ({tc.pipeline.total_time})s")
+  print(f"done: {tc.pipeline.total_time}s")
 
 
-# n datasets : 1 parameter : 1 pipeline
-def run_pipeline_on_all_datasets(strategy: StrategiesConfiguration):
-  TEST_CASES = json.load(open("./test_cases.json"))
-  test_cases = TEST_CASES["test_cases"]
+# n datasets : 1 parameter set : 1 doi : 1 set of strategies
+def run_test_case_on_all_datasets(index: int, datasets: dict = None) -> None:
+  datasets = get_dataset_presets() if datasets is None else datasets
+  test_case = load_test_case(index)
 
-  for index in enumerate(test_cases):
-    test_case = load_test_case(index)
-    test_case.strategies = strategy
-    print(f"({index}/{len(test_cases)}): {test_case.name}")
-    test_case.run()
-    print(f"done ({test_case.pipeline.total_time})s")
+  i = 1
+  for data_label in datasets:
+    tc = copy(test_case)
+    data_config = get_dataset_config(data_label)
+    tc.data = data_config
+    print(f"({i}/{len(datasets.keys())}): {test_case.name}")
+    tc.run()
+    print(f"done: {tc.pipeline.total_time}s")
+    i += 1
 
 
-# 1 dataset : 1 parameter : n pipelines
-def run_test_case_for_all_pipelines(index: int, all_storages: bool = False):
+# 1 dataset : n parameter sets : 1 doi : 1 set of strategies
+def run_test_case_on_all_parameters(index: int, parameters: dict = None) -> None:
+  parameters = get_parameter_presets() if parameters is None else parameters
+  test_case = load_test_case(index)
+
+  i = 1
+  for parameter_label in parameters:
+    tc = copy(test_case)
+    parameter_config = get_parameters_config(parameter_label)
+    tc.params = parameter_config
+    print(f"({i}/{len(parameters.keys())}): {test_case.name}")
+    tc.run()
+    print(f"done: {tc.pipeline.total_time}s")
+    i += 1
+
+
+# 1 dataset : 1 parameter set : n dois : 1 set of strategies
+def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = None) -> None:
+  doi_functions = get_doi_function_presets() if doi_functions is None else doi_functions
+  test_case = load_test_case(index)
+
+  i = 1
+  for doi_function in doi_functions:
+    tc = copy(test_case)
+    doi_config = get_doi_config(doi_function, tc.data)
+    tc.doi = doi_config
+    print(f"({i}/{len(doi_functions.keys())}): {test_case.name}")
+    tc.run()
+    print(f"done: {tc.pipeline.total_time}s")
+    i += 1
+
+
+# 1 dataset : 1 parameter set : 1 doi : n sets of strategies
+def run_test_case_for_all_strategies(index: int, all_storages: bool = False) -> None:
   tc = load_test_case(index)
 
   contexts_, updates_, storages_ = generate_strategies(tc.data, tc.params)
@@ -75,6 +129,8 @@ def run_test_case_for_all_pipelines(index: int, all_storages: bool = False):
     total_tcs *= len(storages_)
   else:
     storages_ = [storages_[0]]  # first element is windowing strategy
+
+  print(f"data: {tc.data.name}, {get_short_title(tc.doi, tc.params)}\n####")
 
   completed_tcs = 0
   for c in contexts_:
@@ -93,4 +149,12 @@ def run_test_case_for_all_pipelines(index: int, all_storages: bool = False):
         print(f"({completed_tcs}/{total_tcs}): {tc_.name}")
 
         tc_.run()
-        print(f"done ({tc_.pipeline.total_time})s")
+        print(f"done: {tc_.pipeline.total_time}s")
+
+
+# P datasets : Q parameter sets : R dois : S sets of strategies
+def run_all_test_cases() -> None:
+  n_test_cases = len(get_all_test_cases())
+
+  for i in range(n_test_cases):
+    run_test_case_config(i)
