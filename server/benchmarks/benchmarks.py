@@ -67,8 +67,7 @@ def get_doi_function_presets():
   return json.load(open(PRESETS_PATH))["doi_functions"]
 
 
-# load a test case with index _index_ from test_cases.json and run it
-def run_test_case(index: int):
+def run_test_case_config(index: int):
   tc = load_test_case(index)
   print(tc.name, tc.doi_csv_path)
   tc.run()
@@ -112,15 +111,15 @@ def run_test_case_bigger_chunks(index: int, mode: str = None):
 # n datasets : 1 parameter set : 1 doi : 1 set of strategies
 def run_test_case_on_all_datasets(index: int, datasets: dict = None) -> None:
   datasets = get_dataset_presets() if datasets is None else datasets
-  test_case = load_test_case(index, mode=DATASET_SUBDIR)
 
   i = 1
   for data_label in datasets:
-    tc = copy(test_case)
+    tc = load_test_case(index, mode=DATASET_SUBDIR)
     data_config = get_dataset_config(data_label)
     tc.data = data_config
+    tc.doi = get_doi_config(tc.doi.name, tc.data)
     tc.name = f"{tc.name}-{data_label}"
-    print(f"({i}/{len(datasets.keys())}): {test_case.name}")
+    print(f"({i}/{len(datasets.keys())}): {tc.name}")
     tc.run()
     print(f"done: {tc.pipeline.total_time}s")
     i += 1
@@ -129,15 +128,14 @@ def run_test_case_on_all_datasets(index: int, datasets: dict = None) -> None:
 # 1 dataset : n parameter sets : 1 doi : 1 set of strategies
 def run_test_case_on_all_parameters(index: int, parameters: dict = None) -> None:
   parameters = get_parameter_presets() if parameters is None else parameters
-  test_case = load_test_case(index, mode=PARAMETER_SUBDIR)
 
   i = 1
   for parameter_label in parameters:
-    tc = copy(test_case)
+    tc = load_test_case(index, mode=PARAMETER_SUBDIR)
     parameter_config = get_parameters_config(parameter_label)
     tc.params = parameter_config
     tc.name = f"{tc.name}-{parameter_label}"
-    print(f"({i}/{len(parameters.keys())}): {test_case.name}")
+    print(f"({i}/{len(parameters.keys())}): {tc.name}")
     tc.run()
     print(f"done: {tc.pipeline.total_time}s")
     i += 1
@@ -146,15 +144,14 @@ def run_test_case_on_all_parameters(index: int, parameters: dict = None) -> None
 # 1 dataset : 1 parameter set : n dois : 1 set of strategies
 def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = None) -> None:
   doi_functions = get_doi_function_presets() if doi_functions is None else doi_functions
-  test_case = load_test_case(index, mode=DOI_SUBDIR)
 
   i = 1
   for doi_function in doi_functions:
-    tc = copy(test_case)
+    tc = load_test_case(index, mode=DOI_SUBDIR)
     doi_config = get_doi_config(doi_function, tc.data)
     tc.doi = doi_config
     tc.name = f"{tc.name}-{doi_function}"
-    print(f"({i}/{len(doi_functions.keys())}): {test_case.name}")
+    print(f"({i}/{len(doi_functions.keys())}): {tc.name}")
     tc.run()
     print(f"done: {tc.pipeline.total_time}s")
     i += 1
@@ -178,13 +175,13 @@ def run_test_case_for_all_strategies(index: int, all_storages: bool = False) -> 
   for c in contexts_:
     for u in updates_:
       for s in storages_:
+        tc_ = load_test_case(index, mode=STRATEGY_SUBDIR)
         strategy_config = StrategiesConfiguration(
           name=f"{s[0]}-{u[0]}-{c[0]}" if all_storages else f"{u[0]}-{c[0]}",
           context_strategy=c[1](),
           update_strategy=u[1](),
           storage_strategy=s[1]()
         )
-        tc_ = copy(tc)
         tc_.strategies = strategy_config
         tc_.name = strategy_config.name
 
@@ -196,8 +193,37 @@ def run_test_case_for_all_strategies(index: int, all_storages: bool = False) -> 
 
 
 # P datasets : Q parameter sets : R dois : S sets of strategies
-def run_all_test_cases() -> None:
+def run_all_test_case_configs() -> None:
   n_test_cases = len(get_all_test_cases())
 
   for i in range(n_test_cases):
-    run_test_case(i)
+    run_test_case_config(i)
+
+
+# load a test case with index _index_ from test_cases.json and run it
+def run_test_case(index: int, mode: str = None):
+  if mode == "strategies":
+    run_test_case_for_all_strategies(index)
+  elif mode == "dois":
+    run_test_case_on_all_doi_functions(index)
+  elif mode == "datasets":
+    run_test_case_on_all_datasets(index)
+  elif mode == "parameters":
+    run_test_case_on_all_parameters(index)
+  else:
+    run_test_case_config(index)
+
+
+if __name__ == "__main__":
+  import sys
+  if len(sys.argv) == 1:
+    raise Exception("please provide the index of a test case from test_case.json and, optionally, "
+                    "an execution mode.")
+  else:
+    if not isinstance(int(sys.argv[1]), int):
+      raise Exception("make sure the test case you provide is an integer.")
+
+    if len(sys.argv) == 2:
+      run_test_case(sys.argv[1])
+    else:
+      run_test_case(index=int(sys.argv[1]), mode=sys.argv[2])
