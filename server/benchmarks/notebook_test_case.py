@@ -6,8 +6,8 @@ from update_strategies import get_update_strategies
 from test_case import get_path
 
 # load benchmark configuration
-modes = ["strategies", "dois", "datasets", "parameters"]
-MODE = "strategies"  # which variable the benchmarks are run over / results are shown by
+# available modes: ["strategies", "dois", "datasets", "parameters"]
+MODE = "datasets"  # which variable the benchmarks are run over / results are shown by
 TEST_CASE_INDEX = 0
 
 tc = load_test_case(TEST_CASE_INDEX)

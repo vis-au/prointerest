@@ -9,14 +9,17 @@ if True:
 
 import json
 from copy import copy
+from typing import Literal
 from test_case import *
 
+
+STATE = Literal["single", "bigger_chunks", "ground_truth"]
 
 PRESETS_PATH = "./presets.json"
 TEST_CASES_PATH = "./test_cases.json"
 
 DATASET_SUBDIR = "datasets"
-DOI_SUBDIR = "doi"
+DOI_SUBDIR = "dois"
 PARAMETER_SUBDIR = "parameters"
 STRATEGY_SUBDIR = "strategies"
 
@@ -82,34 +85,9 @@ def run_test_case_mixed(index: int, mode: str = None):
   print(f"done: {tc.pipeline.total_time}s")
 
 
-# load test case with index __index__ from test_cases.json and run its ground truth
-def run_test_case_ground_truth(index: int, mode: str = None):
-  tc = load_test_case(index)
-  data = tc.data
-  params = tc.params
-  doi = tc.doi
-  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
-  ground_truth_tc = create_ground_truth_test_case(tc.data, tc.doi, tc.params, PATH)
-  print(ground_truth_tc.name, ground_truth_tc.doi_csv_path)
-  ground_truth_tc.run()
-  print(f"done: {ground_truth_tc.pipeline.total_time}s")
-
-
-# load test case with index __index__ from test_cases.json, run it, and use all "space" for new data
-def run_test_case_bigger_chunks(index: int, mode: str = None):
-  tc = load_test_case(index)
-  data = tc.data
-  params = tc.params
-  doi = tc.doi
-  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
-  bigger_chunks_tc = create_bigger_chunks_test_case(tc.data, tc.doi, tc.params, PATH)
-  print(bigger_chunks_tc.name, bigger_chunks_tc.doi_csv_path)
-  bigger_chunks_tc.run()
-  print(f"done: {bigger_chunks_tc.pipeline.total_time}s")
-
-
 # n datasets : 1 parameter set : 1 doi : 1 set of strategies
-def run_test_case_on_all_datasets(index: int, datasets: dict = None) -> None:
+def run_test_case_on_all_datasets(index: int, datasets: dict = None,
+                                  state: STATE = "single") -> None:
   datasets = get_dataset_presets() if datasets is None else datasets
 
   i = 1
@@ -120,13 +98,20 @@ def run_test_case_on_all_datasets(index: int, datasets: dict = None) -> None:
     tc.doi = get_doi_config(tc.doi.name, tc.data)
     tc.name = f"{tc.name}-{data_label}"
     print(f"({i}/{len(datasets.keys())}): {tc.name}")
+
+    if state == "bigger_chunks":
+      tc = transform_into_bigger_chunks_test_case(tc, mode=DATASET_SUBDIR)
+    elif state == "ground_truth":
+      tc = transform_into_ground_truth_test_case(tc, mode=DATASET_SUBDIR)
+
     tc.run()
     print(f"done: {tc.pipeline.total_time}s")
     i += 1
 
 
 # 1 dataset : n parameter sets : 1 doi : 1 set of strategies
-def run_test_case_on_all_parameters(index: int, parameters: dict = None) -> None:
+def run_test_case_on_all_parameters(index: int, parameters: dict = None,
+                                    state: STATE = "single") -> None:
   parameters = get_parameter_presets() if parameters is None else parameters
 
   i = 1
@@ -136,13 +121,20 @@ def run_test_case_on_all_parameters(index: int, parameters: dict = None) -> None
     tc.params = parameter_config
     tc.name = f"{tc.name}-{parameter_label}"
     print(f"({i}/{len(parameters.keys())}): {tc.name}")
+
+    if state == "bigger_chunks":
+      tc = transform_into_bigger_chunks_test_case(tc, STRATEGY_SUBDIR)
+    elif state == "ground_truth":
+      tc = transform_into_ground_truth_test_case(tc, STRATEGY_SUBDIR)
+
     tc.run()
     print(f"done: {tc.pipeline.total_time}s")
     i += 1
 
 
 # 1 dataset : 1 parameter set : n dois : 1 set of strategies
-def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = None) -> None:
+def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = None,
+                                       state: STATE = "single") -> None:
   doi_functions = get_doi_function_presets() if doi_functions is None else doi_functions
 
   i = 1
@@ -151,7 +143,13 @@ def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = No
     doi_config = get_doi_config(doi_function, tc.data)
     tc.doi = doi_config
     tc.name = f"{tc.name}-{doi_function}"
-    print(f"({i}/{len(doi_functions.keys())}): {tc.name}")
+    print(f"({i}/{len(doi_functions)}): {tc.name}")
+
+    if state == "bigger_chunks":
+      tc = transform_into_bigger_chunks_test_case(tc, STRATEGY_SUBDIR)
+    elif state == "ground_truth":
+      tc = transform_into_ground_truth_test_case(tc, STRATEGY_SUBDIR)
+
     tc.run()
     print(f"done: {tc.pipeline.total_time}s")
     i += 1
@@ -214,16 +212,70 @@ def run_test_case(index: int, mode: str = None):
     run_test_case_config(index)
 
 
+def transform_into_bigger_chunks_test_case(test_case: TestCase, mode: str = None):
+  data = test_case.data
+  params = test_case.params
+  doi = test_case.doi
+  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
+
+  return create_bigger_chunks_test_case(test_case.data, test_case.doi, test_case.params, PATH)
+
+
+# load test case with index __index__ from test_cases.json, run it, and use all "space" for new data
+def run_test_case_bigger_chunks(index: int, mode: str = None):
+  if mode == "dois":
+    run_test_case_on_all_doi_functions(index, state="bigger_chunks")
+  elif mode == "datasets":
+    run_test_case_on_all_datasets(index, state="bigger_chunks")
+  elif mode == "parameters":
+    run_test_case_on_all_parameters(index, state="bigger_chunks")
+  else:
+    tc = load_test_case(index)
+    bigger_chunks_tc = transform_into_bigger_chunks_test_case(tc, mode)
+    print(bigger_chunks_tc.name, bigger_chunks_tc.doi_csv_path)
+    bigger_chunks_tc.run()
+    print(f"done: {bigger_chunks_tc.pipeline.total_time}s")
+
+
+def transform_into_ground_truth_test_case(test_case: TestCase, mode: str = None):
+  data = test_case.data
+  params = test_case.params
+  doi = test_case.doi
+  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
+
+  return create_ground_truth_test_case(test_case.data, test_case.doi, test_case.params, PATH)
+
+
+# load test case with index __index__ from test_cases.json and run its ground truth
+def run_test_case_ground_truth(index: int, mode: str = None):
+  if mode == "dois":
+    run_test_case_on_all_doi_functions(index, state="ground_truth")
+  elif mode == "datasets":
+    run_test_case_on_all_datasets(index, state="ground_truth")
+  elif mode == "parameters":
+    run_test_case_on_all_parameters(index, state="ground_truth")
+  else:
+    tc = load_test_case(index)
+    ground_truth_tc = transform_into_ground_truth_test_case(tc, mode)
+    print(ground_truth_tc.name, ground_truth_tc.doi_csv_path)
+    ground_truth_tc.run()
+    print(f"done: {ground_truth_tc.pipeline.total_time}s")
+
+
 if __name__ == "__main__":
   import sys
   if len(sys.argv) == 1:
     raise Exception("please provide the index of a test case from test_case.json and, optionally, "
                     "an execution mode.")
   else:
-    if not isinstance(int(sys.argv[1]), int):
-      raise Exception("make sure the test case you provide is an integer.")
-
     if len(sys.argv) == 2:
-      run_test_case(sys.argv[1])
+      try:
+        isinstance(int(sys.argv[1]), int)  # throws an error if argv[1] is not an integer
+        run_test_case(sys.argv[1])
+      except ValueError:
+        if sys.argv[1].lower() == "all":
+          run_all_test_case_configs()
+        else:
+          raise Exception("make sure the first parameter you provide is an integer or 'all'.")
     else:
       run_test_case(index=int(sys.argv[1]), mode=sys.argv[2])
