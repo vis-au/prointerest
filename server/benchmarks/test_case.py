@@ -77,7 +77,8 @@ class TestCase:
       self.data,
       self.doi,
       self.params,
-      self.doi_csv_path
+      self.doi_csv_path,
+      self.times_csv_path
     )
 
   def _generate_pipeline(self) -> ProgressiveDoiPipeline:
@@ -258,6 +259,7 @@ def get_strategy_config(context_label: str, update_label: str, storage_label: st
     update_strategy=update_,
     storage_strategy=storage_
   )
+
 
 def generate_strategies(data: DatasetConfiguration, params: ParametersConfiguration):
   context_size = params.context_size
