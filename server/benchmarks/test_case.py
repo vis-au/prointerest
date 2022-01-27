@@ -291,8 +291,12 @@ def get_full_title(doi: DoiConfiguration, params: ParametersConfiguration,
           f"bins: {params.n_bins}, age: {params.max_age}\n"
 
 
-def get_path(data_label: str, doi_label: str, total_size: int, chunk_size: int) -> str:
+def get_path(data_label: str, doi_label: str, total_size: int, chunk_size: int,
+             subdir: str = None) -> str:
+
   path = f"./out/{data_label}/{doi_label}/{total_size}/{chunk_size}"
+  if subdir is not None:
+    path = f"{path}/{subdir}"
 
   if not os.path.exists("./out"):
     os.mkdir("./out")
@@ -302,6 +306,8 @@ def get_path(data_label: str, doi_label: str, total_size: int, chunk_size: int) 
     os.mkdir(f"./out/{data_label}/{doi_label}")
   if not os.path.exists(f"./out/{data_label}/{doi_label}/{total_size}"):
     os.mkdir(f"./out/{data_label}/{doi_label}/{total_size}")
+  if subdir is not None and not os.path.exists(f"./out/{data_label}/{doi_label}/{chunk_size}"):
+    os.mkdir(f"./out/{data_label}/{doi_label}/{total_size}/{chunk_size}")
   if not os.path.exists(path):
     os.mkdir(path)
 

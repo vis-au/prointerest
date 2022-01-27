@@ -17,7 +17,7 @@ TEST_CASES_PATH = "./test_cases.json"
 
 
 # load a test case from test_cases.json and parse it into the TestCase format
-def load_test_case(index: int) -> TestCase:
+def load_test_case(index: int, subdir: str = None) -> TestCase:
   test_cases = get_all_test_cases()
   test_case_config = test_cases[index]
   doi_label = test_case_config["doi"]
@@ -34,7 +34,7 @@ def load_test_case(index: int) -> TestCase:
   strategy_config = get_strategy_config(c, u, s, params_config, data_config)
   name = strategy_config.name
 
-  PATH = get_path(data_label, doi_label, params_config.total_size, params_config.chunk_size)
+  PATH = get_path(data_label, doi_label, params_config.total_size, params_config.chunk_size, subdir)
 
   return create_test_case(
     name=name,
@@ -73,7 +73,7 @@ def run_test_case_config(index: int):
 # n datasets : 1 parameter set : 1 doi : 1 set of strategies
 def run_test_case_on_all_datasets(index: int, datasets: dict = None) -> None:
   datasets = get_dataset_presets() if datasets is None else datasets
-  test_case = load_test_case(index)
+  test_case = load_test_case(index, subdir="datasets")
 
   i = 1
   for data_label in datasets:
@@ -90,7 +90,7 @@ def run_test_case_on_all_datasets(index: int, datasets: dict = None) -> None:
 # 1 dataset : n parameter sets : 1 doi : 1 set of strategies
 def run_test_case_on_all_parameters(index: int, parameters: dict = None) -> None:
   parameters = get_parameter_presets() if parameters is None else parameters
-  test_case = load_test_case(index)
+  test_case = load_test_case(index, subdir="parameters")
 
   i = 1
   for parameter_label in parameters:
@@ -107,7 +107,7 @@ def run_test_case_on_all_parameters(index: int, parameters: dict = None) -> None
 # 1 dataset : 1 parameter set : n dois : 1 set of strategies
 def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = None) -> None:
   doi_functions = get_doi_function_presets() if doi_functions is None else doi_functions
-  test_case = load_test_case(index)
+  test_case = load_test_case(index, subdir="doi")
 
   i = 1
   for doi_function in doi_functions:
@@ -123,7 +123,7 @@ def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = No
 
 # 1 dataset : 1 parameter set : 1 doi : n sets of strategies
 def run_test_case_for_all_strategies(index: int, all_storages: bool = False) -> None:
-  tc = load_test_case(index)
+  tc = load_test_case(index, subdir="strategies")
 
   contexts_, updates_, storages_ = generate_strategies(tc.data, tc.params)
   total_tcs = len(contexts_)*len(updates_)
