@@ -1,3 +1,4 @@
+from os.path import join
 import pandas as pd
 import numpy as np
 
@@ -42,3 +43,34 @@ def get_doi_error_df(doi_df_a: pd.DataFrame, doi_df_b: pd.DataFrame, absolute=Tr
   else:
     diff = pd.DataFrame(doi_df_a["doi"] - doi_df_b["doi"])
   return diff
+
+
+def get_strategy_bc_errors(path_list: list[str], file_name: str, label: str):
+  strategies_error = pd.DataFrame()
+  bigger_chunks_errors = pd.DataFrame()
+
+  for test_case_path in path_list:
+    if "ground_truth" in test_case_path or "bigger_chunks" in test_case_path:
+      continue
+
+    if label == "dois":
+      test_case_label = test_case_path.split("/")[3]
+    elif label == "datasets":
+      test_case_label = test_case_path.split("/")[2]
+    elif label == "parameters":
+      test_case_label = "".join(test_case_path.split("/")[-3:-1])  # include data and chunk sizes
+
+    df = pd.read_csv(join(test_case_path, file_name))
+    gt = pd.read_csv(join(test_case_path, "__ground_truth__.csv"))
+    bc = pd.read_csv(join(test_case_path, "__bigger_chunks__.csv"))
+
+    strategy_error = get_doi_error_df(gt, df)
+    strategy_error[label] = test_case_label
+    strategies_error = strategies_error.append(strategy_error)
+    strategies_error = strategies_error.append(strategy_error)
+
+    bigger_chunks_error = get_doi_error_df(gt, bc)
+    bigger_chunks_error[label] = test_case_label
+    bigger_chunks_errors = bigger_chunks_errors.append(bigger_chunks_error)
+
+  return strategies_error, bigger_chunks_errors
