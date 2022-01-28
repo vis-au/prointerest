@@ -20,7 +20,7 @@ STATE = Literal["single", "bigger_chunks", "ground_truth"]
 
 PRESETS_PATH = "./presets.json"
 TEST_CASES_PATH = "./test_cases.json"
-MODES = ["strategies", "dois", "datasets", "parameters"]
+MODES = ["datasets", "dois", "parameters", "strategies"]  # order same as order in doi.csv paths
 
 
 # load a test case from test_cases.json and parse it into the TestCase format
@@ -94,7 +94,7 @@ def get_variant_for_variables(index: int, variables: list[str],
   for variable in variables:
     tc = load_test_case(index)
     tc = apply_variable(tc, variable)
-    tc.name = f"{tc.name}-{variable}"
+    tc.name = f"{tc.name}"
     params = tc.params
     doi = tc.doi
     data = tc.data
