@@ -7,7 +7,10 @@ if True:
   cwd = os.getcwd()
   path.append(f"{cwd}/..")
 
+from fileinput import filename
 import json
+import os
+from datetime import datetime
 from copy import copy
 from typing import Literal
 from test_case import *
@@ -18,14 +21,9 @@ STATE = Literal["single", "bigger_chunks", "ground_truth"]
 PRESETS_PATH = "./presets.json"
 TEST_CASES_PATH = "./test_cases.json"
 
-DATASET_SUBDIR = "datasets"
-DOI_SUBDIR = "dois"
-PARAMETER_SUBDIR = "parameters"
-STRATEGY_SUBDIR = "strategies"
-
 
 # load a test case from test_cases.json and parse it into the TestCase format
-def load_test_case(index: int, mode: str = None) -> TestCase:
+def load_test_case(index: int) -> TestCase:
   test_cases = get_all_test_cases()
   test_case_config = test_cases[index]
   doi_label = test_case_config["doi"]
@@ -42,7 +40,7 @@ def load_test_case(index: int, mode: str = None) -> TestCase:
   strategy_config = get_strategy_config(c, u, s, params_config, data_config)
   name = strategy_config.name
 
-  PATH = get_path(data_label, doi_label, params_config.total_size, params_config.chunk_size, mode)
+  PATH = get_path(data_label, doi_label, params_config.total_size, params_config.chunk_size)
 
   return create_test_case(
     name=name,
@@ -75,29 +73,38 @@ def run_test_case_config(index: int):
   print(tc.name, tc.doi_csv_path)
   tc.run()
   print(f"done: {tc.pipeline.total_time}s")
+  return tc
 
 
 # load test case with index __index__ from test_cases.json and run it in mixed mode
-def run_test_case_mixed(index: int, mode: str = None):
+def run_test_case_mixed(index: int):
   tc = load_test_case(index)
   tc.params.update_interval = 0  # update interval 0 --> mixed update, i.e., updates at every chunk
   tc.run()
   print(f"done: {tc.pipeline.total_time}s")
+  return tc
 
 
-def get_variant_for_variables(index: int, variables: list[str], mode: str,
+def get_variant_for_variables(index: int, variables: list[str],
                               apply_variable: Callable[[TestCase, str], TestCase],
                               state: STATE = "single") -> list[TestCase]:
   variants: list[TestCase] = []
   i = 1
   for variable in variables:
-    tc = load_test_case(index, mode)
+    tc = load_test_case(index)
     tc = apply_variable(tc, variable)
     tc.name = f"{tc.name}-{variable}"
+    params = tc.params
+    doi = tc.doi
+    data = tc.data
+    p = get_path(data.name, doi.name, params.total_size, params.chunk_size)
+    tc.doi_csv_path = f"{p}/doi/"
+    tc.times_csv_path = f"{p}/times/"
+
     if state == "bigger_chunks":
-      tc = transform_into_bigger_chunks_test_case(tc, STRATEGY_SUBDIR)
+      tc = transform_into_bigger_chunks_test_case(tc)
     elif state == "ground_truth":
-      tc = transform_into_ground_truth_test_case(tc, STRATEGY_SUBDIR)
+      tc = transform_into_ground_truth_test_case(tc)
 
     variants += [tc]
     i += 1
@@ -114,7 +121,7 @@ def get_variant_for_all_datasets(index: int, datasets: dict,
 
   data_labels = datasets.keys()
   variants = get_variant_for_variables(
-    index, data_labels, apply_variable=callback, state=state, mode=DATASET_SUBDIR
+    index, data_labels, apply_variable=callback, state=state
   )
 
   return variants
@@ -129,7 +136,7 @@ def get_variant_for_all_parameters(index: int, parameters: dict,
 
   params = parameters.keys()
   variants = get_variant_for_variables(
-    index, params, apply_variable=callback, state=state, mode=PARAMETER_SUBDIR
+    index, params, apply_variable=callback, state=state
   )
 
   return variants
@@ -143,14 +150,14 @@ def get_variant_for_all_doi_functions(index: int, dois: list[str],
     return tc
 
   variants = get_variant_for_variables(
-    index, dois, mode=DOI_SUBDIR, apply_variable=callback, state=state
+    index, dois, apply_variable=callback, state=state
   )
 
   return variants
 
 
 def get_variant_for_all_strategies(index: int, all_storages: bool = False) -> list[TestCase]:
-  tc = load_test_case(index, mode=STRATEGY_SUBDIR)
+  tc = load_test_case(index)
   contexts_, updates_, storages_ = generate_strategies(tc.data, tc.params)
 
   contexts_, updates_, storages_ = generate_strategies(tc.data, tc.params)
@@ -166,7 +173,7 @@ def get_variant_for_all_strategies(index: int, all_storages: bool = False) -> li
   for c in contexts_:
     for u in updates_:
       for s in storages_:
-        tc_ = load_test_case(index, mode=STRATEGY_SUBDIR)
+        tc_ = load_test_case(index)
         strategy_config = StrategiesConfiguration(
           name=f"{s[0]}-{u[0]}-{c[0]}" if all_storages else f"{u[0]}-{c[0]}",
           context_strategy=c[1](),
@@ -181,22 +188,49 @@ def get_variant_for_all_strategies(index: int, all_storages: bool = False) -> li
   return variants
 
 
-def transform_into_bigger_chunks_test_case(test_case: TestCase, mode: str = None):
+def transform_into_bigger_chunks_test_case(test_case: TestCase):
   data = test_case.data
   params = test_case.params
   doi = test_case.doi
-  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
+  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size)
 
   return create_bigger_chunks_test_case(test_case.data, test_case.doi, test_case.params, PATH)
 
 
-def transform_into_ground_truth_test_case(test_case: TestCase, mode: str = None):
+def transform_into_ground_truth_test_case(test_case: TestCase):
   data = test_case.data
   params = test_case.params
   doi = test_case.doi
-  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
+  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size)
 
   return create_ground_truth_test_case(test_case.data, test_case.doi, test_case.params, PATH)
+
+
+def save_benchmark_run(test_cases: list[TestCase], index: int, mode: str):
+  tcs = [
+    {
+      "dataset": tc.data.name,
+      "doi": tc.doi.name,
+      "parameters": tc.params.name,
+      "dois_path": tc.doi_csv_path,
+      "times_path": tc.times_csv_path
+    } for tc in test_cases
+  ]
+  now = str(datetime.now())
+  run = {
+    "timestamp": now,
+    "preset_index": index,
+    "mode": mode,
+    "test_cases": tcs,
+  }
+  run_json = json.dumps(run, indent=2)
+
+  if not os.path.exists("./out/"):
+    os.mkdir("./out/")
+
+  filename = f"test case {index} - {mode}"
+  with open(f"./out/{filename}.json", "w") as file:
+    file.write(run_json)
 
 
 # n datasets : 1 parameter set : 1 doi : 1 set of strategies
@@ -204,10 +238,13 @@ def run_test_case_on_all_datasets(index: int, datasets: dict = None,
                                   state: STATE = "single") -> None:
   datasets = get_dataset_presets() if datasets is None else datasets
   variants = get_variant_for_all_datasets(index, datasets, state)
+
   for i, variant in enumerate(variants):
     print(f"({i}/{len(datasets.keys())}): {variant.name}")
     variant.run()
     print(f"done: {variant.pipeline.total_time}s")
+
+  return variants
 
 
 # 1 dataset : n parameter sets : 1 doi : 1 set of strategies
@@ -221,6 +258,8 @@ def run_test_case_on_all_parameters(index: int, parameters: dict = None,
     variant.run()
     print(f"done: {variant.pipeline.total_time}s")
 
+  return variants
+
 
 # 1 dataset : 1 parameter set : n dois : 1 set of strategies
 def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = None,
@@ -230,14 +269,16 @@ def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = No
   variants = get_variant_for_all_doi_functions(index, doi_functions, state)
 
   for i, variant in enumerate(variants):
-    print(f"({i}/{len(doi_functions.keys())}): {variant.name}")
+    print(f"({i}/{len(doi_functions)}): {variant.name}")
     variant.run()
     print(f"done: {variant.pipeline.total_time}s")
+
+  return variants
 
 
 # 1 dataset : 1 parameter set : 1 doi : n sets of strategies
 def run_test_case_on_all_strategies(index: int, all_storages: bool = False) -> None:
-  tc = load_test_case(index, mode=STRATEGY_SUBDIR)
+  tc = load_test_case(index)
 
   print(f"data: {tc.data.name}, {get_short_title(tc.doi, tc.params)}\n####")
 
@@ -246,28 +287,34 @@ def run_test_case_on_all_strategies(index: int, all_storages: bool = False) -> N
     print(f"({i}/{len(variants)}): {variant.name}")
     variant.run()
     print(f"done: {variant.pipeline.total_time}s")
+  return variants
 
 
 # P datasets : Q parameter sets : R dois : S sets of strategies
 def run_all_test_case_configs() -> None:
   n_test_cases = len(get_all_test_cases())
-
+  tcs: list[TestCase] = []
   for i in range(n_test_cases):
-    run_test_case_config(i)
+    tc = run_test_case_config(i)
+    tcs += [tc]
+  return tcs
 
 
 # load a test case with index _index_ from test_cases.json and run it
 def run_test_case(index: int, mode: str = None):
   if mode == "strategies":
-    run_test_case_on_all_strategies(index)
+    tcs = run_test_case_on_all_strategies(index)
   elif mode == "dois":
-    run_test_case_on_all_doi_functions(index)
+    tcs = run_test_case_on_all_doi_functions(index)
   elif mode == "datasets":
-    run_test_case_on_all_datasets(index)
+    tcs = run_test_case_on_all_datasets(index)
   elif mode == "parameters":
-    run_test_case_on_all_parameters(index)
+    tcs = run_test_case_on_all_parameters(index)
   else:
-    run_test_case_config(index)
+    tcs = run_test_case_config(index)
+    mode = "default"  # used for filename when saving
+
+  save_benchmark_run(tcs, index, mode)
 
 
 # load test case with index __index__ from test_cases.json, run it, and use all "space" for new data
