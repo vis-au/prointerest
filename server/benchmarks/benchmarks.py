@@ -85,79 +85,73 @@ def run_test_case_mixed(index: int, mode: str = None):
   print(f"done: {tc.pipeline.total_time}s")
 
 
-# n datasets : 1 parameter set : 1 doi : 1 set of strategies
-def run_test_case_on_all_datasets(index: int, datasets: dict = None,
-                                  state: STATE = "single") -> None:
-  datasets = get_dataset_presets() if datasets is None else datasets
-
+def get_variant_for_variables(index: int, variables: list[str], mode: str,
+                              apply_variable: Callable[[TestCase, str], TestCase],
+                              state: STATE = "single") -> list[TestCase]:
+  variants: list[TestCase] = []
   i = 1
-  for data_label in datasets:
-    tc = load_test_case(index, mode=DATASET_SUBDIR)
+  for variable in variables:
+    tc = load_test_case(index, mode)
+    tc = apply_variable(tc, variable)
+    tc.name = f"{tc.name}-{variable}"
+    if state == "bigger_chunks":
+      tc = transform_into_bigger_chunks_test_case(tc, STRATEGY_SUBDIR)
+    elif state == "ground_truth":
+      tc = transform_into_ground_truth_test_case(tc, STRATEGY_SUBDIR)
+
+    variants += [tc]
+    i += 1
+  return variants
+
+
+def get_variant_for_all_datasets(index: int, datasets: dict,
+                                 state: STATE = "single") -> list[TestCase]:
+  def callback(tc: TestCase, data_label: str):
     data_config = get_dataset_config(data_label)
     tc.data = data_config
     tc.doi = get_doi_config(tc.doi.name, tc.data)
-    tc.name = f"{tc.name}-{data_label}"
-    print(f"({i}/{len(datasets.keys())}): {tc.name}")
+    return tc
 
-    if state == "bigger_chunks":
-      tc = transform_into_bigger_chunks_test_case(tc, mode=DATASET_SUBDIR)
-    elif state == "ground_truth":
-      tc = transform_into_ground_truth_test_case(tc, mode=DATASET_SUBDIR)
+  data_labels = datasets.keys()
+  variants = get_variant_for_variables(
+    index, data_labels, apply_variable=callback, state=state, mode=DATASET_SUBDIR
+  )
 
-    tc.run()
-    print(f"done: {tc.pipeline.total_time}s")
-    i += 1
+  return variants
 
 
-# 1 dataset : n parameter sets : 1 doi : 1 set of strategies
-def run_test_case_on_all_parameters(index: int, parameters: dict = None,
-                                    state: STATE = "single") -> None:
-  parameters = get_parameter_presets() if parameters is None else parameters
-
-  i = 1
-  for parameter_label in parameters:
-    tc = load_test_case(index, mode=PARAMETER_SUBDIR)
+def get_variant_for_all_parameters(index: int, parameters: dict,
+                                   state: STATE = "single") -> list[TestCase]:
+  def callback(tc: TestCase, parameter_label: str):
     parameter_config = get_parameters_config(parameter_label)
     tc.params = parameter_config
-    tc.name = f"{tc.name}-{parameter_label}"
-    print(f"({i}/{len(parameters.keys())}): {tc.name}")
+    return tc
 
-    if state == "bigger_chunks":
-      tc = transform_into_bigger_chunks_test_case(tc, STRATEGY_SUBDIR)
-    elif state == "ground_truth":
-      tc = transform_into_ground_truth_test_case(tc, STRATEGY_SUBDIR)
+  params = parameters.keys()
+  variants = get_variant_for_variables(
+    index, params, apply_variable=callback, state=state, mode=PARAMETER_SUBDIR
+  )
 
-    tc.run()
-    print(f"done: {tc.pipeline.total_time}s")
-    i += 1
+  return variants
 
 
-# 1 dataset : 1 parameter set : n dois : 1 set of strategies
-def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = None,
-                                       state: STATE = "single") -> None:
-  doi_functions = get_doi_function_presets() if doi_functions is None else doi_functions
-
-  i = 1
-  for doi_function in doi_functions:
-    tc = load_test_case(index, mode=DOI_SUBDIR)
+def get_variant_for_all_doi_functions(index: int, dois: list[str],
+                                      state: STATE = "single") -> list[TestCase]:
+  def callback(tc: TestCase, doi_function: str):
     doi_config = get_doi_config(doi_function, tc.data)
     tc.doi = doi_config
-    tc.name = f"{tc.name}-{doi_function}"
-    print(f"({i}/{len(doi_functions)}): {tc.name}")
+    return tc
 
-    if state == "bigger_chunks":
-      tc = transform_into_bigger_chunks_test_case(tc, STRATEGY_SUBDIR)
-    elif state == "ground_truth":
-      tc = transform_into_ground_truth_test_case(tc, STRATEGY_SUBDIR)
+  variants = get_variant_for_variables(
+    index, dois, mode=DOI_SUBDIR, apply_variable=callback, state=state
+  )
 
-    tc.run()
-    print(f"done: {tc.pipeline.total_time}s")
-    i += 1
+  return variants
 
 
-# 1 dataset : 1 parameter set : 1 doi : n sets of strategies
-def run_test_case_for_all_strategies(index: int, all_storages: bool = False) -> None:
+def get_variant_for_all_strategies(index: int, all_storages: bool = False) -> list[TestCase]:
   tc = load_test_case(index, mode=STRATEGY_SUBDIR)
+  contexts_, updates_, storages_ = generate_strategies(tc.data, tc.params)
 
   contexts_, updates_, storages_ = generate_strategies(tc.data, tc.params)
   total_tcs = len(contexts_)*len(updates_)
@@ -167,9 +161,8 @@ def run_test_case_for_all_strategies(index: int, all_storages: bool = False) -> 
   else:
     storages_ = [s for s in storages_ if s[0] == "windowing"]
 
-  print(f"data: {tc.data.name}, {get_short_title(tc.doi, tc.params)}\n####")
-
-  completed_tcs = 0
+  variants: list[TestCase] = []
+  i = 0
   for c in contexts_:
     for u in updates_:
       for s in storages_:
@@ -183,11 +176,58 @@ def run_test_case_for_all_strategies(index: int, all_storages: bool = False) -> 
         tc_.strategies = strategy_config
         tc_.name = strategy_config.name
 
-        completed_tcs += 1
-        print(f"({completed_tcs}/{total_tcs}): {tc_.name}")
+        i += 1
+        variants += [tc_]
+  return variants
 
-        tc_.run()
-        print(f"done: {tc_.pipeline.total_time}s")
+
+# n datasets : 1 parameter set : 1 doi : 1 set of strategies
+def run_test_case_on_all_datasets(index: int, datasets: dict = None,
+                                  state: STATE = "single") -> None:
+  datasets = get_dataset_presets() if datasets is None else datasets
+  variants = get_variant_for_all_datasets(index, datasets, state)
+  for i, variant in enumerate(variants):
+    print(f"({i}/{len(datasets.keys())}): {variant.name}")
+    variant.run()
+    print(f"done: {variant.pipeline.total_time}s")
+
+
+# 1 dataset : n parameter sets : 1 doi : 1 set of strategies
+def run_test_case_on_all_parameters(index: int, parameters: dict = None,
+                                    state: STATE = "single") -> None:
+  parameters = get_parameter_presets() if parameters is None else parameters
+  variants = get_variant_for_all_parameters(index, parameters, state)
+
+  for i, variant in enumerate(variants):
+    print(f"({i}/{len(parameters.keys())}): {variant.name}")
+    variant.run()
+    print(f"done: {variant.pipeline.total_time}s")
+
+
+# 1 dataset : 1 parameter set : n dois : 1 set of strategies
+def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = None,
+                                       state: STATE = "single") -> None:
+
+  doi_functions = get_doi_function_presets() if doi_functions is None else doi_functions
+  variants = get_variant_for_all_doi_functions(index, doi_functions, state)
+
+  for i, variant in enumerate(variants):
+    print(f"({i}/{len(doi_functions.keys())}): {variant.name}")
+    variant.run()
+    print(f"done: {variant.pipeline.total_time}s")
+
+
+# 1 dataset : 1 parameter set : 1 doi : n sets of strategies
+def run_test_case_on_all_strategies(index: int, all_storages: bool = False) -> None:
+  tc = load_test_case(index, mode=STRATEGY_SUBDIR)
+
+  print(f"data: {tc.data.name}, {get_short_title(tc.doi, tc.params)}\n####")
+
+  variants = get_variant_for_all_strategies(index, all_storages)
+  for i, variant in enumerate(variants):
+    print(f"({i}/{len(variants)}): {variant.name}")
+    variant.run()
+    print(f"done: {variant.pipeline.total_time}s")
 
 
 # P datasets : Q parameter sets : R dois : S sets of strategies
@@ -201,7 +241,7 @@ def run_all_test_case_configs() -> None:
 # load a test case with index _index_ from test_cases.json and run it
 def run_test_case(index: int, mode: str = None):
   if mode == "strategies":
-    run_test_case_for_all_strategies(index)
+    run_test_case_on_all_strategies(index)
   elif mode == "dois":
     run_test_case_on_all_doi_functions(index)
   elif mode == "datasets":
