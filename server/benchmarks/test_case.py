@@ -94,9 +94,12 @@ class TestCase:
       chunks=self.params.chunks
     )
 
-  def run(self) -> None:
+  def run(self, skip_if_exists: bool = True) -> None:
     self.initialize_database()
     self.pipeline = self._generate_pipeline()
+    if skip_if_exists and os.path.isfile(f"{self.doi_csv_path}/{self.pipeline.name}.csv"):
+      print("skipping test case because .csv file already exists")
+      return self.pipeline
     self.pipeline.run(
       doi_csv_path=self.doi_csv_path,
       times_csv_path=self.times_csv_path,
