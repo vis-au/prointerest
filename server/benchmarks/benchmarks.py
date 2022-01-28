@@ -20,6 +20,7 @@ STATE = Literal["single", "bigger_chunks", "ground_truth"]
 
 PRESETS_PATH = "./presets.json"
 TEST_CASES_PATH = "./test_cases.json"
+MODES = ["strategies", "dois", "datasets", "parameters"]
 
 
 # load a test case from test_cases.json and parse it into the TestCase format
