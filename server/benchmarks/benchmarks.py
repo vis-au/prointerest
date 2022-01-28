@@ -181,6 +181,24 @@ def get_variant_for_all_strategies(index: int, all_storages: bool = False) -> li
   return variants
 
 
+def transform_into_bigger_chunks_test_case(test_case: TestCase, mode: str = None):
+  data = test_case.data
+  params = test_case.params
+  doi = test_case.doi
+  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
+
+  return create_bigger_chunks_test_case(test_case.data, test_case.doi, test_case.params, PATH)
+
+
+def transform_into_ground_truth_test_case(test_case: TestCase, mode: str = None):
+  data = test_case.data
+  params = test_case.params
+  doi = test_case.doi
+  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
+
+  return create_ground_truth_test_case(test_case.data, test_case.doi, test_case.params, PATH)
+
+
 # n datasets : 1 parameter set : 1 doi : 1 set of strategies
 def run_test_case_on_all_datasets(index: int, datasets: dict = None,
                                   state: STATE = "single") -> None:
@@ -252,15 +270,6 @@ def run_test_case(index: int, mode: str = None):
     run_test_case_config(index)
 
 
-def transform_into_bigger_chunks_test_case(test_case: TestCase, mode: str = None):
-  data = test_case.data
-  params = test_case.params
-  doi = test_case.doi
-  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
-
-  return create_bigger_chunks_test_case(test_case.data, test_case.doi, test_case.params, PATH)
-
-
 # load test case with index __index__ from test_cases.json, run it, and use all "space" for new data
 def run_test_case_bigger_chunks(index: int, mode: str = None):
   if mode == "dois":
@@ -275,15 +284,6 @@ def run_test_case_bigger_chunks(index: int, mode: str = None):
     print(bigger_chunks_tc.name, bigger_chunks_tc.doi_csv_path)
     bigger_chunks_tc.run()
     print(f"done: {bigger_chunks_tc.pipeline.total_time}s")
-
-
-def transform_into_ground_truth_test_case(test_case: TestCase, mode: str = None):
-  data = test_case.data
-  params = test_case.params
-  doi = test_case.doi
-  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size, mode)
-
-  return create_ground_truth_test_case(test_case.data, test_case.doi, test_case.params, PATH)
 
 
 # load test case with index __index__ from test_cases.json and run its ground truth
