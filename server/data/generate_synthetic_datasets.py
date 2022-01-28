@@ -9,6 +9,8 @@ def generate_dataset(label: str, path: str, args):
     dataset, _ = make_blobs(**args)
   elif label == "swiss_roll":
     dataset, _ = make_swiss_roll(**args)
+  elif label == "sorted1M":
+    dataset = generate_sorted_dataset(**args)
 
   if dataset is not None:
     # write to file
@@ -16,9 +18,8 @@ def generate_dataset(label: str, path: str, args):
     df.to_csv(path, index_label="tripID")  # HACK until use case config is made globally available.
 
 
-def generate_sorted_dataset(size: int, path: str):
-  df = pd.DataFrame(np.arange(size))
-  df.to_csv(path, index_label="tripID")
+def generate_sorted_dataset(n_samples: int):
+  return pd.DataFrame(np.arange(n_samples))
 
 
 n_samples = 1000000
@@ -42,6 +43,9 @@ default_parameters = {
   "swiss_roll": {
     "n_samples": n_samples,
     "random_state": 0
+  },
+  "sorted1M": {
+    "n_samples": 1000000
   }
 }
 
@@ -49,4 +53,4 @@ default_parameters = {
 if __name__ == "__main__":
   for key in default_parameters:
     generate_dataset(key, f"{path}/{key}.csv", default_parameters[key])
-  generate_sorted_dataset(1000000, f"{path}/sorted1M.csv")
+
