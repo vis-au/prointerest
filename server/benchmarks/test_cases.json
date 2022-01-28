@@ -21,6 +21,14 @@
       "context_strategy": "doi based",
       "update_strategy": "last n chunks",
       "parameters": "12k"
+    },
+    {
+      "dataset": "4blobs",
+      "doi": "outlierness",
+      "storage_strategy": "windowing",
+      "context_strategy": "doi based",
+      "update_strategy": "last n chunks",
+      "parameters": "1.2M"
     }
   ]
 }
