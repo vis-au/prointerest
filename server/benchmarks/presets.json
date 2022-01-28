@@ -6,6 +6,16 @@
     "averageness"
   ],
   "parameters": {
+    "1.2M": {
+      "parameter_label": "120k",
+      "total_size": 1200000,
+      "chunk_size": 1000,
+      "update_size": 2000,
+      "context_size": 1000,
+      "n_bins": 10,
+      "max_age": 20,
+      "update_interval": 3
+    },
     "120k": {
       "parameter_label": "120k",
       "total_size": 120000,
