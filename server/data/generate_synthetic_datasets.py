@@ -53,4 +53,3 @@ default_parameters = {
 if __name__ == "__main__":
   for key in default_parameters:
     generate_dataset(key, f"{path}/{key}.csv", default_parameters[key])
-

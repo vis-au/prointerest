@@ -69,24 +69,24 @@
       "data_path": "../data/hr_diagram.csv",
       "column_data_path": "../data/nyc_taxis.unshuffled_full.parquet",
       "total_db_size": 1322033,
-      "n_dims": 3,
-      "numeric_columns": ["0", "1"]
+      "n_dims": 4,
+      "numeric_columns": ["a", "b"]
     },
     "us_census": {
       "data_label": "us_census",
       "data_path": "../data/us_census.csv",
       "column_data_path": "../data/nyc_taxis.unshuffled_full.parquet",
       "total_db_size": 2000000,
-      "n_dims": 3,
-      "numeric_columns": ["0", "1"]
+      "n_dims": 4,
+      "numeric_columns": ["a", "b"]
     },
     "arxiv_articles_umap": {
       "data_label": "arxiv_articles_umap",
       "data_path": "../data/arxiv_articles_umap.csv",
       "column_data_path": "../data/nyc_taxis.unshuffled_full.parquet",
       "total_db_size": 1625064,
-      "n_dims": 3,
-      "numeric_columns": ["0", "1"]
+      "n_dims": 4,
+      "numeric_columns": ["a", "b"]
     },
     "swiss_roll": {
       "data_label": "swiss_roll",
