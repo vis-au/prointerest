@@ -328,7 +328,7 @@ def run_test_case_bigger_chunks(index: int, mode: str = None):
     run_test_case_on_all_parameters(index, state="bigger_chunks")
   else:
     tc = load_test_case(index)
-    bigger_chunks_tc = transform_into_bigger_chunks_test_case(tc, mode)
+    bigger_chunks_tc = transform_into_bigger_chunks_test_case(tc)
     print(bigger_chunks_tc.name, bigger_chunks_tc.doi_csv_path)
     bigger_chunks_tc.run()
     print(f"done: {bigger_chunks_tc.pipeline.total_time}s")
@@ -344,7 +344,7 @@ def run_test_case_ground_truth(index: int, mode: str = None):
     run_test_case_on_all_parameters(index, state="ground_truth")
   else:
     tc = load_test_case(index)
-    ground_truth_tc = transform_into_ground_truth_test_case(tc, mode)
+    ground_truth_tc = transform_into_ground_truth_test_case(tc)
     print(ground_truth_tc.name, ground_truth_tc.doi_csv_path)
     ground_truth_tc.run()
     print(f"done: {ground_truth_tc.pipeline.total_time}s")

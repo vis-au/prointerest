@@ -16,16 +16,12 @@ def get_doi_bins_df(doi_df: pd.DataFrame, n_bins: int, with_labels=False) -> pd.
 
 
 # compute the difference bins
-def get_doi_delta_bins_df(doi_bins_a: pd.DataFrame, doi_bins_b: pd.DataFrame, total_size: int,
-                          n_bins: int):
+def get_doi_delta_bins_df(doi_bins_a: pd.DataFrame, doi_bins_b: pd.DataFrame):
   # copy the first df
   delta_bins = pd.DataFrame(doi_bins_a)
-  delta_bins["delta"] = (doi_bins_a[0] - doi_bins_b[0]) / total_size
+  delta_bins["delta"] = (doi_bins_a[0] - doi_bins_b[0])
   delta_bins.columns = ["doi", "delta"]
-  # delta_bins["delta"] = bins_a[0]
-
-  # add context info
-  delta_bins["bin"] = delta_bins.index / n_bins
+  delta_bins["bin"] = delta_bins.index
   return delta_bins
 
 
@@ -45,7 +41,7 @@ def get_doi_error_df(doi_df_a: pd.DataFrame, doi_df_b: pd.DataFrame, absolute=Tr
   return diff
 
 
-def get_strategy_bc_errors(path_list: list[str], file_name: str, label: str):
+def get_strategy_bc_errors(path_list: list[str], file_name: str, label: str, absolute: bool = False):
   strategies_error = pd.DataFrame()
   bigger_chunks_errors = pd.DataFrame()
 
@@ -64,12 +60,12 @@ def get_strategy_bc_errors(path_list: list[str], file_name: str, label: str):
     gt = pd.read_csv(join(test_case_path, "__ground_truth__.csv"))
     bc = pd.read_csv(join(test_case_path, "__bigger_chunks__.csv"))
 
-    strategy_error = get_doi_error_df(gt, df)
+    strategy_error = get_doi_error_df(gt, df, absolute=absolute)
     strategy_error[label] = test_case_label
     strategies_error = strategies_error.append(strategy_error)
     strategies_error = strategies_error.append(strategy_error)
 
-    bigger_chunks_error = get_doi_error_df(gt, bc)
+    bigger_chunks_error = get_doi_error_df(gt, bc, absolute=absolute)
     bigger_chunks_error[label] = test_case_label
     bigger_chunks_errors = bigger_chunks_errors.append(bigger_chunks_error)
 
