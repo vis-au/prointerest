@@ -69,7 +69,6 @@ def get_strategy_bc_errors(path_list: list[str], file_name: str, label: str,
     strategy_error = get_doi_error_df(gt, df, absolute=absolute)
     strategy_error[label] = test_case_label
     strategies_error = strategies_error.append(strategy_error)
-    strategies_error = strategies_error.append(strategy_error)
 
     bigger_chunks_error = get_doi_error_df(gt, bc, absolute=absolute)
     bigger_chunks_error[label] = test_case_label
