@@ -1,18 +1,4 @@
 {
-  "ground_truth": [
-    {
-      "name": "__bigger_chunks__",
-      "datasets": "*",
-      "doi": "*",
-      "storage_strategy": "window",
-      "context_strategy": "*",
-      "update_strategy": "*",
-      "parameters": "*"
-    }
-  ],
-  "bigger_chunks": [
-
-  ],
   "test_cases": [
     {
       "dataset": "blobs",
@@ -20,7 +6,7 @@
       "storage_strategy": "windowing",
       "context_strategy": "doi based",
       "update_strategy": "last n chunks",
-      "parameters": "12k"
+      "parameters": "12k-1000-c1000-u2000"
     },
     {
       "dataset": "4blobs",
@@ -28,7 +14,17 @@
       "storage_strategy": "windowing",
       "context_strategy": "doi based",
       "update_strategy": "last n chunks",
-      "parameters": "1.2M"
+      "parameters": "12k-1000-c1000-u2000"
+    }
+  ],
+  "composite_test_cases": [
+    {
+      "datasets": ["blobs", "4blobs", "sorted1M", "taxis-shuffled"],
+      "dois": ["averageness", "outlierness", "density", "sort"],
+      "storage_strategies": ["windowing"],
+      "context_strategies": ["doi based"],
+      "update_strategies": ["outdated bins"],
+      "parameters": ["12k-1000-c1000-u2000"]
     }
   ]
 }

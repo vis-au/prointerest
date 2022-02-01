@@ -6,42 +6,42 @@
     "averageness"
   ],
   "parameters": {
-    "1.2M": {
-      "parameter_label": "120k",
-      "total_size": 1200000,
-      "chunk_size": 1000,
-      "update_size": 2000,
-      "context_size": 1000,
-      "n_bins": 10,
-      "max_age": 20,
-      "update_interval": 3
-    },
-    "120k": {
-      "parameter_label": "120k",
-      "total_size": 120000,
-      "chunk_size": 1000,
-      "update_size": 2000,
-      "context_size": 1000,
-      "n_bins": 10,
-      "max_age": 20,
-      "update_interval": 3
-    },
-    "12k": {
-      "parameter_label": "12k",
+    "12k-1000-c1000-u2000": {
+      "parameter_label": "12k-1000-c1000-u2000",
       "total_size": 12000,
       "chunk_size": 1000,
-      "update_size": 2000,
       "context_size": 1000,
+      "update_size": 2000,
       "n_bins": 10,
       "max_age": 20,
       "update_interval": 3
     },
-    "120": {
-      "parameter_label": "120",
+    "12k-100-c100-u600": {
+      "parameter_label": "12k-100-c100-u600",
+      "total_size": 12000,
+      "chunk_size": 100,
+      "context_size": 100,
+      "update_size": 600,
+      "n_bins": 10,
+      "max_age": 20,
+      "update_interval": 3
+    },
+    "120-10-c10-u20": {
+      "parameter_label": "120-10-c10-u20",
       "total_size": 120,
       "chunk_size": 10,
-      "update_size": 20,
       "context_size": 10,
+      "update_size": 20,
+      "n_bins": 10,
+      "max_age": 20,
+      "update_interval": 3
+    },
+    "120-1-c1-u2": {
+      "parameter_label": "120-1-c1-u2",
+      "total_size": 120,
+      "chunk_size": 1,
+      "context_size": 1,
+      "update_size": 2,
       "n_bins": 10,
       "max_age": 20,
       "update_interval": 3
@@ -54,7 +54,7 @@
       "column_data_path": "../data/nyc_taxis.shuffled_full.parquet",
       "total_db_size": 112145904,
       "n_dims": 17,
-      "numeric_columns": ["duration", "ratio"]
+      "numeric_columns": ["duration", "ratio", "trip_distance", "fare_amount", "tip_amount", "total_amount"]
     },
     "taxis-unshuffled": {
       "data_label": "taxis-unshuffled",
