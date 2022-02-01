@@ -195,9 +195,9 @@ def create_bigger_chunks_test_case(data: DatasetConfiguration, doi: DoiConfigura
 
   parameters_config = ParametersConfiguration(
     name=name,
-    chunks=round(total_size // (chunk_size + update_size + context_size)),
+    chunks=round(total_size // (chunk_size + context_size)),
     total_size=total_size,
-    chunk_size=chunk_size + update_size + context_size,
+    chunk_size=chunk_size + context_size,
     update_size=0,
     context_size=0,
     storage_size=0,
@@ -253,7 +253,8 @@ def get_parameters_config(parameter_label: str) -> ParametersConfiguration:
 def get_strategy_config(context_label: str, update_label: str, storage_label: str,
                         params: ParametersConfiguration, data: DatasetConfiguration):
   context_ = get_context_strategy(context_label, data.n_dims, params.chunks, params.n_bins)
-  update_ = get_update_strategy(update_label, data.n_dims, params.chunks, params.max_age)
+  update_ = get_update_strategy(update_label, data.n_dims, params.chunks, params.max_age,
+                                params.n_bins)
   storage_ = get_storage_strategy(storage_label, params.max_age*params.chunk_size)
 
   return StrategiesConfiguration(
@@ -277,7 +278,7 @@ def generate_strategies(data: DatasetConfiguration, params: ParametersConfigurat
   n_chunks_update = max(update_size // chunk_size, 1)  # number of chunks considered for updating
 
   context_strategies = get_context_strategies(n_dims, n_chunks_context, n_bins)
-  update_strategies = get_update_strategies(n_dims, n_chunks_update, max_age)
+  update_strategies = get_update_strategies(n_dims, n_chunks_update, max_age, n_bins)
   storage_strategies = get_storage_strategies(storage_size)
 
   return context_strategies, update_strategies, storage_strategies

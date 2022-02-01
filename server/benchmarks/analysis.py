@@ -41,7 +41,8 @@ def get_doi_error_df(doi_df_a: pd.DataFrame, doi_df_b: pd.DataFrame, absolute=Tr
   return diff
 
 
-def get_strategy_bc_errors(path_list: list[str], file_name: str, label: str, absolute: bool = False):
+def get_strategy_bc_errors(path_list: list[str], file_name: str, label: str,
+                           absolute: bool = False):
   strategies_error = pd.DataFrame()
   bigger_chunks_errors = pd.DataFrame()
 
