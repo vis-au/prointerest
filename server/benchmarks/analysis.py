@@ -50,12 +50,17 @@ def get_strategy_bc_errors(path_list: list[str], file_name: str, label: str,
     if "ground_truth" in test_case_path or "bigger_chunks" in test_case_path:
       continue
 
+    # remove the file name
+    test_case_path = test_case_path.split(file_name)[0]
+
     if label == "dois":
       test_case_label = test_case_path.split("/")[3]
     elif label == "datasets":
       test_case_label = test_case_path.split("/")[2]
     elif label == "parameters":
       test_case_label = "".join(test_case_path.split("/")[-3:-1])  # include data and chunk sizes
+    else:
+      raise Exception("please use either of [dois, datasets, parameters] as label")
 
     df = pd.read_csv(join(test_case_path, file_name))
     gt = pd.read_csv(join(test_case_path, "__ground_truth__.csv"))
