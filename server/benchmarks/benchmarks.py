@@ -53,8 +53,54 @@ def load_test_case(index: int) -> TestCase:
   )
 
 
+# load all combinations of test cases defined in a test_case in test_case.json into TestCases
+def load_composite_test_cases(index: int) -> list[TestCase]:
+  test_cases = get_all_composite_test_cases()
+  test_case_config = test_cases[index]
+
+  dois = test_case_config["dois"]
+  datasets = test_case_config["datasets"]
+  parameters = test_case_config["parameters"]
+  context_strategies = test_case_config["context_strategies"]
+  update_strategies = test_case_config["update_strategies"]
+  storage_strategies = test_case_config["storage_strategies"]
+
+  tcs: list[TestCase] = []
+  labels: list[str] = []
+
+  for doi_label in dois:
+    for data_label in datasets:
+      for param_label in parameters:
+        for c in context_strategies:
+          for u in update_strategies:
+            for s in storage_strategies:
+              para_config = get_parameters_config(param_label)
+              data_config = get_dataset_config(data_label)
+              doi_config = get_doi_config(doi_label, data_config)
+
+              strategy_config = get_strategy_config(c, u, s, para_config, data_config)
+              name = strategy_config.name
+
+              PATH = get_path(data_label, doi_label, para_config.total_size, para_config.chunk_size)
+
+              tcs += [create_test_case(
+                name=name,
+                strategies=strategy_config,
+                data=data_config,
+                doi=doi_config,
+                params=para_config,
+                path=PATH
+              )]
+              labels += [[doi_label, data_label, param_label, c, u, s]]
+  return tcs, labels
+
+
 def get_all_test_cases():
   return json.load(open(TEST_CASES_PATH))["test_cases"]
+
+
+def get_all_composite_test_cases():
+  return json.load(open(TEST_CASES_PATH))["composite_test_cases"]
 
 
 def get_dataset_presets():
@@ -213,8 +259,11 @@ def save_benchmark_run(test_cases: list[TestCase], index: int, mode: str):
       "dataset": tc.data.name,
       "doi": tc.doi.name,
       "parameters": tc.params.name,
-      "dois_path": tc.doi_csv_path,
-      "times_path": tc.times_csv_path
+      "context_strategy": tc.name.split("-")[0],
+      "update_strategy": tc.name.split("-")[1],
+      "storage_strategy": tc.name.split("-")[2],
+      "dois_path": f"{tc.doi_csv_path}{tc.name}.csv",
+      "times_path": f"{tc.times_csv_path}{tc.name}.csv"
     } for tc in test_cases
   ]
   now = str(datetime.now())
@@ -302,8 +351,10 @@ def run_all_test_case_configs() -> None:
 
 
 # load a test case with index _index_ from test_cases.json and run it
-def run_test_case(index: int, mode: str = None):
-  if mode == "strategies":
+def run_test_case(index: int, mode: str = None) -> None:
+  if mode == "composite":
+    tcs = run_composite_test_case(index)
+  elif mode == "strategies":
     tcs = run_test_case_on_all_strategies(index)
   elif mode == "dois":
     tcs = run_test_case_on_all_doi_functions(index)
@@ -318,8 +369,29 @@ def run_test_case(index: int, mode: str = None):
   save_benchmark_run(tcs, index, mode)
 
 
+def run_composite_test_case(index: int) -> None:
+  variants, labels = load_composite_test_cases(index)
+
+  for i, variant in enumerate(variants):
+    print(f"\n({i}/{len(variants)}): {variant.name}")
+    print(f"{' : '.join(labels[i])}")
+    variant.run()
+    print(f"done: {variant.pipeline.total_time}s")
+
+    bc = transform_into_bigger_chunks_test_case(variant)
+    gt = transform_into_ground_truth_test_case(variant)
+    print(f"ground truth")
+    gt.run()
+    print(f"done: {gt.pipeline.total_time}s")
+    print("bigger chunks")
+    bc.run()
+    print(f"done: {bc.pipeline.total_time}s")
+
+  return variants
+
+
 # load test case with index __index__ from test_cases.json, run it, and use all "space" for new data
-def run_test_case_bigger_chunks(index: int, mode: str = None):
+def run_test_case_bigger_chunks(index: int, mode: str = None) -> None:
   if mode == "dois":
     run_test_case_on_all_doi_functions(index, state="bigger_chunks")
   elif mode == "datasets":
@@ -335,7 +407,7 @@ def run_test_case_bigger_chunks(index: int, mode: str = None):
 
 
 # load test case with index __index__ from test_cases.json and run its ground truth
-def run_test_case_ground_truth(index: int, mode: str = None):
+def run_test_case_ground_truth(index: int, mode: str = None) -> None:
   if mode == "dois":
     run_test_case_on_all_doi_functions(index, state="ground_truth")
   elif mode == "datasets":
