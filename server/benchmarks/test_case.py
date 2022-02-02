@@ -1,3 +1,4 @@
+from genericpath import exists
 import os
 import json
 from dataclasses import dataclass, field
@@ -100,11 +101,15 @@ class TestCase:
     if skip_if_exists and os.path.isfile(f"{self.doi_csv_path}/{self.pipeline.name}.csv"):
       print("skipping test case because .csv file already exists")
       return self.pipeline
-    self.pipeline.run(
-      doi_csv_path=self.doi_csv_path,
-      times_csv_path=self.times_csv_path,
-      update_interval=self.params.update_interval
-    )
+
+    try:
+      self.pipeline.run(
+        doi_csv_path=self.doi_csv_path,
+        times_csv_path=self.times_csv_path,
+        update_interval=self.params.update_interval
+      )
+    except Exception as e:
+      print(f"failed with excpetion:\n{e}\n\ndone")
     return self.pipeline
 
   # wipe the databases that track doi, processed, update chunks, etc.
@@ -296,19 +301,8 @@ def get_full_title(doi: DoiConfiguration, params: ParametersConfiguration,
 
 
 def get_path(data_label: str, doi_label: str, total_size: int, chunk_size: int) -> str:
-
   path = f"./out/{data_label}/{doi_label}/{total_size}/{chunk_size}"
-
-  if not os.path.exists("./out"):
-    os.mkdir("./out")
-  if not os.path.exists(f"./out/{data_label}"):
-    os.mkdir(f"./out/{data_label}")
-  if not os.path.exists(f"./out/{data_label}/{doi_label}"):
-    os.mkdir(f"./out/{data_label}/{doi_label}")
-  if not os.path.exists(f"./out/{data_label}/{doi_label}/{total_size}"):
-    os.mkdir(f"./out/{data_label}/{doi_label}/{total_size}")
-  if not os.path.exists(path):
-    os.mkdir(path)
+  os.makedirs(path, exist_ok=True)
 
   return path
 
