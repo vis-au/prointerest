@@ -180,6 +180,30 @@ def create_ground_truth_test_case(data: DatasetConfiguration, doi: DoiConfigurat
   )
 
 
+def create_no_strategy_test_case(data: DatasetConfiguration, doi: DoiConfiguration,
+                                 params: ParametersConfiguration, path: str) -> TestCase:
+  s = NoStorage()
+  name = "__no_strategies__"
+
+  strategy_config = StrategiesConfiguration(
+    name=name,
+    context_strategy=NoContext(data.n_dims, s),
+    update_strategy=NoUpdate(data.n_dims, s),
+    storage_strategy=s,
+  )
+
+  params.name = name
+
+  return create_test_case(
+    name=name,
+    strategies=strategy_config,
+    data=data,
+    doi=doi,
+    params=params,
+    path=path
+  )
+
+
 def create_bigger_chunks_test_case(data: DatasetConfiguration, doi: DoiConfiguration,
                                    params: ParametersConfiguration, path: str) -> TestCase:
 
@@ -196,7 +220,6 @@ def create_bigger_chunks_test_case(data: DatasetConfiguration, doi: DoiConfigura
   total_size = params.total_size
   chunk_size = params.chunk_size
   context_size = params.context_size
-  update_size = params.update_size
 
   parameters_config = ParametersConfiguration(
     name=name,
