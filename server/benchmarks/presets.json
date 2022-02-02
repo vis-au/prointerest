@@ -62,7 +62,7 @@
       "column_data_path": "../data/nyc_taxis.unshuffled_full.parquet",
       "total_db_size": 112145904,
       "n_dims": 17,
-      "numeric_columns": ["duration", "ratio"]
+      "numeric_columns": ["duration", "ratio", "trip_distance", "fare_amount", "tip_amount", "total_amount"]
     },
     "hr_diagram": {
       "data_label": "hr_diagram",
