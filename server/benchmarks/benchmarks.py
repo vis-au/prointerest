@@ -54,7 +54,7 @@ def load_test_case(index: int) -> TestCase:
 
 
 # load all combinations of test cases defined in a test_case in test_case.json into TestCases
-def load_composite_test_cases(index: int) -> list[TestCase]:
+def load_composite_test_cases(index: int) -> tuple[list[TestCase], list[str]]:
   test_cases = get_all_composite_test_cases()
   test_case_config = test_cases[index]
 
@@ -235,22 +235,31 @@ def get_variant_for_all_strategies(index: int, all_storages: bool = False) -> li
   return variants
 
 
-def transform_into_bigger_chunks_test_case(test_case: TestCase):
-  data = test_case.data
-  params = test_case.params
-  doi = test_case.doi
-  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size)
-
-  return create_bigger_chunks_test_case(test_case.data, test_case.doi, test_case.params, PATH)
-
-
 def transform_into_ground_truth_test_case(test_case: TestCase):
   data = test_case.data
   params = test_case.params
   doi = test_case.doi
   PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size)
 
-  return create_ground_truth_test_case(test_case.data, test_case.doi, test_case.params, PATH)
+  return create_ground_truth_test_case(data, doi, params, PATH)
+
+
+def transform_into_no_strategy_test_case(test_case: TestCase):
+  data = test_case.data
+  params = test_case.params
+  doi = test_case.doi
+  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size)
+
+  return create_no_strategy_test_case(data, doi, params, PATH)
+
+
+def transform_into_bigger_chunks_test_case(test_case: TestCase):
+  data = test_case.data
+  params = test_case.params
+  doi = test_case.doi
+  PATH = get_path(data.name, doi.name, params.total_size, params.chunk_size)
+
+  return create_bigger_chunks_test_case(data, doi, params, PATH)
 
 
 def save_benchmark_run(test_cases: list[TestCase], index: int, mode: str):
@@ -379,31 +388,19 @@ def run_composite_test_case(index: int) -> None:
     print(f"done: {variant.pipeline.total_time}s")
 
     bc = transform_into_bigger_chunks_test_case(variant)
+    sc = transform_into_no_strategy_test_case(variant)
     gt = transform_into_ground_truth_test_case(variant)
-    print(f"ground truth")
+    print("ground truth")
     gt.run()
     print(f"done: {gt.pipeline.total_time}s")
+    print("smaller chunks")
+    sc.run()
+    print(f"done {sc.pipeline.total_time}s")
     print("bigger chunks")
     bc.run()
     print(f"done: {bc.pipeline.total_time}s")
 
   return variants
-
-
-# load test case with index __index__ from test_cases.json, run it, and use all "space" for new data
-def run_test_case_bigger_chunks(index: int, mode: str = None) -> None:
-  if mode == "dois":
-    run_test_case_on_all_doi_functions(index, state="bigger_chunks")
-  elif mode == "datasets":
-    run_test_case_on_all_datasets(index, state="bigger_chunks")
-  elif mode == "parameters":
-    run_test_case_on_all_parameters(index, state="bigger_chunks")
-  else:
-    tc = load_test_case(index)
-    bigger_chunks_tc = transform_into_bigger_chunks_test_case(tc)
-    print(bigger_chunks_tc.name, bigger_chunks_tc.doi_csv_path)
-    bigger_chunks_tc.run()
-    print(f"done: {bigger_chunks_tc.pipeline.total_time}s")
 
 
 # load test case with index __index__ from test_cases.json and run its ground truth
@@ -420,6 +417,38 @@ def run_test_case_ground_truth(index: int, mode: str = None) -> None:
     print(ground_truth_tc.name, ground_truth_tc.doi_csv_path)
     ground_truth_tc.run()
     print(f"done: {ground_truth_tc.pipeline.total_time}s")
+
+
+# load test case with index __index__ from test_cases.json, run it, and use all "space" for new data
+def run_test_case_no_strategies(index: int, mode: str = None) -> None:
+  if mode == "dois":
+    run_test_case_on_all_doi_functions(index, state="no_strategies")
+  elif mode == "datasets":
+    run_test_case_on_all_datasets(index, state="no_strategies")
+  elif mode == "parameters":
+    run_test_case_on_all_parameters(index, state="no_strategies")
+  else:
+    tc = load_test_case(index)
+    no_strategies_tc = transform_into_no_strategy_test_case(tc)
+    print(no_strategies_tc.name, no_strategies_tc.doi_csv_path)
+    no_strategies_tc.run()
+    print(f"done: {no_strategies_tc.pipeline.total_time}s")
+
+
+# load test case with index __index__ from test_cases.json, run it, and use all "space" for new data
+def run_test_case_bigger_chunks(index: int, mode: str = None) -> None:
+  if mode == "dois":
+    run_test_case_on_all_doi_functions(index, state="bigger_chunks")
+  elif mode == "datasets":
+    run_test_case_on_all_datasets(index, state="bigger_chunks")
+  elif mode == "parameters":
+    run_test_case_on_all_parameters(index, state="bigger_chunks")
+  else:
+    tc = load_test_case(index)
+    bigger_chunks_tc = transform_into_bigger_chunks_test_case(tc)
+    print(bigger_chunks_tc.name, bigger_chunks_tc.doi_csv_path)
+    bigger_chunks_tc.run()
+    print(f"done: {bigger_chunks_tc.pipeline.total_time}s")
 
 
 if __name__ == "__main__":
