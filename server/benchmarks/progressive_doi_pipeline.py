@@ -56,8 +56,8 @@ class ProgressiveDoiPipeline():
     self.doi_csv_path = None  # set once this test case is run
 
   def __str__(self):
-    output = "chunk,chunk_time,storage_time,context_time,update_context_dois_time,outdated_time,"\
-             "new_doi_time,old_doi_time,store_new_time,update_dois_time,total_time\n"
+    output = "step,chunk_time,storage_time,context_time,update_context_dois_time,outdated_time,"\
+             "new_doi_time,old_doi_time,store_new_time,update_dois_time,step_time\n"
     for step in self.test_case_steps:
       output = f"{output}{step}\n"
     return output
@@ -149,10 +149,12 @@ class ProgressiveDoiPipeline():
       n = min(self.update_size, n_unprocessed_items)
       chunk = self.update_strategy.get_outdated_items(n=n, current_chunk=step.step_number)
       chunk = process_chunk(DataFrame(chunk))
+      step.outdated_time = time() - now
+      now = time()
       if len(chunk) > 0:
         doi = self.doi.compute_doi(chunk)
         update_dois(chunk[ID].to_list(), doi)
-      step.outdated_time = time() - now
+      step.old_doi_time = time() - now
     else:
       # process the next chunk without an update
       n = min(self.chunk_size, n_unprocessed_items)
