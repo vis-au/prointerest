@@ -42,6 +42,18 @@ def get_doi_error_df(doi_df_a: pd.DataFrame, doi_df_b: pd.DataFrame, absolute=Tr
   return diff
 
 
+def get_label_for_mode(test_case_path: str, mode: str) -> str:
+  if mode == "dois":
+    test_case_label = test_case_path.split("/")[3]
+  elif mode == "datasets":
+    test_case_label = test_case_path.split("/")[2]
+  elif mode == "parameters":
+    test_case_label = "".join(test_case_path.split("/")[-3:-1])  # include data and chunk sizes
+  else:
+    raise Exception("please use either of [dois, datasets, parameters] as label")
+  return test_case_label
+
+
 def get_strategy_bc_errors(path_list: list[str], file_name: str, label: str,
                            absolute: bool = False, no_strategies: bool = False):
   strategy_errors = pd.DataFrame()
@@ -53,16 +65,8 @@ def get_strategy_bc_errors(path_list: list[str], file_name: str, label: str,
       continue
 
     # remove the file name
-    test_case_path = test_case_path.split(file_name)[0]
-
-    if label == "dois":
-      test_case_label = test_case_path.split("/")[3]
-    elif label == "datasets":
-      test_case_label = test_case_path.split("/")[2]
-    elif label == "parameters":
-      test_case_label = "".join(test_case_path.split("/")[-3:-1])  # include data and chunk sizes
-    else:
-      raise Exception("please use either of [dois, datasets, parameters] as label")
+    test_case_path = dirname(test_case_path)
+    test_case_label = get_label_for_mode(test_case_path, label)
 
     # check if the files exist before loading them
     if not exists(join(test_case_path, file_name)):
@@ -165,11 +169,13 @@ def merge_err_dfs(strat_err_df: pd.DataFrame, bc_err_df: pd.DataFrame, mode: str
   return df
 
 
-def get_times_df(parent_folder_paths: list[str], file_name: str):
+def get_times_df(parent_folder_paths: list[str], file_name: str, mode: str):
   all_times_df = pd.DataFrame()
 
   for path in parent_folder_paths:
     times_df = pd.read_csv(join(path, file_name))
+    label = get_label_for_mode(path, mode)
+    times_df[mode] = label
     all_times_df = all_times_df.append(times_df)
 
   return all_times_df
@@ -194,17 +200,17 @@ def get_times_for_test_case(test_case_file_name: str, mode: str):
         file_name = f"{c}-{u}-{s}.csv"
         path_list = [dirname(p) for p in test_case_doi_paths if file_name in p]
 
-        strategies_df = get_times_df(path_list, file_name)
+        strategies_df = get_times_df(path_list, file_name, mode)
         strategies_df["context_strategy"] = c
         strategies_df["update_strategy"] = u
         strategies_df["storage_strategy"] = s
 
-        bc_df = get_times_df(path_list, "__bigger_chunks__.csv")
+        bc_df = get_times_df(path_list, "__bigger_chunks__.csv", mode)
         bc_df["context_strategy"] = c
         bc_df["update_strategy"] = u
         bc_df["storage_strategy"] = s
 
-        sc_df = get_times_df(path_list, "__no_strategies__.csv")
+        sc_df = get_times_df(path_list, "__no_strategies__.csv", mode)
         sc_df["context_strategy"] = c
         sc_df["update_strategy"] = u
         sc_df["storage_strategy"] = s
