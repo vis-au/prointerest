@@ -1,4 +1,4 @@
-from os.path import join, exists
+from os.path import join, exists, dirname
 import json
 import pandas as pd
 import numpy as np
@@ -147,18 +147,81 @@ def get_error_for_test_case(test_case_file_name: str, mode: str):
   return all_strategies_error, all_bigger_chunks_error, all_no_strategies_error
 
 
-def merge_err_dfs(strat_err_df: pd.DataFrame, bc_err_df: pd.DataFrame, mode: str):
-  df = strat_err_df
-  df["_doi_"] = bc_err_df["doi"].to_numpy()
+def merge_err_dfs(strat_err_df: pd.DataFrame, bc_err_df: pd.DataFrame, mode: str,
+                  sc_err_df: pd.DataFrame = None):
 
-  columns = [mode, "context_strategy", "update_strategy", "storage_strategy"]
+  strat_err_df["type"] = "strategies"
+  bc_err_df["type"] = "bigger chunks"
 
-  df_a = df[["doi"] + columns]
-  df_b = df[["_doi_"] + columns]
-  df_b = df_b.rename(columns={"_doi_": "doi"})
-  df_a["type"] = "using strategies"
-  df_b["type"] = "using bigger chunks"
-  df = df_a.append(df_b)
+  df = strat_err_df.append(bc_err_df)
   df.reset_index(inplace=True)
 
+  if sc_err_df is not None:
+    sc_err_df["type"] = "no strategies"
+    df = df.append(sc_err_df)
+    df.reset_index(inplace=True)
+
+  df = df[[mode, "type", "doi", "context_strategy", "update_strategy", "storage_strategy"]]
+  return df
+
+
+def get_times_df(parent_folder_paths: list[str], file_name: str):
+  all_times_df = pd.DataFrame()
+
+  for path in parent_folder_paths:
+    times_df = pd.read_csv(join(path, file_name))
+    all_times_df = all_times_df.append(times_df)
+
+  return all_times_df
+
+
+def get_times_for_test_case(test_case_file_name: str, mode: str):
+  selected_test_case = json.load(open("./out/"+test_case_file_name))
+  test_cases = selected_test_case["test_cases"]
+  test_case_doi_paths = [tc["times_path"] for tc in test_cases]
+
+  context_strategies = np.unique([tc["context_strategy"] for tc in test_cases]).tolist()
+  update_strategies = np.unique([tc["update_strategy"] for tc in test_cases]).tolist()
+  storage_strategies = np.unique([tc["storage_strategy"] for tc in test_cases]).tolist()
+
+  all_strategies_times = pd.DataFrame()
+  all_bigger_chunks_times = pd.DataFrame()
+  all_no_strategies_times = pd.DataFrame()
+
+  for c in context_strategies:
+    for u in update_strategies:
+      for s in storage_strategies:
+        file_name = f"{c}-{u}-{s}.csv"
+        path_list = [dirname(p) for p in test_case_doi_paths if file_name in p]
+
+        strategies_df = get_times_df(path_list, file_name)
+        strategies_df["context_strategy"] = c
+        strategies_df["update_strategy"] = u
+        strategies_df["storage_strategy"] = s
+
+        bc_df = get_times_df(path_list, "__bigger_chunks__.csv")
+        bc_df["context_strategy"] = c
+        bc_df["update_strategy"] = u
+        bc_df["storage_strategy"] = s
+
+        sc_df = get_times_df(path_list, "__no_strategies__.csv")
+        sc_df["context_strategy"] = c
+        sc_df["update_strategy"] = u
+        sc_df["storage_strategy"] = s
+
+        all_strategies_times = all_strategies_times.append(strategies_df, ignore_index=True)
+        all_bigger_chunks_times = all_bigger_chunks_times.append(bc_df, ignore_index=True)
+        all_no_strategies_times = all_no_strategies_times.append(sc_df, ignore_index=True)
+
+  return all_strategies_times, all_bigger_chunks_times, all_no_strategies_times
+
+
+def merge_time_dfs(strat_time_df: pd.DataFrame, bc_time_df: pd.DataFrame, sc_time_df: pd.DataFrame,
+                   mode: str):
+
+  strat_time_df["type"] = "strategies"
+  bc_time_df["type"] = "bigger chunks"
+  sc_time_df["type"] = "no strategies"
+
+  df = strat_time_df.append([bc_time_df, sc_time_df], ignore_index=True)
   return df
