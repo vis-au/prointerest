@@ -1,4 +1,4 @@
-from os.path import join, exists, dirname
+from os.path import join, exists, dirname, basename
 import json
 import pandas as pd
 import numpy as np
@@ -231,3 +231,28 @@ def merge_time_dfs(strat_time_df: pd.DataFrame, bc_time_df: pd.DataFrame, sc_tim
 
   df = strat_time_df.append([bc_time_df, sc_time_df], ignore_index=True)
   return df
+
+
+def collect_ground_truth_dfs(test_case_file_name: str, mode: str):
+  selected_test_case = json.load(open("./out/"+test_case_file_name))
+  test_cases = selected_test_case["test_cases"]
+
+  # all directories to __ground_truth__ files, but there are still duplicates, since the ground
+  # truth is the same for cases on the same dataset size
+  test_case_directories = [dirname(tc["dois_path"]) for tc in test_cases]
+
+  test_case_prefixes = [dirname(t) for t in test_case_directories]
+  unique_test_case_indeces = np.unique(test_case_prefixes, return_index=True)[1]
+  unique_test_cases = np.array(test_case_directories)[unique_test_case_indeces].tolist()
+
+  test_case_paths = [join(d, "__ground_truth__.csv") for d in unique_test_cases]
+
+  ground_truth_dfs = pd.DataFrame()
+  for path in test_case_paths:
+    df = pd.read_csv(path)
+    label = get_label_for_mode(path, mode)
+    df[mode] = label
+    ground_truth_dfs = ground_truth_dfs.append(df)
+
+  return ground_truth_dfs
+

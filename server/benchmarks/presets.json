@@ -6,6 +6,16 @@
     "averageness"
   ],
   "parameters": {
+    "1.2M-2000-c1000-u3000": {
+      "parameter_label": "12k-200-c100-u300",
+      "total_size": 1200000,
+      "chunk_size": 2000,
+      "context_size": 1000,
+      "update_size": 3000,
+      "n_bins": 10,
+      "max_age": 100200,
+      "update_interval": 10
+    },
     "12k-1000-c1000-u2000": {
       "parameter_label": "12k-1000-c1000-u2000",
       "total_size": 12000,
@@ -15,6 +25,16 @@
       "n_bins": 10,
       "max_age": 20,
       "update_interval": 3
+    },
+    "12k-200-c100-u300": {
+      "parameter_label": "12k-200-c100-u300",
+      "total_size": 12000,
+      "chunk_size": 200,
+      "context_size": 100,
+      "update_size": 300,
+      "n_bins": 10,
+      "max_age": 20,
+      "update_interval": 5
     },
     "12k-100-c100-u600": {
       "parameter_label": "12k-100-c100-u600",

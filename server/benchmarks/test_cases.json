@@ -72,6 +72,63 @@
         "outdated bins"
       ],
       "parameters": ["12k-1000-c1000-u2000"]
+    },
+    {
+      "datasets": ["taxis-unshuffled"],
+      "dois": ["averageness"],
+      "storage_strategies": ["windowing"],
+      "context_strategies": [
+        "random chunk based",
+        "most recent chunk based",
+        "sampling based",
+        "clustering based",
+        "doi based"
+      ],
+      "update_strategies": [
+        "oldest n chunks",
+        "last n chunks",
+        "regular intervals",
+        "outdated bins"
+      ],
+      "parameters": ["12k-200-c100-u300"]
+    },
+    {
+      "datasets": ["taxis-unshuffled"],
+      "dois": ["averageness"],
+      "storage_strategies": ["windowing"],
+      "context_strategies": [
+        "random chunk based",
+        "most recent chunk based",
+        "sampling based",
+        "clustering based",
+        "doi based"
+      ],
+      "update_strategies": [
+        "oldest n chunks",
+        "last n chunks",
+        "regular intervals",
+        "outdated bins"
+      ],
+      "parameters": ["1.2M-2000-c1000-u3000"]
+    },
+    {
+      "datasets": ["taxis-unshuffled"],
+      "dois": ["outlierness"],
+      "storage_strategies": ["windowing"],
+      "context_strategies": [
+        "random chunk based",
+        "most recent chunk based",
+        "sampling based",
+        "clustering based",
+        "doi based"
+      ],
+      "update_strategies": [
+        "oldest n chunks",
+        "last n chunks",
+        "regular intervals",
+        "outdated bins"
+      ],
+      "parameters": ["12k-200-c100-u300"]
     }
   ]
 }
