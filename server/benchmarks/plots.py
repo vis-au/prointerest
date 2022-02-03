@@ -10,7 +10,18 @@ def _apply_styles():
   sns.set_palette(PALETTE)
 
 
+def histogram(df: pd.DataFrame, x: str):
+  _apply_styles()
+  matrix = sns.histplot(
+    data=df,
+    x=x,
+    binwidth=0.1,
+  )
+  return matrix
+
+
 def histogram_matrix(df: pd.DataFrame, x: str, row: str, column: str, hue: str):
+  _apply_styles()
   matrix = sns.FacetGrid(
     data=df,
     row=row,
@@ -26,12 +37,13 @@ def histogram_matrix(df: pd.DataFrame, x: str, row: str, column: str, hue: str):
     kde=True,
     kde_kws={"bw_adjust": 4}
   )
+  matrix.fig.subplots_adjust(top=0.95)
   matrix.add_legend()
-  _apply_styles()
   return matrix
 
 
 def boxplot(df: pd.DataFrame, x: str, y: str, hue: str):
+  _apply_styles()
   plot = sns.catplot(
     kind="box",
     data=df,
@@ -41,12 +53,13 @@ def boxplot(df: pd.DataFrame, x: str, y: str, hue: str):
     linewidth=1,
     margin_titles=True
   )
+  plot.fig.subplots_adjust(top=0.95)
   sns.despine(left=True, bottom=True)
-  _apply_styles()
   return plot
 
 
 def boxplot_matrix(df: pd.DataFrame, x: str, y: str, hue: str, row: str, column: str):
+  _apply_styles()
   plot = sns.catplot(
     kind="box",
     data=df,
@@ -59,5 +72,4 @@ def boxplot_matrix(df: pd.DataFrame, x: str, y: str, hue: str, row: str, column:
     margin_titles=True
   )
   sns.despine(left=True, bottom=True)
-  _apply_styles()
   return plot
