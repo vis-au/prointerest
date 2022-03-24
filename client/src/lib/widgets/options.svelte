@@ -8,6 +8,7 @@
   export let activeOptions: Record<string, boolean>;
   export let showInactive = true;
   export let showActive = true;
+  export let useDarkMode = true;
 
   $: inactiveOptions = options.filter((o) => !activeOptions[o]);
   $: activeOptionKeys = Object.keys(activeOptions).filter((o) => activeOptions[o]);
@@ -18,7 +19,7 @@
   }
 </script>
 
-<div {id} class="options {className}" {style}>
+<div {id} class="options {className} {useDarkMode ? "dark" : ""}" {style}>
   {#if showInactive}
     {#each options as option}
       <div class="option">
@@ -32,7 +33,7 @@
       </div>
     {/each}
   {:else}
-    <Dropdown id="inactive-options" selectedValue="null" style="margin-right:20px">
+    <Dropdown useDarkMode={useDarkMode} id="inactive-options" selectedValue="null" style="margin-right:20px">
       <option disabled value="null">add ...</option>
       {#each inactiveOptions as option}
         <option value={option} on:click={() => select(option)}>{option}</option>
@@ -68,7 +69,6 @@
     display: none;
   }
   div.options div.option label {
-    background: #efefef;
     cursor: pointer;
     border-radius: 4px;
     padding: 3px 10px;
