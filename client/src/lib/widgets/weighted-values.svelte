@@ -11,8 +11,10 @@
   export let totalSize = 250;
   export let height = 28;
   export let showValue = false;
+  export let weightsRemovable = false;
   export let useDarkmode = false;
   export let backgroundColor = "";
+  export let isSelectable = true;
 
   $: weights = Array.from(valueWeights.entries());
   let resize: ResizeEvent;
@@ -28,6 +30,10 @@
     } else {
       activeWeight = weight;
     }
+  }
+
+  function onWeightRemoved(weight: string) {
+    dispatch("remove-weight", weight);
   }
 
   function onResizingStarted(event: ResizeEvent) {
@@ -109,8 +115,11 @@
         name={id}
         value={entry[0]}
         bind:group={activeWeight}
-        on:click={() => selectWeight(entry[0])}
+        on:click={() => isSelectable ? selectWeight(entry[0]): null}
       />
+      {#if weightsRemovable}
+        <button class="remove" on:click={() => onWeightRemoved(entry[0])}>x</button>
+      {/if}
     </div>
 
     {#if i !== Array.from(valueWeights.entries()).length - 1}
@@ -180,5 +189,16 @@
 
   div.entry input {
     display: none;
+  }
+
+  div.entry button.remove {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    padding-right: 10px;
+  }
+  div.weighted-values.dark div.entry button.remove {
+    color: white;
   }
 </style>
