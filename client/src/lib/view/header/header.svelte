@@ -37,13 +37,14 @@
     <img src="static/logo.svg" alt="the ProInterest logo" height={height * 0.8} />
   </div>
   <Row>
-    <Row id="doi-configuration" style="align-items:stretch;height:{height * 0.8}px;flex-grow: 5">
+    <Row id="doi-configuration" style="align-items:center;height:{height * 0.8}px;flex-grow: 5">
+      <h2>Configure DOI:</h2>
       <WeightedValues
         id="selected-scagnostics"
         totalSize={maxWidth}
         weightsRemovable={true}
         useDarkmode={true}
-        backgroundColor="#80b1d3"
+        backgroundColor="#b3de69"
         isSelectable={false}
         bind:valueWeights={selectedWeights}
         on:remove-weight={removeScagnostic}
@@ -55,7 +56,7 @@
         showInactive={false}
         bind:activeOptions={isSelected}
         useDarkMode={true}
-        style="margin-left: 1rem"
+        style="margin-left: 25px"
       />
     </Row>
   </Row>
@@ -71,6 +72,14 @@
     background: #333;
     color: #fff;
     border-bottom: 1px solid #ddd;
+  }
+
+  h2 {
+    margin: 0;
+    margin-right: 25px;
+    padding: 0;
+    font-size: 18px;
+    font-weight: bold;;
   }
 
   header div.title {

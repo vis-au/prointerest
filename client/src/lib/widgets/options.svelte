@@ -8,7 +8,7 @@
   export let activeOptions: Record<string, boolean>;
   export let showInactive = true;
   export let showActive = true;
-  export let useDarkMode = true;
+  export let useDarkMode = false;
 
   $: inactiveOptions = options.filter((o) => !activeOptions[o]);
   $: activeOptionKeys = Object.keys(activeOptions).filter((o) => activeOptions[o]);
