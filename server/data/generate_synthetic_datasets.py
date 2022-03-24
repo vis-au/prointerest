@@ -26,7 +26,7 @@ n_samples = 1000000
 path = "./"
 
 default_parameters = {
-  "blobs": {
+  "1blobs": {
     "n_samples": n_samples,
     "n_features": 2,
     "centers": 1,
@@ -35,18 +35,25 @@ default_parameters = {
   },
   "4blobs": {
     "n_samples": n_samples,
-    "n_features": 2,
+    "n_features": 4,
     "centers": 4,
     "cluster_std": 0.75,
     "random_state": 0,
   },
-  "swiss_roll": {
+  "10blobs": {
     "n_samples": n_samples,
-    "random_state": 0
+    "n_features": 10,
+    "centers": 10,
+    "cluster_std": 1,
+    "random_state": 0,
   },
-  "sorted1M": {
-    "n_samples": 1000000
-  }
+  # "swiss_roll": {
+  #   "n_samples": n_samples,
+  #   "random_state": 0
+  # },
+  # "sorted1M": {
+  #   "n_samples": 1000000
+  # }
 }
 
 

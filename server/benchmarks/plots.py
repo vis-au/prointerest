@@ -34,8 +34,8 @@ def histogram_matrix(df: pd.DataFrame, x: str, row: str, column: str, hue: str):
     x=x,
     binwidth=0.1,
     binrange=[-1, 1],
-    kde=True,
-    kde_kws={"bw_adjust": 4}
+    # kde=True,
+    # kde_kws={"bw_adjust": 4}
   )
   matrix.fig.subplots_adjust(top=0.95)
   matrix.add_legend()

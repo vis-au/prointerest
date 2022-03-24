@@ -1,4 +1,4 @@
-from os.path import join, exists, dirname, basename
+from os.path import join, exists, dirname
 import json
 import pandas as pd
 import numpy as np
@@ -255,4 +255,3 @@ def collect_ground_truth_dfs(test_case_file_name: str, mode: str):
     ground_truth_dfs = ground_truth_dfs.append(df)
 
   return ground_truth_dfs
-

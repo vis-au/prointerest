@@ -7,11 +7,9 @@ if True:
   cwd = os.getcwd()
   path.append(f"{cwd}/..")
 
-from fileinput import filename
 import json
 import os
 from datetime import datetime
-from copy import copy
 from typing import Literal
 from test_case import *
 

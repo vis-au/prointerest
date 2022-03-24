@@ -5,11 +5,11 @@ from sklearn.linear_model import PassiveAggressiveRegressor
 
 class DoiComponent:
     """
-    Describes a general component of a progressive degree-of-interest function. It can either be prior
-    or posterior component. Prior components derive the degree-of-interest for each data item in the
-    context of other data without considering user behavior. Posterior components on the other hand
-    derive the degree-of-interest for each data item by also considering user interactions, for
-    example by measuring the similarity to a focus point set by the user or by.
+    Describes a general component of a progressive degree-of-interest function. It can either be
+    prior or posterior component. Prior components derive the degree-of-interest for each data item
+    in the context of other data without considering user behavior. Posterior components on the
+    other hand derive the degree-of-interest for each data item by also considering user
+    interactions, for example by measuring the similarity to a focus point set by the user or by.
     """
 
     def __init__(self) -> None:

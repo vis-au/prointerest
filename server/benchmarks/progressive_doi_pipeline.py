@@ -9,6 +9,7 @@ from doi_component.doi_component import *
 from storage_strategy.storage_strategy import *
 from context_item_selection_strategy.context_item_selection_strategy import *
 from outdated_item_selection_strategy.outdated_item_selection_strategy import *
+from outdated_item_selection_strategy.no_update import NoUpdate
 
 
 class DoiComputationTimeStep():
@@ -143,7 +144,7 @@ class ProgressiveDoiPipeline():
     step.step_time = time()
     n_unprocessed_items = self.chunk_size*self.chunks - processed_items
 
-    if step.step_number % update_interval == 0:
+    if step.step_number % update_interval == 0 and not isinstance(self.update_strategy, NoUpdate):
       # update as much data as possible without retrieving any new data
       now = time()
       n = min(self.update_size, n_unprocessed_items)

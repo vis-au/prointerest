@@ -113,6 +113,25 @@
     },
     {
       "datasets": ["taxis-unshuffled"],
+      "dois": ["sort"],
+      "storage_strategies": ["windowing"],
+      "context_strategies": [
+        "random chunk based",
+        "most recent chunk based",
+        "sampling based",
+        "clustering based",
+        "doi based"
+      ],
+      "update_strategies": [
+        "oldest n chunks",
+        "last n chunks",
+        "regular intervals",
+        "outdated bins"
+      ],
+      "parameters": ["12k-200-c100-u300"]
+    },
+    {
+      "datasets": ["hr_diagram"],
       "dois": ["outlierness"],
       "storage_strategies": ["windowing"],
       "context_strategies": [
@@ -129,6 +148,63 @@
         "outdated bins"
       ],
       "parameters": ["12k-200-c100-u300"]
+    },
+    {
+      "datasets": ["swiss_roll"],
+      "dois": ["averageness"],
+      "storage_strategies": ["windowing"],
+      "context_strategies": [
+        "random chunk based",
+        "most recent chunk based",
+        "sampling based",
+        "clustering based",
+        "doi based"
+      ],
+      "update_strategies": [
+        "oldest n chunks",
+        "last n chunks",
+        "regular intervals",
+        "outdated bins"
+      ],
+      "parameters": ["12k-200-c100-u300"]
+    },
+    {
+      "datasets": ["sorted1M"],
+      "dois": ["sort"],
+      "storage_strategies": ["windowing"],
+      "context_strategies": [
+        "random chunk based",
+        "most recent chunk based",
+        "sampling based",
+        "clustering based",
+        "doi based"
+      ],
+      "update_strategies": [
+        "oldest n chunks",
+        "last n chunks",
+        "regular intervals",
+        "outdated bins"
+      ],
+      "parameters": ["12k-200-c100-u300"]
+    },
+    {
+      "datasets": ["sorted1M"],
+      "dois": ["sort"],
+      "storage_strategies": ["windowing"],
+      "context_strategies": [
+        "random chunk based",
+        "most recent chunk based",
+        "sampling based",
+        "clustering based",
+        "doi based"
+      ],
+      "update_strategies": [
+        "oldest n chunks",
+        "last n chunks",
+        "regular intervals",
+        "outdated bins"
+      ],
+      "parameters": ["120k-2000-c1000-u3000"]
     }
   ]
 }
