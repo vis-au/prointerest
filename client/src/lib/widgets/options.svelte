@@ -7,6 +7,7 @@
   export let options: string[];
   export let activeOptions: Record<string, boolean>;
   export let showInactive = true;
+  export let showActive = true;
 
   $: inactiveOptions = options.filter((o) => !activeOptions[o]);
   $: activeOptionKeys = Object.keys(activeOptions).filter((o) => activeOptions[o]);
@@ -32,23 +33,25 @@
     {/each}
   {:else}
     <Dropdown id="inactive-options" selectedValue="null" style="margin-right:20px">
-      <option disabled value="null">add histogram</option>
+      <option disabled value="null">add ...</option>
       {#each inactiveOptions as option}
         <option value={option} on:click={() => select(option)}>{option}</option>
       {/each}
     </Dropdown>
 
-    {#each activeOptionKeys as option}
-      <div class="option">
-        <input
-          id="options-list-{option}"
-          type="checkbox"
-          value={option}
-          bind:checked={activeOptions[option]}
-        />
-        <label for="options-list-{option}">{option}</label>
-      </div>
-    {/each}
+    {#if showActive}
+      {#each activeOptionKeys as option}
+        <div class="option">
+          <input
+            id="options-list-{option}"
+            type="checkbox"
+            value={option}
+            bind:checked={activeOptions[option]}
+          />
+          <label for="options-list-{option}">{option}</label>
+        </div>
+      {/each}
+    {/if}
   {/if}
 </div>
 
