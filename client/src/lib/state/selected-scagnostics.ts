@@ -1,4 +1,5 @@
 import type { Scagnostic } from "$lib/types/scagnostics";
+import { sendScagnosticWeights } from "$lib/util/requests";
 import { writable } from "svelte/store";
 
 let currentSelectedScagnostics = ["outlying", "clumpy", "stringy"] as Scagnostic[];
@@ -49,5 +50,6 @@ selectedScagnostics.subscribe((newSelection) => {
   }
 
   currentSelectedScagnostics = newSelection;
+  sendScagnosticWeights(weights);
   scagnosticWeights.set(weights);
 });
