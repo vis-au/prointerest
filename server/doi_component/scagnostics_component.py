@@ -16,11 +16,11 @@ SCAGNOSTICS = [
     "Stringy",
     "Monotonic",
 ]
-SCATTERPLOT_AXES: dict[str, str] = {"x": None, "y": None}
+SCATTERPLOT_AXES: dict = {"x": None, "y": None}
 
 
 class ScagnosticsComponent(DoiComponent):
-    def __init__(self, subspace: list[str]) -> None:
+    def __init__(self, subspace: list) -> None:
         super().__init__()
         self.subspace = subspace
         self.weights = {

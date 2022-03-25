@@ -11,7 +11,7 @@ from .doi_component import DoiComponent
 
 # adapted from https://scikit-learn.org/stable/modules/outlier_detection.html
 class OutliernessComponent(DoiComponent):
-    def __init__(self, subspace: list[int] = None, outlierness_fraction: float=0.15) -> None:
+    def __init__(self, subspace: list = None, outlierness_fraction: float=0.15) -> None:
         super().__init__()
         self.subspace = subspace
         self.outliers_fraction = outlierness_fraction

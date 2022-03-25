@@ -13,14 +13,14 @@ class DoiComponent:
     """
 
     def __init__(self) -> None:
-        self.weights: dict[str, float] = {}
+        self.weights: dict = {}
         self.current_interest = np.empty(shape=(0, 2))
         # self.predictor: svm.SVR = svm.SVR()
         # self.predictor: SGDRegressor = SGDRegressor(max_iter=1000, tol=1e-3)
         self.predictor = PassiveAggressiveRegressor()
         self.is_trained = False
 
-    def set_components(self, weights: dict[str, float]):
+    def set_components(self, weights: dict):
         """
         Specify components of the doi function, such as weights. Expects a dictionary that for each
         component specifies a numeric value.

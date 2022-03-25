@@ -44,7 +44,7 @@ def get_next_chunk():
     "chunk": chunk,
     "dois": dois.tolist(),
     "labels": labels.tolist(),
-    "bins": bins
+    "bins": bins.tolist()
   })
 
 
@@ -148,7 +148,7 @@ def get_suggested_items():
 
 # @app.route("/doi", methods=["POST"])
 # def get_doi():
-#   items: list[list[Any]] = json.loads(request.data)["items"]
+#   items: list
 
 #   interest = compute_dois(items)
 #   return cors_response(interest)
@@ -156,7 +156,7 @@ def get_suggested_items():
 
 @app.route("/prediction", methods=["GET"])
 def get_prediction():
-  items: list[list[Any]] = json.loads(request.data)["items"]
+  items: list
   return cors_response([])
 
 

@@ -2,7 +2,7 @@ import duckdb
 import numpy as np
 import pandas as pd
 import random
-from typing import Callable
+from typing import Callable, List
 
 # TOTAL_SIZE = 112145904
 TOTAL_SIZE: int = None
@@ -128,7 +128,7 @@ def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
   return PROCESS_CHUNK_CALLBACK(chunk)
 
 
-def get_from_db(db_name: str, query_filters: list[str], dimensions: list[str], distinct=False,
+def get_from_db(db_name: str, query_filters: list, dimensions: list, distinct=False,
                 as_df=False):
   where_clause = ""
   for filter in query_filters:
@@ -151,23 +151,23 @@ def get_from_db(db_name: str, query_filters: list[str], dimensions: list[str], d
     return cursor.execute(query).fetchall()
 
 
-def get_from_data(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+def get_from_data(query_filters: list, dimensions="*", distinct=False, as_df=False):
   return get_from_db(DATA_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_column_data(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+def get_from_column_data(query_filters: list, dimensions="*", distinct=False, as_df=False):
   return get_from_db(COLUMN_DATA_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_processed(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+def get_from_processed(query_filters: list, dimensions="*", distinct=False, as_df=False):
   return get_from_db(PROCESSED_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_latest_update(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+def get_from_latest_update(query_filters: list, dimensions="*", distinct=False, as_df=False):
   return get_from_db(LAST_UPDATE_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_doi(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+def get_from_doi(query_filters: list, dimensions="*", distinct=False, as_df=False):
   return get_from_db(DOI_DB, query_filters, dimensions, distinct, as_df)
 
 
@@ -279,7 +279,7 @@ def get_dimension_extent(dimension: str):
   return DIMENSION_EXTENTS.get(dimension)
 
 
-def get_items_for_ids(ids: list[str], as_df=False):
+def get_items_for_ids(ids: list, as_df=False):
   if len(ids) == 1:
     ids += ids
   return get_from_column_data([f"{ID} IN {tuple(ids)}"], as_df=as_df)

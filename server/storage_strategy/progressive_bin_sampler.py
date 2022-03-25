@@ -8,8 +8,8 @@ class ProgressiveBinSampler:
         self.reservoir_size = reservoir_size
         self.n_bins = n_bins
         self.n_dims = n_dims
-        self.X_reservoir: dict[str, np.ndarray] = {}
-        self.y_reservoir: dict[str, np.ndarray] = {}
+        self.X_reservoir: dict = {}
+        self.y_reservoir: dict = {}
         self.skips = [self.reservoir_size for _ in range(self.n_bins)]
         self.reset_reservoirs()
 
@@ -18,9 +18,9 @@ class ProgressiveBinSampler:
 
         Returns
         -------
-        self.X_reservoir : dict[str, np.ndarray]
+        self.X_reservoir : dict
           A dictionary of empty bins, indexed by bin labels from `bin`.
-        self.y_reservoir : dict[str, np.ndarray]
+        self.y_reservoir : dict
           A dictionary of empty bins, indexed by bin labels from `bin`.
         """
 
@@ -82,7 +82,7 @@ class ProgressiveBinSampler:
 
         Returns
         -------
-        list[float]
+        list
           Bin boundaries from y.min() to y.max().
         """
         edges = []
@@ -148,9 +148,9 @@ class ProgressiveBinSampler:
 
         Returns
         -------
-        self.X_reservoir : dict[str, np.ndarray]
+        self.X_reservoir : dict
           A dictionary of data bins after sampling, indexed by bin labels from `bin`.
-        self.y_reservoir : dict[str, np.ndarray]
+        self.y_reservoir : dict
           A dictionary of label bins after sampling, indexed by bin labels from `bin`.
         """
         for j in range(self.n_bins):
@@ -221,13 +221,13 @@ class ProgressiveBinSampler:
 
         Returns
         -------
-        X_res : dict[str, np.ndarray]
+        X_res : dict
           A dictionary of data bins after sampling, indexed by bin labels from `bin`.
-        y_res : dict[str, np.ndarray]
+        y_res : dict
           A dictionary of label bins after sampling, indexed by bin labels from `bin`.
         labels : np.ndarray
           The bins computed for each item in y. Has shape (n, ).
-        edges : list[number]
+        edges : list
           The bin edges for the computed bins
         """
         # labels can be used to index both X and y
