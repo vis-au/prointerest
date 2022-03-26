@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-# from pyscagnostics import scagnostics
+from pyscagnostics import scagnostics
 
 from .doi_component import DoiComponent
 
@@ -35,36 +35,35 @@ class ScagnosticsComponent(DoiComponent):
             "monotonic": 0.11,
         }
 
-    def _compute_scagnostics(self, df):
-        # return scagnostics(df)
-        return np.zeros((len(df), ))  # pyscagnostics does not work with python version >= 3.9
-
-    def _get_mean_scangostics(self, result_generator):
-        all_results = []
-        for x, y, result in result_generator:
-            measures, _ = result
-            all_results += [measures]
-
-        return pd.DataFrame(all_results).mean()
-
     def compute_doi(self, X: pd.DataFrame):
         if len(X) == 0:
             return np.empty((0, ))
 
         X_ = X.select_dtypes(["number"]) if len(self.subspace) == 0 else X[self.subspace]
 
-        # get scagnostics for the entire dataset
-        results = self._compute_scagnostics(X_)
-        mean_all = self._get_mean_scangostics(results)
+        # get scagnostics for the input
+        results = scagnostics(X_)
 
-        # compute scagnostics without each item
-        generators = X_.apply(
-            lambda item: self._compute_scagnostics(X_[X_.index != item.name]), axis=1
-        )
-        mean_per_item = generators.apply(self._get_mean_scangostics)
+        # calling scagnostics on a dataframe computes scagnostics for all pairwise subspaces, which
+        # are all bundled up in the result object. For the doi function, we compute the mean across
+        # all these subspaces:
+        subspace_measures = []
+        for x_dim, y_dim, result in results:
+            measures, _ = result  # second element are bins
+            subspace_measures += [measures]
 
-        total_doi = (mean_per_item - mean_all).mean(axis=1).abs()
-        min_doi = total_doi.min()
-        max_doi = total_doi.max()
-        scaled_doi = (total_doi - min_doi) / (max_doi - min_doi)
-        return scaled_doi
+        mean_scagnostics = pd.DataFrame(subspace_measures).mean()  # one value per component
+
+        # measures produced by the library have upper case first letter key, so we need to fit those
+        # to the labels used in self.weights
+        mean_scagnostics = {key.lower(): value for key, value in mean_scagnostics.items()}
+
+        doi = 0
+        for measure in self.weights:
+            doi += self.weights[measure] * mean_scagnostics[measure]
+
+        print(self.weights)
+
+        doi_ = np.empty((len(X), ))[:]
+        doi_[:] = doi
+        return doi_

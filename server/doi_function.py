@@ -95,6 +95,10 @@ def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: 
   current_interactions += 1
 
 
+CONTEXT_SIZE: int = 1000
+UPDATE_INTERVAL: int = 10
+
+
 def doi_f(X: np.ndarray):
   df = pd.DataFrame(X)
   df = df.drop(columns=[2, 3, 7, 18, 19])
@@ -103,7 +107,16 @@ def doi_f(X: np.ndarray):
   df["id"] = df.index
 
   # TODO: use the scagnostics doi function instead
-  doi = np.ones((len(X), ))
+  # doi = np.random.rand(len(X), 1)
+  # compute scagnostics in context
+  # context_items = pd.DataFrame(context.get_context_items(CONTEXT_SIZE, current_chunk))
+  # chunk_with_context = pd.concat([df, context_items])
+  doi = doi_component.compute_doi(df)
+
+  # print(doi)
+
+  # compute scagnostics without context
+  # difference is the interest for all items in the new chunk?
 
   return doi
 
