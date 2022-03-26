@@ -25,13 +25,13 @@
   const interactionFactory = new InteractionFactory(width, height, $quadtree);
 
   let histogramMode: "selected" | "all" = "all";
-  let showDoiLabels = true;
   let showDoiValues = true;
 
   $: items = histogramMode === "all" ? $randomlySampledBinItems : $selectedItems;
   $: data = items.map(dataItemToRecord);
 
-  $: selectedDoiDimensions = [showDoiValues ? "doi" : null, showDoiLabels ? "label" : null].filter(
+  // include the doi distribution if active
+  $: selectedDoiDimensions = [showDoiValues ? "doi" : null].filter(
     (d) => d !== null
   );
 
@@ -92,7 +92,7 @@
       <Toggle id="doi-values" style="margin-right:10px" bind:active={showDoiValues}
         >doi values</Toggle
       >
-      <Toggle id="doi-labels" bind:active={showDoiLabels}>doi labels</Toggle>
+      <!-- <Toggle id="doi-labels" bind:active={showDoiLabels}>doi labels</Toggle> -->
     </Row>
     <ControlButton on:click={() => ($isSecondaryViewCollapsed = true)}>close</ControlButton>
   </Row>
