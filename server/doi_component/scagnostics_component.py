@@ -62,8 +62,6 @@ class ScagnosticsComponent(DoiComponent):
         for measure in self.weights:
             doi += self.weights[measure] * mean_scagnostics[measure]
 
-        print(self.weights)
-
         doi_ = np.empty((len(X), ))[:]
         doi_[:] = doi
         return doi_

@@ -7,20 +7,23 @@ from doi_component.scagnostics_component import *
 from context_item_selection_strategy.context_item_selection_strategy import *
 from outdated_item_selection_strategy.outdated_item_selection_strategy import *
 from doi_component.provenance_component import ProvenanceComponent
+from context_item_selection_strategy.doi_based_context import DoiBasedContext
+from storage_strategy.windowing_storage import WindowingStorage
 from storage_strategy.storage_strategy import StorageStrategy
 
 
 # INTEREST COMPUTATION
+STORAGE_SIZE = 100000
 current_chunk = 0
 current_interactions = 0
 
 provenance_comp = ProvenanceComponent()
 scagnostics_comp = ScagnosticsComponent([5, 17])
-
 doi_component: DoiComponent = scagnostics_comp
-context: ContextItemSelectionStrategy = None
+
+storage: StorageStrategy = WindowingStorage(STORAGE_SIZE)
+context: ContextItemSelectionStrategy = DoiBasedContext(n_dims=20, storage=storage, n_bins=25)
 update: OutdatedItemSelectionStrategy = None
-storage: StorageStrategy = None
 
 
 def set_component_weights(weights: dict):
@@ -106,11 +109,8 @@ def doi_f(X: np.ndarray):
 
   df["id"] = df.index
 
-  # TODO: use the scagnostics doi function instead
-  # doi = np.random.rand(len(X), 1)
   # compute scagnostics in context
-  # context_items = pd.DataFrame(context.get_context_items(CONTEXT_SIZE, current_chunk))
-  # chunk_with_context = pd.concat([df, context_items])
+  # context_items =
   doi = doi_component.compute_doi(df)
 
   # print(doi)
@@ -123,9 +123,20 @@ def doi_f(X: np.ndarray):
 
 def compute_dois(items: list) -> np.ndarray:
   global current_chunk
-  X = np.array(items)
 
-  dois = doi_f(X)
+  X = np.array(items)
+  dois_without_context = doi_f(X)
+
+  context_items = context.get_context_items(CONTEXT_SIZE, current_chunk)
+  X_ = np.concatenate((X, context_items), axis=0)
+  dois_with_context = doi_f(X_)
+
+  df = pd.DataFrame(items)
+  df.rename(columns={0: ID}, inplace=True)
+
+  storage.insert_chunk(df, current_chunk)
+
+  dois = np.abs(dois_without_context - dois_with_context[:len(X)])
 
   current_chunk += 1
   return dois, np.zeros_like(dois), np.zeros_like(dois)  # FIXME: returns legacy doi bins and labels

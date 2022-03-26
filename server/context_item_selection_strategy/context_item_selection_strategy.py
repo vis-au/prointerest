@@ -25,7 +25,7 @@ class ContextItemSelectionStrategy:
     '''
     context_ids = self.get_context_ids(n, current_chunk)
     if len(context_ids) == 0:
-      return DataFrame([])
+      return DataFrame(empty((0, self.n_dims)))
 
     context_id_list = context_ids.tolist()
     return self.storage.get_items_for_ids(context_id_list, as_df=True)
