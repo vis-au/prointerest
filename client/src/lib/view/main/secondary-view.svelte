@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import type HistogramBrushInteraction from "$lib/provenance/histogram-brush-interaction";
   import { interactionLog } from "$lib/provenance/interaction-log";

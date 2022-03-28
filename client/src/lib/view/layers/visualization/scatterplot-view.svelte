@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { afterUpdate, onMount } from "svelte";
   import { Deck, OrthographicView } from "@deck.gl/core";
   import { ScatterplotLayer } from "@deck.gl/layers";

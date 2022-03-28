@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import Dropdown from "./dropdown.svelte";
 
   export let id = "";

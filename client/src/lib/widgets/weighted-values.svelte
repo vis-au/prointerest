@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { isResizing } from "$lib/state/is-resizing";
   import type { ResizeEvent } from "$lib/types/resize-event";

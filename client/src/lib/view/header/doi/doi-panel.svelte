@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
   import ControlButton from "$lib/widgets/control-button.svelte";
 

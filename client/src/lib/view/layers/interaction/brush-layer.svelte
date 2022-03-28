@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import type { D3BrushEvent } from "d3-brush";
   import { brush } from "d3-brush";
   import { geoPath } from "d3-geo";

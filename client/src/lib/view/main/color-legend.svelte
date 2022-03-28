@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { range } from "d3-array";
   import type { ScaleDiverging, ScaleSequential } from "d3-scale";
   import { scaleSequential, scaleSequentialLog } from "d3-scale";

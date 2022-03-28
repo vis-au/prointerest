@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   export let id: string;
   export let className = "";
   export let selectedValue: string;

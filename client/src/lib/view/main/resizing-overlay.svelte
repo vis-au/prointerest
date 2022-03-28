@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { isResizing } from "$lib/state/is-resizing";
   import Column from "$lib/widgets/column.svelte";
 

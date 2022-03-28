@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { componentWeights } from "$lib/state/active-doi-weights";
   import { selectedDoiInterpolationFunction } from "$lib/state/selected-doi-interpolation-function";
   import { selectedDoiComponent } from "$lib/state/selected-doi-weight";

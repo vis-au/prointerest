@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { outliernessWeights } from "$lib/state/active-doi-weights";
   import { selectedOutlierMeasure } from "$lib/state/selected-outlier-measure";
   import { sendWeights } from "$lib/util/requests";

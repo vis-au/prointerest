@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { afterUpdate } from "svelte";
   import { axisBottom, axisLeft } from "d3-axis";
   import type { Selection } from "d3-selection";

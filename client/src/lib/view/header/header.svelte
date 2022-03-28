@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import ProgressionControls from "../main/progression-controls.svelte";
   import { scagnosticWeights, selectedScagnostics } from "$lib/state/selected-scagnostics";
   import { scagnostics } from "$lib/types/scagnostics";

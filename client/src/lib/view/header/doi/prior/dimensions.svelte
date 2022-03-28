@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { interestingDimensions, interestingIntervals } from "$lib/state/interesting-dimensions";
   import { dimensions } from "$lib/state/processed-data";
   import { randomlySampledItems } from "$lib/state/randomly-sampled-items";

@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   export let id: string;
   export let progress: number;
   export let current: number;

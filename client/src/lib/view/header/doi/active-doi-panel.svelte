@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
   import Outlierness from "./prior/outlierness.svelte";
   import Dimensions from "./prior/dimensions.svelte";

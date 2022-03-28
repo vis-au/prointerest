@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { hexbinning } from "$lib/state/hexbinning";
   import { viewPort as vp } from "$lib/state/visible-data";
   import { afterUpdate } from "svelte";

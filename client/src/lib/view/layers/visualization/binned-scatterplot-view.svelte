@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { max, min } from "d3-array";
   import type { HexbinBin } from "d3-hexbin";
   import { afterUpdate, onMount } from "svelte";

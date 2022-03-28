@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { posteriorWeights } from "$lib/state/active-doi-weights";
   import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
   import { sendWeights } from "$lib/util/requests";

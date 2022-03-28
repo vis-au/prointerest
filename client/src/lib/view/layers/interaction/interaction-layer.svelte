@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import type { DoiInteraction } from "$lib/provenance/doi-interaction";
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import { interactionLog } from "$lib/provenance/interaction-log";

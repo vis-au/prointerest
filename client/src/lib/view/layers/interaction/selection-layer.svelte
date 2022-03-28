@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { afterUpdate } from "svelte";
 
   import { hexbinning } from "$lib/state/hexbinning";

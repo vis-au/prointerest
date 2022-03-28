@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import Column from "$lib/widgets/column.svelte";
   import ControlButton from "../../widgets/control-button.svelte";
 
