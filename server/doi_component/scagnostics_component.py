@@ -52,15 +52,15 @@ class ScagnosticsComponent(DoiComponent):
             measures, _ = result  # second element are bins
             subspace_measures += [measures]
 
-        mean_scagnostics = pd.DataFrame(subspace_measures).mean()  # one value per component
+        avg_scores = pd.DataFrame(subspace_measures).median()  # one value per component
 
         # measures produced by the library have upper case first letter key, so we need to fit those
         # to the labels used in self.weights
-        mean_scagnostics = {key.lower(): value for key, value in mean_scagnostics.items()}
+        avg_scores = {key.lower(): value for key, value in avg_scores.items()}
 
         doi = 0
         for measure in self.weights:
-            doi += self.weights[measure] * mean_scagnostics[measure]
+            doi += self.weights[measure] * avg_scores[measure]
 
         doi_ = np.empty((len(X), ))[:]
         doi_[:] = doi
