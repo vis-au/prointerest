@@ -46,7 +46,7 @@
       bind:value={sliderValue}
       on:mouseup={() => {
         value = sliderValue;
-        dispatch("end");
+        dispatch("end", sliderValue);
       }}
     />
   {/if}

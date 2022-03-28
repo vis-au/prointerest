@@ -10,6 +10,8 @@
   import Alternatives from "$lib/widgets/alternatives.svelte";
   import Dropdown from "$lib/widgets/dropdown.svelte";
   import Row from "$lib/widgets/row.svelte";
+  import Slider from "$lib/widgets/slider.svelte";
+  import { doiLimit } from "$lib/state/doi-limit";
 </script>
 
 <Row id="view-controls">
@@ -48,6 +50,16 @@
       name="scatterplot-brush-mode"
       alternatives={brushModes}
       bind:activeAlternative={$scatterplotBrush}
+    />
+  </div>
+  <div class="configuration">
+    <Slider
+      id="doi-limit"
+      label="DOI limit"
+      width={300}
+      min={0}
+      max={1}
+      bind:value={$doiLimit}
     />
   </div>
 </Row>
