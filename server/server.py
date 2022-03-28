@@ -37,12 +37,14 @@ def get_next_chunk():
   chunk = get_next_chunk_from_db(chunk_size)
 
   ids = np.array(chunk)[:, 0].tolist()
-  dois = compute_dois(chunk)
+  dois, updated_ids, updated_dois = compute_dois(chunk)
   save_dois(ids, dois)
 
   return cors_response({
     "chunk": chunk,
-    "dois": dois.tolist()
+    "dois": dois.tolist(),
+    "updated_ids": updated_ids,
+    "updated_dois": updated_dois.tolist()
   })
 
 

@@ -121,13 +121,15 @@ def compute_dois(items: list) -> np.ndarray:
   X = np.array(items)
 
   context_items = context.get_context_items(CONTEXT_SIZE, current_chunk)
+  updated_ids = context_items[ID].tolist() if len(context_items) > 0 else []
   X_ = np.concatenate((X, context_items), axis=0)
   dois_with_context = doi_f(X_)
-  dois = dois_with_context[:len(X)]
+  new_dois = dois_with_context[:len(X)]
+  updated_dois = dois_with_context[len(X):]
 
   df = pd.DataFrame(items)
   df.rename(columns={0: ID}, inplace=True)
   storage.insert_chunk(df, current_chunk)
 
   current_chunk += 1
-  return dois
+  return new_dois, updated_ids, updated_dois
