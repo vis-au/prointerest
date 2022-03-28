@@ -55,7 +55,7 @@ export async function getDimensionExtent(dimension: string): Promise<{ min: numb
 
 export async function getNextChunk(
   chunkSize: number
-): Promise<{ chunk: number[][]; dois: number[] }> {
+): Promise<{ chunk: number[][]; dois: number[], updated_ids: string[], updated_dois: number[] }> {
   return sendRequestToBaseURL(`/next_chunk?size=${chunkSize}`);
 }
 

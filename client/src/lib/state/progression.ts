@@ -28,6 +28,10 @@ const progressionCallback = () => {
       chunk.dois.forEach((doi, i) => {
         currentDoiValues.set(chunk.chunk[i][0], doi);
       });
+      chunk.updated_dois.forEach((doi, i) => {
+        const id = chunk.updated_dois[i];
+        currentDoiValues.set(id, doi);
+      });
 
       doiValues.update(() => currentDoiValues);
 
