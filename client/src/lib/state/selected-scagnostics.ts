@@ -6,7 +6,9 @@ let currentSelectedScagnostics = ["outlying", "clumpy", "stringy"] as Scagnostic
 export const selectedScagnostics = writable(currentSelectedScagnostics);
 
 const weights = new Map<Scagnostic, number>();
-currentSelectedScagnostics.forEach((s) => weights.set(s, 0.3));
+weights.set("outlying", 0.75);
+weights.set("clumpy", 0.125);
+weights.set("stringy", 0.125)
 export const scagnosticWeights = writable(weights);
 
 selectedScagnostics.subscribe((newSelection) => {
