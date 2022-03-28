@@ -44,7 +44,7 @@
         totalSize={maxWidth}
         weightsRemovable={true}
         useDarkmode={true}
-        backgroundColor="#b3de69"
+        backgroundColor="#008080"
         isSelectable={false}
         bind:valueWeights={selectedWeights}
         on:remove-weight={removeScagnostic}
