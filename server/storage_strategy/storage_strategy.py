@@ -46,7 +46,7 @@ class StorageStrategy:
 
         return self.chunk_storage[CHUNK].unique()
 
-    def get_items_for_ids(self, ids: list[str], as_df=False):
+    def get_items_for_ids(self, ids: list, as_df=False):
         if not self.is_storage_registered and len(self.storage) > 0:
             self.cursor.register(DF, self.storage)
             self.is_storage_registered = True
@@ -60,7 +60,7 @@ class StorageStrategy:
 
         return response.fetchdf() if as_df else response.fetchall()
 
-    def get_items_for_chunks(self, chunks: list[str], as_df=False) -> pd.DataFrame:
+    def get_items_for_chunks(self, chunks: list, as_df=False) -> pd.DataFrame:
         if len(chunks) == 0 or len(self.chunk_storage) == 0:
             return pd.DataFrame()
 
@@ -78,7 +78,7 @@ class StorageStrategy:
 
         return get_dois(ids)
 
-    def get_chunks_for_ids(self, ids: list[str]) -> np.ndarray:
+    def get_chunks_for_ids(self, ids: list) -> np.ndarray:
         if len(ids) == 0:
             return np.empty(0)
 

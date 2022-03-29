@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { processedData, totalSize } from "$lib/state/processed-data";
   import {
     pauseProgression,

@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { exploredItemInterest, exploredItems } from "$lib/state/explored-items";
   import type DataItem from "$lib/types/data-item";
   import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";

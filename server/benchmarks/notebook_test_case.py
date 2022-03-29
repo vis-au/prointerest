@@ -1,5 +1,3 @@
-import altair as alt
-
 from benchmarks import load_test_case
 from context_strategies import get_context_strategies
 from update_strategies import get_update_strategies
@@ -17,8 +15,14 @@ DOI_CONFIG = tc.doi
 
 PATH = get_path(DATA.name, DOI_CONFIG.name, PARAMETERS.total_size, PARAMETERS.chunk_size)
 
-CONTEXT_STRATEGIES = get_context_strategies(DATA.n_dims, PARAMETERS.chunks, PARAMETERS.n_bins)
-UPDATE_STRATEGIES = get_update_strategies(DATA.n_dims, PARAMETERS.chunks, PARAMETERS.max_age, PARAMETERS.n_bins)
-
-# altair visualizations use the data server extension to reduce notebook size
-alt.data_transformers.enable("data_server")
+CONTEXT_STRATEGIES = get_context_strategies(
+  DATA.n_dims,
+  PARAMETERS.chunks,
+  PARAMETERS.n_bins
+)
+UPDATE_STRATEGIES = get_update_strategies(
+  DATA.n_dims,
+  PARAMETERS.chunks,
+  PARAMETERS.max_age,
+  PARAMETERS.n_bins
+)

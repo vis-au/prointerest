@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   export let name: string;
   export let alternatives: string[];
   export let activeAlternative: string;

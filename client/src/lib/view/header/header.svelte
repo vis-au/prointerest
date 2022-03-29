@@ -1,13 +1,35 @@
-<script lang="typescript">
-  import { selectedDoiComponent } from "$lib/state/selected-doi-weight";
-  import Row from "$lib/widgets/row.svelte";
+<script lang="ts">
   import ProgressionControls from "../main/progression-controls.svelte";
-
-  import InterpolationComponent from "./interpolation-component.svelte";
-  import PosteriorComponentWeights from "./posterior-component-weights.svelte";
-  import PriorComponentWeights from "./prior-component-weights.svelte";
+  import { scagnosticWeights, selectedScagnostics } from "$lib/state/selected-scagnostics";
+  import { scagnostics } from "$lib/types/scagnostics";
+  import { sendScagnosticWeights } from "$lib/util/requests";
+  import type { Scagnostic } from "$lib/types/scagnostics";
+  import Row from "$lib/widgets/row.svelte";
+  import WeightedValues from "$lib/widgets/weighted-values.svelte";
+  import Options from "$lib/widgets/options.svelte";
 
   export let height: number;
+
+  const maxWidth = 700;
+  let selectedWeights = new Map<Scagnostic, number>();
+
+  let isSelected = {};
+  scagnostics.forEach((s) => (isSelected[s] = false));
+  $selectedScagnostics.forEach((s) => (isSelected[s] = true));
+
+  $: selectedWeights.forEach((value, key) => $scagnosticWeights.set(key, value));
+  $: $selectedScagnostics = scagnostics.filter((s) => isSelected[s]);
+
+  selectedScagnostics.subscribe((newSelection) => {
+    selectedWeights = new Map();
+    newSelection.forEach((scagnostic) => {
+      selectedWeights.set(scagnostic, $scagnosticWeights.get(scagnostic));
+    });
+  });
+
+  function removeScagnostic(event: CustomEvent<string>) {
+    isSelected[event.detail] = false;
+  }
 </script>
 
 <header style="height:{height}px">
@@ -15,18 +37,30 @@
     <img src="static/logo.svg" alt="the ProInterest logo" height={height * 0.8} />
   </div>
   <Row>
-    <InterpolationComponent />
-
-    <Row id="doi-configuration" style="align-items:stretch;height:{height * 0.8}px;width:700px">
-      {#if $selectedDoiComponent === "prior"}
-        <PriorComponentWeights />
-      {:else if $selectedDoiComponent === "posterior"}
-        <PosteriorComponentWeights />
-      {/if}
+    <Row id="doi-configuration" style="align-items:center;height:{height * 0.8}px;flex-grow: 5">
+      <h2>Configure DOI:</h2>
+      <WeightedValues
+        id="selected-scagnostics"
+        totalSize={maxWidth}
+        weightsRemovable={true}
+        useDarkmode={true}
+        backgroundColor="#008080"
+        isSelectable={false}
+        bind:valueWeights={selectedWeights}
+        on:remove-weight={removeScagnostic}
+        on:end={() => sendScagnosticWeights($scagnosticWeights)}
+      />
+      <Options
+        options={scagnostics}
+        showActive={false}
+        showInactive={false}
+        bind:activeOptions={isSelected}
+        useDarkMode={true}
+        style="margin-left: 25px"
+      />
     </Row>
-
-    <ProgressionControls useAbsolutePositioning={false} useDarkMode={true} />
   </Row>
+  <ProgressionControls useAbsolutePositioning={false} useDarkMode={true} style="flex-grow:0" />
 </header>
 
 <style>
@@ -38,6 +72,14 @@
     background: #333;
     color: #fff;
     border-bottom: 1px solid #ddd;
+  }
+
+  h2 {
+    margin: 0;
+    margin-right: 25px;
+    padding: 0;
+    font-size: 18px;
+    font-weight: bold;;
   }
 
   header div.title {

@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { colorScale } from "$lib/state/active-color-scale";
   import { activeViewMode } from "$lib/state/active-view-mode";
   import BrushLayer from "../layers/interaction/brushed-regions-layer.svelte";

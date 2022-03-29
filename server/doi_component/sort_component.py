@@ -4,7 +4,7 @@ from .doi_component import DoiComponent
 
 
 class SortComponent(DoiComponent):
-  def __init__(self, sort_columns: list[str]) -> None:
+  def __init__(self, sort_columns: list) -> None:
       super().__init__()
       self.sort_columns = sort_columns
 

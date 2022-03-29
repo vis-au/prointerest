@@ -1,61 +1,65 @@
-from typing import Any, Literal
+from typing import Literal
 import pandas as pd
 import numpy as np
 
+from benchmarks.progressive_doi_pipeline import ProgressiveDoiPipeline
 from database import *
-from doi_component.outlierness_component import *
-from doi_component.provenance_component import *
 from doi_component.scagnostics_component import *
-from storage_strategy.progressive_bin_sampler import ProgressiveBinSampler
-from doi_approximator import ActualDoiEvaluator
+from context_item_selection_strategy.context_item_selection_strategy import *
+from outdated_item_selection_strategy.outdated_item_selection_strategy import *
+from doi_component.provenance_component import ProvenanceComponent
+from context_item_selection_strategy.doi_based_context import DoiBasedContext
+from storage_strategy.windowing_storage import WindowingStorage
+from storage_strategy.storage_strategy import StorageStrategy
 
 
-COMPONENT_WEIGHTS = {
-  "prior": 0.5,
-  "posterior": 0.5
-}
-PRIOR_WEIGHTS = {
-  "dimensions": .33,
-  "outlierness": .33,
-  "selection": .33
-}
-POSTERIOR_WEIGHTS = {
-  "provenance": .5,
-  "scagnostics": .5
-}
+# INTEREST COMPUTATION
+STORAGE_SIZE = 100000
+current_chunk = 0
+current_interactions = 0
 
-DOI_CLASSES = 10  # number of clusters the doi values are grouped into
+provenance_comp = ProvenanceComponent()
+scagnostics_comp = ScagnosticsComponent([5, 17])
+doi_component: DoiComponent = scagnostics_comp
 
-dimensions_of_interest: list[str] = []
-ranges_of_interest: dict[str, float] = {}
-outlierness_metric: Literal["scagnostic", "tukey", "clustering"] = "scagnostic"
+storage: StorageStrategy = WindowingStorage(STORAGE_SIZE)
+context: ContextItemSelectionStrategy = DoiBasedContext(n_dims=20, storage=storage, n_bins=25)
+update: OutdatedItemSelectionStrategy = None
 
 
-def set_component_weights(weights: dict[str, list[float]]):
-  COMPONENT_WEIGHTS["prior"] = weights["prior"]
-  COMPONENT_WEIGHTS["posterior"] = weights["posterior"]
+def set_component_weights(weights: dict):
+  # FIXME: legacy function
+  # COMPONENT_WEIGHTS["prior"] = weights["prior"]
+  # COMPONENT_WEIGHTS["posterior"] = weights["posterior"]
+  return
 
 
-def set_prior_weights(weights: dict[str, list[float]]):
-  global PRIOR_WEIGHTS
-  PRIOR_WEIGHTS = weights
+def set_prior_weights(weights: dict):
+  # FIXME: legacy function
+  # global PRIOR_WEIGHTS
+  # PRIOR_WEIGHTS = weights
+  return
 
 
-def set_posterior_weights(weights: dict[str, float]):
-  global POSTERIOR_WEIGHTS
-  POSTERIOR_WEIGHTS = weights
+def set_posterior_weights(weights: dict):
+  # FIXME: legacy function
+  # global POSTERIOR_WEIGHTS
+  # POSTERIOR_WEIGHTS = weights
+  return
 
 
-def set_scagnostic_weights(weights: dict[str, float]):
+def set_scagnostic_weights(weights: dict):
   scagnostics_comp.weights = weights
 
 
-def set_provenance_weights(weights: dict[str, float]):
+def set_provenance_weights(weights: dict):
   provenance_comp.weights = weights
 
 
-def set_outlierness_weights(weights: dict[str, float]):
-  outlierness_comp.weights = weights
+def set_outlierness_weights(weights: dict):
+  # FIXME: legacy function
+  # outlierness_comp.weights = weights
+  return
 
 
 def set_doi_classes(classes: int):
@@ -63,7 +67,7 @@ def set_doi_classes(classes: int):
   DOI_CLASSES = classes
 
 
-def set_dimensions_of_interest(dimensions: list[str]):
+def set_dimensions_of_interest(dimensions: list):
   global dimensions_of_interest
   dimensions_of_interest = dimensions
 
@@ -78,17 +82,11 @@ def set_outlierness_metric(metric: str):
   outlierness_metric = metric
 
 
-# INTEREST COMPUTATION
-current_chunk = 0
-current_interactions = 0
-
-progressive_sampler = ProgressiveBinSampler(n_dims=20)  # taxi dataset has 20 dimensions
-outlierness_comp = OutliernessComponent([5, 17])
-provenance_comp = ProvenanceComponent()
-scagnostics_comp = ScagnosticsComponent([5, 17])
+def set_scagnostic_weights(weights: dict):
+  scagnostics_comp.weights = weights
 
 
-def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: list[any]):
+def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: list):
   global current_interactions
   provenance_comp.add_interaction([
     current_interactions, mode, np.array(items)[:, 0]
@@ -101,48 +99,37 @@ def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: 
   current_interactions += 1
 
 
-def doi_f(X: np.ndarray):
-  df = pd.DataFrame(X)
+CONTEXT_SIZE: int = 1000
+UPDATE_INTERVAL: int = 10
+
+
+def doi_f(chunk_with_context: np.ndarray):
+  df = pd.DataFrame(chunk_with_context)
   df = df.drop(columns=[2, 3, 7, 18, 19])
   df = df.astype(np.float64)
 
   df["id"] = df.index
-  outlierness_doi = outlierness_comp.train(df)
 
-  prior = outlierness_doi
-  posterior = 0
-  doi = COMPONENT_WEIGHTS["prior"] * prior + COMPONENT_WEIGHTS["posterior"] * posterior
+  doi = doi_component.compute_doi(df)
+
   return doi
 
 
-doi_module = ActualDoiEvaluator(doi=doi_f, n_dims=20)
-items_processed = 0
-
-
-def compute_dois(items: list[list[Any]]):
+def compute_dois(items: list) -> np.ndarray:
   global current_chunk
+
   X = np.array(items)
 
-  doi, labels, edges = doi_module.get_next(current_chunk, X)
+  context_items = context.get_context_items(CONTEXT_SIZE, current_chunk)
+  updated_ids = context_items[ID].tolist() if len(context_items) > 0 else []
+  X_ = np.concatenate((X, context_items), axis=0)
+  dois_with_context = doi_f(X_)
+  new_dois = dois_with_context[:len(X)]
+  updated_dois = dois_with_context[len(X):]
+
+  df = pd.DataFrame(items)
+  df.rename(columns={0: ID}, inplace=True)
+  storage.insert_chunk(df, current_chunk)
 
   current_chunk += 1
-  return doi, labels, edges
-
-
-def compute_doi_bin_edges(doi: np.ndarray, bins: np.ndarray):
-  # est = KBinsDiscretizer(n_bins=DOI_CLASSES, encode="ordinal", strategy="kmeans")
-  bins = progressive_sampler._bin(np.array(doi))
-  edges = progressive_sampler.get_bin_edges(doi, bins)
-  return edges
-
-
-def compute_doi_prediction_error(items: list[list[Any]]):
-  df = pd.DataFrame(items)
-  df = df.drop(columns=[2, 3, 7, 18, 19])
-  df = df.astype(np.float64)
-  df["id"] = df.index
-
-  error = outlierness_comp.get_prediction_error(df)
-  print(error)
-  print(error.mean())
-  return error
+  return new_dois, updated_ids, updated_dois

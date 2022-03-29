@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { afterUpdate, onMount } from "svelte";
   import { Deck, OrthographicView } from "@deck.gl/core";
   import { ScatterplotLayer } from "@deck.gl/layers";
@@ -6,7 +6,7 @@
 
   import { currentTransform } from "$lib/state/zoom";
   import type DataItem from "$lib/types/data-item";
-  import { visibleData } from "$lib/state/visible-data";
+  import { interestingData } from "$lib/state/visible-data";
 
   export let id = "deck-gl-scatterplot";
   export let width = 100;
@@ -14,7 +14,7 @@
   export let radius = 5; // size of points
   export let orientation = "right"; // left or right side of the screen?
 
-  $: data = $visibleData;
+  $: data = $interestingData;
 
   const INITIAL_VIEW_STATE = {
     zoom: 0,

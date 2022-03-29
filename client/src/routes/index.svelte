@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { dimensions, totalSize } from "$lib/state/processed-data";
   import Header from "$lib/view/header/header.svelte";
   import MainView from "$lib/view/main/main-view.svelte";

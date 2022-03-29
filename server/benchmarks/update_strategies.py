@@ -1,5 +1,4 @@
-from functools import update_wrapper
-from typing import Callable
+from typing import Callable, List, Tuple
 
 from outdated_item_selection_strategy.no_update import *
 from outdated_item_selection_strategy.oldest_chunks_update import *
@@ -16,7 +15,7 @@ UPDATE_STRATEGY_LABELS = [
 ]
 
 
-def get_update_strategies(n_dims: int, n_chunks: int, max_age: int, n_bins: int) -> list[tuple[str, Callable[[], OutdatedItemSelectionStrategy]]]:
+def get_update_strategies(n_dims: int, n_chunks: int, max_age: int, n_bins: int) -> List[Tuple[str, Callable[[], OutdatedItemSelectionStrategy]]]:
   return list(
     map(
       lambda label: (label, lambda: get_update_strategy(label, n_dims, n_chunks, max_age, n_bins)),

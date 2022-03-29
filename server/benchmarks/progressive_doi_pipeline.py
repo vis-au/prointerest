@@ -94,7 +94,7 @@ class ProgressiveDoiPipeline():
     # measure time for storing new values
     new_ids = chunk[ID].to_list()
     now = time()
-    save_dois(new_ids, new_doi, np.zeros_like(new_doi))
+    save_dois(new_ids, new_doi)
     step.store_new_time = time() - now
 
   def _apply_update_strategy(self, chunk: DataFrame, step: DoiComputationTimeStep):

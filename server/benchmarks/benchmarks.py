@@ -10,7 +10,7 @@ if True:
 import json
 import os
 from datetime import datetime
-from typing import Literal
+from typing import Literal, List, Tuple
 from test_case import *
 
 
@@ -52,7 +52,7 @@ def load_test_case(index: int) -> TestCase:
 
 
 # load all combinations of test cases defined in a test_case in test_case.json into TestCases
-def load_composite_test_cases(index: int) -> tuple[list[TestCase], list[str]]:
+def load_composite_test_cases(index: int) -> Tuple[List[TestCase], List[str]]:
   test_cases = get_all_composite_test_cases()
   test_case_config = test_cases[index]
 
@@ -63,8 +63,8 @@ def load_composite_test_cases(index: int) -> tuple[list[TestCase], list[str]]:
   update_strategies = test_case_config["update_strategies"]
   storage_strategies = test_case_config["storage_strategies"]
 
-  tcs: list[TestCase] = []
-  labels: list[str] = []
+  tcs: List[TestCase] = []
+  labels: List[str] = []
 
   for doi_label in dois:
     for data_label in datasets:
@@ -130,10 +130,10 @@ def run_test_case_mixed(index: int):
   return tc
 
 
-def get_variant_for_variables(index: int, variables: list[str],
+def get_variant_for_variables(index: int, variables: List[str],
                               apply_variable: Callable[[TestCase, str], TestCase],
-                              state: STATE = "single") -> list[TestCase]:
-  variants: list[TestCase] = []
+                              state: STATE = "single") -> List[TestCase]:
+  variants: List[TestCase] = []
   i = 1
   for variable in variables:
     tc = load_test_case(index)
@@ -157,7 +157,7 @@ def get_variant_for_variables(index: int, variables: list[str],
 
 
 def get_variant_for_all_datasets(index: int, datasets: dict,
-                                 state: STATE = "single") -> list[TestCase]:
+                                 state: STATE = "single") -> List[TestCase]:
   def callback(tc: TestCase, data_label: str):
     data_config = get_dataset_config(data_label)
     tc.data = data_config
@@ -173,7 +173,7 @@ def get_variant_for_all_datasets(index: int, datasets: dict,
 
 
 def get_variant_for_all_parameters(index: int, parameters: dict,
-                                   state: STATE = "single") -> list[TestCase]:
+                                   state: STATE = "single") -> List[TestCase]:
   def callback(tc: TestCase, parameter_label: str):
     parameter_config = get_parameters_config(parameter_label)
     tc.params = parameter_config
@@ -187,8 +187,8 @@ def get_variant_for_all_parameters(index: int, parameters: dict,
   return variants
 
 
-def get_variant_for_all_doi_functions(index: int, dois: list[str],
-                                      state: STATE = "single") -> list[TestCase]:
+def get_variant_for_all_doi_functions(index: int, dois: List[str],
+                                      state: STATE = "single") -> List[TestCase]:
   def callback(tc: TestCase, doi_function: str):
     doi_config = get_doi_config(doi_function, tc.data)
     tc.doi = doi_config
@@ -201,7 +201,7 @@ def get_variant_for_all_doi_functions(index: int, dois: list[str],
   return variants
 
 
-def get_variant_for_all_strategies(index: int, all_storages: bool = False) -> list[TestCase]:
+def get_variant_for_all_strategies(index: int, all_storages: bool = False) -> List[TestCase]:
   tc = load_test_case(index)
   contexts_, updates_, storages_ = generate_strategies(tc.data, tc.params)
 
@@ -213,7 +213,7 @@ def get_variant_for_all_strategies(index: int, all_storages: bool = False) -> li
   else:
     storages_ = [s for s in storages_ if s[0] == "windowing"]
 
-  variants: list[TestCase] = []
+  variants: List[TestCase] = []
   i = 0
   for c in contexts_:
     for u in updates_:
@@ -260,7 +260,7 @@ def transform_into_bigger_chunks_test_case(test_case: TestCase):
   return create_bigger_chunks_test_case(data, doi, params, PATH)
 
 
-def save_benchmark_run(test_cases: list[TestCase], index: int, mode: str):
+def save_benchmark_run(test_cases: List[TestCase], index: int, mode: str):
   tcs = [
     {
       "dataset": tc.data.name,
@@ -319,7 +319,7 @@ def run_test_case_on_all_parameters(index: int, parameters: dict = None,
 
 
 # 1 dataset : 1 parameter set : n dois : 1 set of strategies
-def run_test_case_on_all_doi_functions(index: int, doi_functions: list[str] = None,
+def run_test_case_on_all_doi_functions(index: int, doi_functions: List[str] = None,
                                        state: STATE = "single") -> None:
 
   doi_functions = get_doi_function_presets() if doi_functions is None else doi_functions
@@ -350,7 +350,7 @@ def run_test_case_on_all_strategies(index: int, all_storages: bool = False) -> N
 # P datasets : Q parameter sets : R dois : S sets of strategies
 def run_all_test_case_configs() -> None:
   n_test_cases = len(get_all_test_cases())
-  tcs: list[TestCase] = []
+  tcs: List[TestCase] = []
   for i in range(n_test_cases):
     tc = run_test_case_config(i)
     tcs += [tc]

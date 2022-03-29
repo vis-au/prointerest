@@ -37,14 +37,14 @@ def get_next_chunk():
   chunk = get_next_chunk_from_db(chunk_size)
 
   ids = np.array(chunk)[:, 0].tolist()
-  dois, labels, bins = compute_dois(chunk)
-  save_dois(ids, dois, labels)
+  dois, updated_ids, updated_dois = compute_dois(chunk)
+  save_dois(ids, dois)
 
   return cors_response({
     "chunk": chunk,
     "dois": dois.tolist(),
-    "labels": labels.tolist(),
-    "bins": bins
+    "updated_ids": updated_ids,
+    "updated_dois": updated_dois.tolist()
   })
 
 
@@ -148,7 +148,7 @@ def get_suggested_items():
 
 # @app.route("/doi", methods=["POST"])
 # def get_doi():
-#   items: list[list[Any]] = json.loads(request.data)["items"]
+#   items: list
 
 #   interest = compute_dois(items)
 #   return cors_response(interest)
@@ -156,7 +156,7 @@ def get_suggested_items():
 
 @app.route("/prediction", methods=["GET"])
 def get_prediction():
-  items: list[list[Any]] = json.loads(request.data)["items"]
+  items: list
   return cors_response([])
 
 

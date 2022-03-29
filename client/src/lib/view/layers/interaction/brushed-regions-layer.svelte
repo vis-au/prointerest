@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { geoPath } from "d3-geo";
   import type { GeoPermissibleObjects } from "d3-geo";
   import type { ZoomTransform } from "d3-zoom";

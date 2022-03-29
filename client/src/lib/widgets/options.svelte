@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import Dropdown from "./dropdown.svelte";
 
   export let id = "";
@@ -7,6 +7,8 @@
   export let options: string[];
   export let activeOptions: Record<string, boolean>;
   export let showInactive = true;
+  export let showActive = true;
+  export let useDarkMode = false;
 
   $: inactiveOptions = options.filter((o) => !activeOptions[o]);
   $: activeOptionKeys = Object.keys(activeOptions).filter((o) => activeOptions[o]);
@@ -17,7 +19,7 @@
   }
 </script>
 
-<div {id} class="options {className}" {style}>
+<div {id} class="options {className} {useDarkMode ? "dark" : ""}" {style}>
   {#if showInactive}
     {#each options as option}
       <div class="option">
@@ -31,24 +33,26 @@
       </div>
     {/each}
   {:else}
-    <Dropdown id="inactive-options" selectedValue="null" style="margin-right:20px">
-      <option disabled value="null">add histogram</option>
+    <Dropdown useDarkMode={useDarkMode} id="inactive-options" selectedValue="null" style="margin-right:20px">
+      <option disabled value="null">add ...</option>
       {#each inactiveOptions as option}
         <option value={option} on:click={() => select(option)}>{option}</option>
       {/each}
     </Dropdown>
 
-    {#each activeOptionKeys as option}
-      <div class="option">
-        <input
-          id="options-list-{option}"
-          type="checkbox"
-          value={option}
-          bind:checked={activeOptions[option]}
-        />
-        <label for="options-list-{option}">{option}</label>
-      </div>
-    {/each}
+    {#if showActive}
+      {#each activeOptionKeys as option}
+        <div class="option">
+          <input
+            id="options-list-{option}"
+            type="checkbox"
+            value={option}
+            bind:checked={activeOptions[option]}
+          />
+          <label for="options-list-{option}">{option}</label>
+        </div>
+      {/each}
+    {/if}
   {/if}
 </div>
 
@@ -65,7 +69,6 @@
     display: none;
   }
   div.options div.option label {
-    background: #efefef;
     cursor: pointer;
     border-radius: 4px;
     padding: 3px 10px;

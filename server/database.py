@@ -2,7 +2,7 @@ import duckdb
 import numpy as np
 import pandas as pd
 import random
-from typing import Callable
+from typing import Callable, List
 
 # TOTAL_SIZE = 112145904
 TOTAL_SIZE: int = None
@@ -28,7 +28,6 @@ DOI_DB = "doi"  # name of database containing current doi values
 
 ID = "tripID"  # column in a table containing the id of data items as in the original data
 DOI = "doi"  # column in a table containing the doi value
-BIN = "label"  # column in a table containing the current label assigned to a doi
 CHUNK = "chunk"  # column in a table storing the chunk an item was processed
 TIMESTAMP = "timestamp_"  # column in a table storing a timestamp for when a datum was updated
 NOW = "current_timestamp"  # shorthand in duckdb for the current date and time
@@ -78,7 +77,7 @@ def initialize_db(row_data_path: str, column_data_path: str, id_column: str, tot
   cursor.execute(f"CREATE TABLE {PROCESSED_DB} "
                  f"({ID} VARCHAR UNIQUE PRIMARY KEY, {CHUNK} INTEGER)")
   cursor.execute(f"CREATE TABLE {DOI_DB} "
-                 f"({ID} VARCHAR UNIQUE PRIMARY KEY,{DOI} VARCHAR, {BIN} VARCHAR)")
+                 f"({ID} VARCHAR UNIQUE PRIMARY KEY,{DOI} VARCHAR)")
   cursor.execute(f"CREATE TABLE {LAST_UPDATE_DB} "
                  f"({ID} VARCHAR UNIQUE PRIMARY KEY, {TIMESTAMP} TIMESTAMP)")
 
@@ -128,7 +127,7 @@ def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
   return PROCESS_CHUNK_CALLBACK(chunk)
 
 
-def get_from_db(db_name: str, query_filters: list[str], dimensions: list[str], distinct=False,
+def get_from_db(db_name: str, query_filters: list, dimensions: list, distinct=False,
                 as_df=False):
   where_clause = ""
   for filter in query_filters:
@@ -151,23 +150,23 @@ def get_from_db(db_name: str, query_filters: list[str], dimensions: list[str], d
     return cursor.execute(query).fetchall()
 
 
-def get_from_data(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+def get_from_data(query_filters: list, dimensions="*", distinct=False, as_df=False):
   return get_from_db(DATA_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_column_data(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+def get_from_column_data(query_filters: list, dimensions="*", distinct=False, as_df=False):
   return get_from_db(COLUMN_DATA_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_processed(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+def get_from_processed(query_filters: list, dimensions="*", distinct=False, as_df=False):
   return get_from_db(PROCESSED_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_latest_update(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+def get_from_latest_update(query_filters: list, dimensions="*", distinct=False, as_df=False):
   return get_from_db(LAST_UPDATE_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_doi(query_filters: list[str], dimensions="*", distinct=False, as_df=False):
+def get_from_doi(query_filters: list, dimensions="*", distinct=False, as_df=False):
   return get_from_db(DOI_DB, query_filters, dimensions, distinct, as_df)
 
 
@@ -194,7 +193,7 @@ def update_last_update(ids: list):
   cursor.execute(query)
 
 
-def save_dois(ids: list, dois: list, bins: list):
+def save_dois(ids: list, dois: list):
   if len(ids) == 0:
     return
 
@@ -202,16 +201,16 @@ def save_dois(ids: list, dois: list, bins: list):
     # optimization: when too many ids get loaded, the query becomes too long. Therefore run this
     # operation recursively in two parts until the threshold is cleared
     split = round(len(ids) / 2)
-    save_dois(ids[:split], dois[:split], bins[:split])
-    save_dois(ids[split:], dois[split:], bins[split:])
+    save_dois(ids[:split], dois[:split])
+    save_dois(ids[split:], dois[split:])
     return
 
   values = ""
   for i, id in enumerate(ids):
-    values = f"{values}({id},{dois[i]},{bins[i]})"
+    values = f"{values}({id},{dois[i]})"
     if i < len(ids) - 1:
       values += ","
-  query = f"INSERT INTO {DOI_DB} ({ID}, {DOI}, {BIN}) VALUES {values}"
+  query = f"INSERT INTO {DOI_DB} ({ID}, {DOI}) VALUES {values}"
   cursor.execute(query)
   update_last_update(ids)
 
@@ -246,7 +245,7 @@ def update_dois(ids: list, dois: list):
   # query = f"DELETE FROM {DOI_DB} WHERE {ID} IN ({ids_list})"
   # cursor.execute(query)
 
-  # save_dois(ids, dois, np.zeros_like(ids))
+  # save_dois(ids, dois)
 
   update_last_update(ids)
 
@@ -279,7 +278,7 @@ def get_dimension_extent(dimension: str):
   return DIMENSION_EXTENTS.get(dimension)
 
 
-def get_items_for_ids(ids: list[str], as_df=False):
+def get_items_for_ids(ids: list, as_df=False):
   if len(ids) == 1:
     ids += ids
   return get_from_column_data([f"{ID} IN {tuple(ids)}"], as_df=as_df)

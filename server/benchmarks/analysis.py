@@ -2,6 +2,7 @@ from os.path import join, exists, dirname
 import json
 import pandas as pd
 import numpy as np
+from typing import List
 
 
 # helper function that bins the doi column
@@ -54,7 +55,7 @@ def get_label_for_mode(test_case_path: str, mode: str) -> str:
   return test_case_label
 
 
-def get_strategy_bc_errors(path_list: list[str], file_name: str, label: str,
+def get_strategy_bc_errors(path_list: List[str], file_name: str, label: str,
                            absolute: bool = False, no_strategies: bool = False):
   strategy_errors = pd.DataFrame()
   bigger_chunks_errors = pd.DataFrame()
@@ -169,7 +170,7 @@ def merge_err_dfs(strat_err_df: pd.DataFrame, bc_err_df: pd.DataFrame, mode: str
   return df
 
 
-def get_times_df(parent_folder_paths: list[str], file_name: str, mode: str):
+def get_times_df(parent_folder_paths: List[str], file_name: str, mode: str):
   all_times_df = pd.DataFrame()
 
   for path in parent_folder_paths:
@@ -233,7 +234,7 @@ def merge_time_dfs(strat_time_df: pd.DataFrame, bc_time_df: pd.DataFrame, sc_tim
   return df
 
 
-def collect_ground_truth_dfs(test_case_file_name: str, mode: str):
+def collect_ground_truth_dfs(test_case_file_name: str, mode: str or List[str] = []):
   selected_test_case = json.load(open("./out/"+test_case_file_name))
   test_cases = selected_test_case["test_cases"]
 
@@ -251,6 +252,7 @@ def collect_ground_truth_dfs(test_case_file_name: str, mode: str):
   for path in test_case_paths:
     df = pd.read_csv(path)
     label = get_label_for_mode(path, mode)
+    print(f"label: {label}")
     df[mode] = label
     ground_truth_dfs = ground_truth_dfs.append(df)
 

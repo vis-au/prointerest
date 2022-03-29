@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import BigNumber from "./big-number.svelte";
 
   export let values: string[];

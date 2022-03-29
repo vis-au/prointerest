@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { createEventDispatcher } from "svelte";
   import VegaLitePlot from "./vega-lite-plot.svelte";
 

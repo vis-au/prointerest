@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { currentTransform, isZooming } from "$lib/state/zoom";
 
   import { zoom, zoomTransform } from "d3-zoom";

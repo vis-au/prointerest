@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { afterUpdate, createEventDispatcher } from "svelte";
 
   export let id: string;

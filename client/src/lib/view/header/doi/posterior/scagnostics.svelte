@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { scagnosticWeights, selectedScagnostics } from "$lib/state/selected-scagnostics";
   import { scagnostics } from "$lib/types/scagnostics";
   import type { Scagnostic } from "$lib/types/scagnostics";

@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   export let id = "";
   export let width = -1;
   export let height = -1;

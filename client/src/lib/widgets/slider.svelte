@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   import { createEventDispatcher } from "svelte";
 
   import BigNumber from "./big-number.svelte";
@@ -46,7 +46,7 @@
       bind:value={sliderValue}
       on:mouseup={() => {
         value = sliderValue;
-        dispatch("end");
+        dispatch("end", sliderValue);
       }}
     />
   {/if}

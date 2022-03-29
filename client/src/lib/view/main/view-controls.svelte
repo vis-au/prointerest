@@ -1,13 +1,17 @@
 <script>
   import { scatterplotBrush } from "$lib/state/active-scatterplot-brush";
+  import { activeBinMode } from "$lib/state/active-bin-mode";
   import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { activeViewMode } from "$lib/state/active-view-mode";
   import { dimensions } from "$lib/state/processed-data";
+  import { binModes } from "$lib/types/bin-mode";
   import { brushModes } from "$lib/types/brush-mode";
   import { viewModes } from "$lib/types/view-modes";
   import Alternatives from "$lib/widgets/alternatives.svelte";
   import Dropdown from "$lib/widgets/dropdown.svelte";
   import Row from "$lib/widgets/row.svelte";
+  import Slider from "$lib/widgets/slider.svelte";
+  import { doiLimit } from "$lib/state/doi-limit";
 </script>
 
 <Row id="view-controls">
@@ -17,6 +21,14 @@
       name="view-modes"
       alternatives={viewModes}
       bind:activeAlternative={$activeViewMode}
+    />
+  </div>
+  <div class="configuration">
+    <h2>Bin by</h2>
+    <Alternatives
+      name="bin-modes"
+      alternatives={binModes}
+      bind:activeAlternative={$activeBinMode}
     />
   </div>
   <div class="configuration">
@@ -38,6 +50,16 @@
       name="scatterplot-brush-mode"
       alternatives={brushModes}
       bind:activeAlternative={$scatterplotBrush}
+    />
+  </div>
+  <div class="configuration">
+    <Slider
+      id="doi-limit"
+      label="DOI limit"
+      width={300}
+      min={0}
+      max={1}
+      bind:value={$doiLimit}
     />
   </div>
 </Row>

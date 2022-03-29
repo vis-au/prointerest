@@ -4,7 +4,6 @@ import { writable } from "svelte/store";
 import { processedData } from "./processed-data";
 import { sendReset } from "../util/requests";
 import { doiValues } from "./doi-values";
-import { doiLabels } from "./doi-labels";
 
 export const CHUNK_SIZE = 1000;
 
@@ -16,7 +15,6 @@ export const progressionState = writable("paused" as ProgressionState);
 let currentlyWaiting = false;
 export const waitingForChunk = writable(currentlyWaiting);
 
-const currentDoiLabels: Map<number, number> = new Map();
 const currentDoiValues: Map<number, number> = new Map();
 
 const progressionCallback = () => {
@@ -27,14 +25,14 @@ const progressionCallback = () => {
       processedData.update((processed) => {
         return [...processed, ...chunk.chunk];
       });
-      chunk.labels.forEach((label, i) => {
-        currentDoiLabels.set(chunk.chunk[i][0], label);
-      });
       chunk.dois.forEach((doi, i) => {
         currentDoiValues.set(chunk.chunk[i][0], doi);
       });
+      chunk.updated_dois.forEach((doi, i) => {
+        const id = chunk.updated_dois[i];
+        currentDoiValues.set(id, doi);
+      });
 
-      doiLabels.update(() => currentDoiLabels);
       doiValues.update(() => currentDoiValues);
 
       currentlyWaiting = false;
