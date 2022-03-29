@@ -1,6 +1,7 @@
 import os
 import json
 from dataclasses import dataclass, field
+from typing import List
 
 from database import initialize_db, drop_tables
 from doi_components import get_doi_component
@@ -34,7 +35,7 @@ class DatasetConfiguration():
   data_path: str
   column_data_path: str
   id_column: str
-  numeric_columns: list[str]  # columns used in the doi functions
+  numeric_columns: List[str]  # columns used in the doi functions
   total_db_size: int  # full size of database
   n_dims: int  # number of dimensions in the data
 

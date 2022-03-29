@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, List, Tuple
 
 from context_item_selection_strategy.no_context import *
 from context_item_selection_strategy.chunk_based_context import *
@@ -17,7 +17,7 @@ CONTEXT_STRATEGY_LABELS = [
 ]
 
 
-def get_context_strategies(n_dims: int, n_chunks: int, n_bins: int) -> list[tuple[str, Callable[[], ContextItemSelectionStrategy]]]:
+def get_context_strategies(n_dims: int, n_chunks: int, n_bins: int) -> List[Tuple[str, Callable[[], ContextItemSelectionStrategy]]]:
   return list(
     map(
       lambda label: (label, lambda: get_context_strategy(label, n_dims, n_chunks, n_bins)),

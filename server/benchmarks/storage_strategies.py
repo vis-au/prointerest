@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, List, Tuple
 
 from storage_strategy.no_storage import *
 from storage_strategy.compression_storage import *
@@ -15,7 +15,7 @@ STORAGE_STRATEGY_LABELS = [
 ]
 
 
-def get_storage_strategies(storage_size: int) -> list[tuple[str, Callable[[], StorageStrategy]]]:
+def get_storage_strategies(storage_size: int) -> List[Tuple[str, Callable[[], StorageStrategy]]]:
   return list(
     map(
       lambda label: (label, lambda: get_storage_strategy(label, storage_size)),
