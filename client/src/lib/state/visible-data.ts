@@ -16,7 +16,6 @@ export const viewPort = writable(vp);
 export const visibleData = writable([] as DataItem[]);
 
 export const interestingData = derived([visibleData, doiValues, doiLimit], ([$visibleData, $doiValues, $doiLimit]) => {
-  console.log($doiLimit, $doiValues);
   return $visibleData.filter((item) => {
     return $doiValues.get(item.id) > $doiLimit;
   });
