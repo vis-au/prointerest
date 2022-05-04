@@ -7,6 +7,7 @@
   import BinnedScatterplotView from "../layers/visualization/binned-scatterplot-view.svelte";
   import Axes from "../layers/visualization/axes.svelte";
   import ColorLegend from "./color-legend.svelte";
+  import Tooltip from "./tooltip.svelte";
   import ViewControls from "./view-controls.svelte";
 
   export let width: number;
@@ -23,6 +24,7 @@
   <Axes {width} {height} />
   <!-- <SuggestionLayer {width} {height} /> -->
   <BrushLayer {width} {height} />
+  <Tooltip />
   <InteractionLayer {width} {height} />
 
   {#if $activeViewMode === "binned"}
