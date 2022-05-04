@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { max, min } from "d3-array";
+  import { max, median, min } from "d3-array";
   import type { HexbinBin } from "d3-hexbin";
   import { afterUpdate, onMount } from "svelte";
 
@@ -21,9 +21,7 @@
     if ($activeBinMode === "density") {
       return bin.length;
     } else {
-      return bin
-        .map(item => +$doiValues.get(item.id))
-        .reduce((a: number, b: number) => a + b, 0);
+      return median(bin.map(item => +$doiValues.get(item.id)));
     }
   }
 
@@ -47,10 +45,14 @@
     const minCount = min($bins, (d: HexbinBin<DataItem>) => getBinValue(d)) || 0;
     const maxCount = max($bins, (d: HexbinBin<DataItem>) => getBinValue(d)) || 1;
 
-    if ($colorScale.range().length === 3) {
-      $colorScale.domain([maxCount, 0, minCount]);
-    } else {
-      $colorScale.domain([minCount, maxCount]);
+    if ($activeBinMode === "doi") {
+      $colorScale.domain([0, 1]);
+    } else if ($activeBinMode === "density") {
+      if ($colorScale.range().length === 3) {
+        $colorScale.domain([maxCount, 0, minCount]);
+      } else {
+        $colorScale.domain([minCount, maxCount]);
+      }
     }
   }
 
