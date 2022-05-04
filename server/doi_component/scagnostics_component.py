@@ -38,16 +38,18 @@ class ScagnosticsComponent(DoiComponent):
 
     def get_doi(self, ids: np.ndarray):
         if len(ids) == 0:
-            return np.empty((0, )), ids
+            return np.empty((0, ))
 
-        known_ids = self.scores.loc[self.scores[ID].isin(ids)]
+        # this is a sanity check, in case this function is called "on-demand", finding only those
+        # ids that we actually have scores for
+        available_scores = self.scores.loc[self.scores[ID].isin(ids)]
 
-        doi = np.zeros((len(known_ids), ))
+        doi = np.zeros((len(available_scores), ))
 
         for measure in self.weights:
-            doi += self.weights[measure] * known_ids[measure]
+            doi += self.weights[measure] * available_scores[measure]
 
-        return doi, known_ids[ID]
+        return doi
 
     def compute_doi(self, X: pd.DataFrame):
         if len(X) == 0:
@@ -68,9 +70,10 @@ class ScagnosticsComponent(DoiComponent):
         for measure in self.weights:
             scores_df[measure] = scores[measure]
 
+        # save the scores for fast retrieval for when the user adjusts the weights
         self.scores = pd.concat([self.scores, scores_df], ignore_index=True)
 
-        doi, _ = self.get_doi(scores_df[ID])
-        print(doi)
+        # the doi value then is just multiplying the weights with the scores
+        doi = self.get_doi(scores_df[ID])
 
         return doi

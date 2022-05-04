@@ -36,7 +36,7 @@ def get_next_chunk():
 
   ids = np.array(chunk)[:, 0].tolist()
   dois, updated_ids, updated_dois = compute_dois(chunk)
-  save_dois(ids, dois)
+  save_dois(ids, dois.tolist())
 
   return cors_response({
     "chunk": chunk,

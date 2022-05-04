@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, List, Tuple
 import pandas as pd
 import numpy as np
 
@@ -127,7 +127,7 @@ def doi_f(chunk_with_context: np.ndarray):
   return doi
 
 
-def compute_dois(items: list) -> np.ndarray:
+def compute_dois(items: list) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
   global current_chunk
 
   X = np.array(items)

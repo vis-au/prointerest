@@ -96,7 +96,7 @@ def reset_progression():
   cursor.execute(f"DELETE FROM {DOI_DB}")
 
 
-def mark_ids_processed(ids: list):
+def mark_ids_processed(ids: List):
   if len(ids) == 0:
     return
 
@@ -127,7 +127,7 @@ def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
   return PROCESS_CHUNK_CALLBACK(chunk)
 
 
-def get_from_db(db_name: str, query_filters: list, dimensions: list, distinct=False,
+def get_from_db(db_name: str, query_filters: List, dimensions: List, distinct=False,
                 as_df=False):
   where_clause = ""
   for filter in query_filters:
@@ -150,23 +150,23 @@ def get_from_db(db_name: str, query_filters: list, dimensions: list, distinct=Fa
     return cursor.execute(query).fetchall()
 
 
-def get_from_data(query_filters: list, dimensions="*", distinct=False, as_df=False):
+def get_from_data(query_filters: List, dimensions="*", distinct=False, as_df=False):
   return get_from_db(DATA_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_column_data(query_filters: list, dimensions="*", distinct=False, as_df=False):
+def get_from_column_data(query_filters: List, dimensions="*", distinct=False, as_df=False):
   return get_from_db(COLUMN_DATA_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_processed(query_filters: list, dimensions="*", distinct=False, as_df=False):
+def get_from_processed(query_filters: List, dimensions="*", distinct=False, as_df=False):
   return get_from_db(PROCESSED_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_latest_update(query_filters: list, dimensions="*", distinct=False, as_df=False):
+def get_from_latest_update(query_filters: List, dimensions="*", distinct=False, as_df=False):
   return get_from_db(LAST_UPDATE_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_from_doi(query_filters: list, dimensions="*", distinct=False, as_df=False):
+def get_from_doi(query_filters: List, dimensions="*", distinct=False, as_df=False):
   return get_from_db(DOI_DB, query_filters, dimensions, distinct, as_df)
 
 
@@ -185,7 +185,7 @@ def get_next_chunk_from_db(chunk_size: int, as_df=False):
   return next_chunk if as_df else next_chunk.values.tolist()
 
 
-def update_last_update(ids: list):
+def update_last_update(ids: List):
   ids_list_str = list(map(str, ids))
   ids_str = f"{','.join(ids_list_str)}"
 
@@ -193,7 +193,7 @@ def update_last_update(ids: list):
   cursor.execute(query)
 
 
-def save_dois(ids: list, dois: list):
+def save_dois(ids: List, dois: List):
   if len(ids) == 0:
     return
 
@@ -215,7 +215,7 @@ def save_dois(ids: list, dois: list):
   update_last_update(ids)
 
 
-def get_dois(ids: list):
+def get_dois(ids: List):
   if len(ids) == 0:
     return np.empty(0)
   if len(ids) == 1:
@@ -224,7 +224,7 @@ def get_dois(ids: list):
   return cursor.execute(query).fetchnumpy()[DOI.lower()]
 
 
-def update_dois(ids: list, dois: list):
+def update_dois(ids: List, dois: List):
   # code below contains the slow approach using upate, which is slowing down the computation
   # noticably (see delete -> insert alternative below)
   def update_doi(id: str, doi: str):
@@ -278,7 +278,7 @@ def get_dimension_extent(dimension: str):
   return DIMENSION_EXTENTS.get(dimension)
 
 
-def get_items_for_ids(ids: list, as_df=False):
+def get_items_for_ids(ids: List, as_df=False):
   if len(ids) == 1:
     ids += ids
   return get_from_column_data([f"{ID} IN {tuple(ids)}"], as_df=as_df)
