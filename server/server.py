@@ -1,9 +1,7 @@
-from typing import Any
 from flask import Flask, json, jsonify, request
 
 from database import *
 from doi_function import *
-from doi_component.scagnostics_component import SCATTERPLOT_AXES
 
 app = Flask(__name__)
 
@@ -106,7 +104,7 @@ def send_axis_dimension():
   if axis not in ["x", "y"]:
     return cors_response(False)
 
-  SCATTERPLOT_AXES[axis] = dimension
+  set_scatterplot_axis(axis, dimension)
   return cors_response(True)
 
 
@@ -146,12 +144,10 @@ def get_suggested_items():
   pass
 
 
-# @app.route("/doi", methods=["POST"])
-# def get_doi():
-#   items: list
-
-#   interest = compute_dois(items)
-#   return cors_response(interest)
+@app.route("/doi/<ids>", methods=["POST"])
+def get_doi(ids):
+  interest = get_dois(ids)
+  return cors_response(interest)
 
 
 @app.route("/prediction", methods=["GET"])
