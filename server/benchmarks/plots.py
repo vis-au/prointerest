@@ -11,7 +11,6 @@ def _apply_styles():
 
 
 def histogram(df: pd.DataFrame, x: str):
-  print(df)
   _apply_styles()
   matrix = sns.histplot(
     data=df,

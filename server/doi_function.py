@@ -18,9 +18,9 @@ STORAGE_SIZE = 100000
 current_chunk = 0
 current_interactions = 0
 
-provenance_comp = ProvenanceComponent()
 scagnostics_comp = ScagnosticsComponent([5, 17])
 doi_component: DoiComponent = scagnostics_comp
+provenance_comp = ProvenanceComponent()  # FIXME: unused, but kept for legacy compatibility
 
 storage: StorageStrategy = WindowingStorage(STORAGE_SIZE)
 context: ContextItemSelectionStrategy = DoiBasedContext(n_dims=20, storage=storage, n_bins=25)
@@ -45,6 +45,18 @@ def set_posterior_weights(weights: dict):
   # FIXME: legacy function
   # global POSTERIOR_WEIGHTS
   # POSTERIOR_WEIGHTS = weights
+  return
+
+
+def set_scatterplot_axis(axis: str, dimension: int):
+  # subspace = scagnostics_comp.subspace
+
+  # if axis == "x":
+  #   subspace[0] = dimension
+  # elif axis == "y":
+  #   subspace[1] = dimension
+
+  # scagnostics_comp.subspace = subspace
   return
 
 

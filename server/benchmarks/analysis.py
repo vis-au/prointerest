@@ -252,8 +252,10 @@ def collect_ground_truth_dfs(test_case_file_name: str, mode: str or List[str] = 
   for path in test_case_paths:
     df = pd.read_csv(path)
     label = get_label_for_mode(path, mode)
-    print(f"label: {label}")
     df[mode] = label
     ground_truth_dfs = ground_truth_dfs.append(df)
 
+  # since the df combines results from multiple configurations of the same test_case over the mode,
+  # it also has duplicate index entries, so we need to rebuild reset the index here:
+  ground_truth_dfs.reset_index(inplace=True)
   return ground_truth_dfs

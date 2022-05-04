@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from pyscagnostics import scagnostics
 
+from database import ID
 from .doi_component import DoiComponent
 
 
@@ -16,7 +17,6 @@ SCAGNOSTICS = [
     "Stringy",
     "Monotonic",
 ]
-SCATTERPLOT_AXES: dict = {"x": None, "y": None}
 
 
 class ScagnosticsComponent(DoiComponent):
@@ -34,6 +34,20 @@ class ScagnosticsComponent(DoiComponent):
             "stringy": 0.11,
             "monotonic": 0.11,
         }
+        self.scores = pd.DataFrame(columns=[ID] + list(self.weights.keys()))
+
+    def get_doi(self, ids: np.ndarray):
+        if len(ids) == 0:
+            return np.empty((0, )), ids
+
+        known_ids = self.scores.loc[self.scores[ID].isin(ids)]
+
+        doi = np.zeros((len(known_ids), ))
+
+        for measure in self.weights:
+            doi += self.weights[measure] * known_ids[measure]
+
+        return doi, known_ids[ID]
 
     def compute_doi(self, X: pd.DataFrame):
         if len(X) == 0:
@@ -41,27 +55,22 @@ class ScagnosticsComponent(DoiComponent):
 
         X_ = X.select_dtypes(["number"]) if len(self.subspace) == 0 else X[self.subspace]
 
-        # get scagnostics for the input
-        results = scagnostics(X_)
+        # get scagnostics scores for the input along the current axes in the plot
+        scores, _ = scagnostics(X[self.subspace[0]].to_numpy(), X[self.subspace[1]].to_numpy())
 
-        # calling scagnostics on a dataframe computes scagnostics for all pairwise subspaces, which
-        # are all bundled up in the result object. For the doi function, we compute the mean across
-        # all these subspaces:
-        subspace_measures = []
-        for x_dim, y_dim, result in results:
-            measures, _ = result  # second element are bins
-            subspace_measures += [measures]
+        # score names produced by the library have upper case first letter key, so we need to fit
+        # those to the labels used in self.weights
+        scores = {key.lower(): value for key, value in scores.items()}
 
-        avg_scores = pd.DataFrame(subspace_measures).median()  # one value per component
+        scores_df = pd.DataFrame(columns=self.scores.columns)
+        scores_df[ID] = X[0]  # first column in df is id column
 
-        # measures produced by the library have upper case first letter key, so we need to fit those
-        # to the labels used in self.weights
-        avg_scores = {key.lower(): value for key, value in avg_scores.items()}
-
-        doi = 0
         for measure in self.weights:
-            doi += self.weights[measure] * avg_scores[measure]
+            scores_df[measure] = scores[measure]
 
-        doi_ = np.empty((len(X), ))[:]
-        doi_[:] = doi
-        return doi_
+        self.scores = pd.concat([self.scores, scores_df], ignore_index=True)
+
+        doi, _ = self.get_doi(scores_df[ID])
+        print(doi)
+
+        return doi

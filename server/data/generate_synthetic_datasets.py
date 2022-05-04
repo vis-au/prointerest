@@ -42,7 +42,7 @@ default_parameters = {
   },
   "10blobs": {
     "n_samples": n_samples,
-    "n_features": 10,
+    "n_features": 2,
     "centers": 10,
     "cluster_std": 1,
     "random_state": 0,

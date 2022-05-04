@@ -66,7 +66,57 @@
         "regular intervals",
         "outdated bins"
       ],
-      "parameters": ["120k-2000-c1000-u3000"]
+      "parameters": ["1.2M-2000-c1000-u3000"]
+    },
+    {
+      "datasets": ["10blobs"],
+      "dois": [
+        "outlierness",
+        "density",
+        "sort"
+      ],
+      "storage_strategies": ["windowing"],
+      "context_strategies": [
+        "no context",
+        "random chunk based",
+        "most recent chunk based",
+        "sampling based",
+        "clustering based",
+        "doi based"
+      ],
+      "update_strategies": [
+        "no update",
+        "oldest n chunks",
+        "last n chunks",
+        "regular intervals",
+        "outdated bins"
+      ],
+      "parameters": ["12k-2000-c1000-u3000"]
+    },
+    {
+      "datasets": ["4blobs"],
+      "dois": [
+        "outlierness",
+        "density",
+        "sort"
+      ],
+      "storage_strategies": ["windowing"],
+      "context_strategies": [
+        "no context",
+        "random chunk based",
+        "most recent chunk based",
+        "sampling based",
+        "clustering based",
+        "doi based"
+      ],
+      "update_strategies": [
+        "no update",
+        "oldest n chunks",
+        "last n chunks",
+        "regular intervals",
+        "outdated bins"
+      ],
+      "parameters": ["12k-2000-c1000-u3000"]
     }
   ]
 }
