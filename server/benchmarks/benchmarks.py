@@ -206,7 +206,7 @@ def get_variant_for_all_strategies(index: int, all_storages: bool = False) -> Li
   contexts_, updates_, storages_ = generate_strategies(tc.data, tc.params)
 
   contexts_, updates_, storages_ = generate_strategies(tc.data, tc.params)
-  total_tcs = len(contexts_)*len(updates_)
+  total_tcs = len(contexts_) * len(updates_)
 
   if all_storages:
     total_tcs *= len(storages_)

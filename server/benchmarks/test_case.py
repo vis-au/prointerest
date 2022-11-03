@@ -283,7 +283,7 @@ def get_strategy_config(context_label: str, update_label: str, storage_label: st
   context_ = get_context_strategy(context_label, data.n_dims, params.chunks, params.n_bins)
   update_ = get_update_strategy(update_label, data.n_dims, params.chunks, params.max_age,
                                 params.n_bins)
-  storage_ = get_storage_strategy(storage_label, params.max_age*params.chunk_size)
+  storage_ = get_storage_strategy(storage_label, params.max_age * params.chunk_size)
 
   return StrategiesConfiguration(
     name=f"{context_label}-{update_label}-{storage_label}",

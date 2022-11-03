@@ -142,7 +142,7 @@ class ProgressiveDoiPipeline():
   def _run_next_synchronous_step(self, update_interval: int, processed_items: int,
                                  step: DoiComputationTimeStep):
     step.step_time = time()
-    n_unprocessed_items = self.chunk_size*self.chunks - processed_items
+    n_unprocessed_items = self.chunk_size * self.chunks - processed_items
 
     if step.step_number % update_interval == 0 and not isinstance(self.update_strategy, NoUpdate):
       # update as much data as possible without retrieving any new data
@@ -177,7 +177,7 @@ class ProgressiveDoiPipeline():
 
     processed_items = 0
     i = 0
-    while processed_items < self.chunk_size*self.chunks:
+    while processed_items < self.chunk_size * self.chunks:
       # run an update, using as much data as possible without retrieving any new data
       i += 1
       step = DoiComputationTimeStep(i)
