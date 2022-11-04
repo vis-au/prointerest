@@ -26,6 +26,8 @@ storage: StorageStrategy = WindowingStorage(STORAGE_SIZE)
 context: ContextItemSelectionStrategy = DoiBasedContext(n_dims=20, storage=storage, n_bins=25)
 update: OutdatedItemSelectionStrategy = None
 
+WEIGHTS = {}
+
 
 def set_component_weights(weights: dict):
   # FIXME: legacy function
@@ -72,6 +74,15 @@ def set_outlierness_weights(weights: dict):
   # FIXME: legacy function
   # outlierness_comp.weights = weights
   return
+
+
+def set_dimension_weights(weights: dict):
+  global WEIGHTS
+
+  WEIGHTS = {}
+
+  for dimension in weights:
+    WEIGHTS[dimension] = weights[dimension]
 
 
 def set_doi_classes(classes: int):

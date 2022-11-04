@@ -1,8 +1,9 @@
 import type { DoiInteraction } from "$lib/provenance/doi-interaction";
 import type DataItem from "$lib/types/data-item";
+import type { DOIDimension } from "$lib/types/doi-dimension";
 import type { OutliernessMeasure } from "$lib/types/outlier-measures";
 import type { ProvenanceConfig } from "$lib/types/provenance-config";
-import { scagnostics } from "$lib/types/scagnostics";
+import { scagnostics, type Scagnostic } from "$lib/types/scagnostics";
 import { dataItemToList } from "./item-transform";
 import { mapToRecord } from "./map-to-record";
 import { sample } from "./sample-list";
@@ -84,7 +85,7 @@ export async function sendComponentWeights(weights: Map<string, number>): Promis
   return sendRequestToBaseURL("/weights/components", "POST", { weights: record });
 }
 
-export async function sendScagnosticWeights(weights: Map<string, number>): Promise<void> {
+export async function sendScagnosticWeights(weights: Map<Scagnostic, number>): Promise<void> {
   // make sure that every scagnostic is assigned a weight
   const copy = new Map(weights);
   scagnostics.forEach((s) => {
@@ -94,6 +95,11 @@ export async function sendScagnosticWeights(weights: Map<string, number>): Promi
   });
   const record = mapToRecord(copy);
   return sendRequestToBaseURL("/weights/scagnostics", "POST", { weights: record });
+}
+
+export async function sendDimenionWeights(weights: Map<DOIDimension, number>) {
+  const record = mapToRecord(weights);
+  return sendRequestToBaseURL("/weights/dimensions", "POST", { weights: record });
 }
 
 export async function sendInterestingDimensions(dimensions: string[]): Promise<void> {

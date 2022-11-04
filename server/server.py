@@ -74,6 +74,8 @@ def send_weights(component: str):
     set_provenance_weights(weights)
   elif component == "outlierness":
     set_outlierness_weights(weights)
+  elif component == "dimensions":
+    set_dimension_weights(weights)
 
   return cors_response("ok")
 

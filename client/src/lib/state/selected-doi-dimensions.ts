@@ -1,4 +1,5 @@
 import type { DOIDimension } from "$lib/types/doi-dimension";
+import { sendDimenionWeights } from "$lib/util/requests";
 import { writable } from "svelte/store";
 
 let currentlySelectedDoiDimensions = [] as DOIDimension[];
@@ -52,6 +53,6 @@ selectedDoiDimensions.subscribe((newSelection) => {
   }
 
   currentlySelectedDoiDimensions = newSelection;
-  // sendScagnosticWeights(weights);
+  sendDimenionWeights(weights);
   doiDimensionWeights.set(weights);
 });

@@ -2,6 +2,7 @@
   import { dimensions } from "$lib/state/processed-data";
   import { doiDimensionWeights, selectedDoiDimensions } from "$lib/state/selected-doi-dimensions";
   import type { DOIDimension } from "$lib/types/doi-dimension";
+  import { sendDimenionWeights } from "$lib/util/requests";
   import Row from "$lib/widgets/row.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
   import Options from "$lib/widgets/options.svelte";
@@ -47,7 +48,7 @@
         isSelectable={false}
         bind:valueWeights={selectedDimensionWeights}
         on:remove-weight={removeDimension}
-        on:end={() => null}
+        on:end={() => sendDimenionWeights($doiDimensionWeights)}
       />
       <Options
         options={$dimensions}
