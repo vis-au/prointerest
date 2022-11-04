@@ -57,7 +57,7 @@ DIMENSION_EXTENTS = {
 }
 
 
-def initialize_db(row_data_path: str, column_data_path: str, id_column: str, total_size: int,
+def create_tables(row_data_path: str, column_data_path: str, id_column: str, total_size: int,
                   process_chunk_callback=None):
   global PATH, PATH_COLUMN_BASED, ID, TOTAL_SIZE, PROCESS_CHUNK_CALLBACK
 
@@ -104,13 +104,13 @@ def mark_ids_processed(ids: List):
     # optimization: when too many ids get loaded, the query becomes too long. Therefore run this
     # operation recursively in two parts until the threshold is cleared
     mark_ids_processed(ids[:round(len(ids) / 2)])
-    mark_ids_processed(ids[round(len(ids)/2):])
+    mark_ids_processed(ids[round(len(ids) / 2):])
     return
 
   chunk = cursor.execute(f"SELECT MAX({CHUNK}) FROM {PROCESSED_DB}").fetchall()[0]
   chunk = chunk[0] + 1 if chunk[0] is not None else 0
-  chunked_values = "('"+f"',{chunk}),('".join(ids)+f"',{chunk})"
-  timestamped_values = "('"+f"',{NOW}),('".join(ids)+f"',{NOW})"
+  chunked_values = "('" + f"',{chunk}),('".join(ids) + f"',{chunk})"
+  timestamped_values = "('" + f"',{NOW}),('".join(ids) + f"',{NOW})"
 
   query = f"INSERT INTO {PROCESSED_DB} ({ID}, {CHUNK}) VALUES {chunked_values}"
   cursor.execute(query)

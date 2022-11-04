@@ -174,7 +174,7 @@ def taxi_process_chunk(chunk: pd.DataFrame):
 
 if __name__ == "__main__":
   drop_tables()
-  initialize_db(
+  create_tables(
     row_data_path=data_path,
     column_data_path=column_data_path,
     id_column=id_column,
