@@ -2,8 +2,8 @@
 _Supporting progressive visualization with degree-of-interest functions._
 
 ## Prerequisites
-* requires [nodeJS]() version 16 or later, with [npm]() version 7 or later
-* requires [python 3.8]() (**NOTE:** due to a dependency on the [`pyscagnostics`]() package, later versions than 3.8 are currently NOT supported), with [pip]() version 22.
+* requires [nodeJS](https://nodejs.org/en/blog/release/v16.0.0/) version 16 or later, with [npm](https://www.npmjs.com/) version 7 or later
+* requires [python 3.8](https://www.python.org/downloads/release/python-380/) (**NOTE:** due to a dependency on the [`pyscagnostics`](https://pypi.org/project/pyscagnostics/) package, later versions than 3.8 are currently NOT supported), with [pip]() version 22.
 
 ## Getting Started
 To install ProInterest, you need to install both the frontend and backend components, located in their own subdirectories in this repository.
