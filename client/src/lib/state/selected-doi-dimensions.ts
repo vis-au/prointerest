@@ -1,18 +1,18 @@
-import type { Scagnostic } from "$lib/types/scagnostics";
-import { sendScagnosticWeights } from "$lib/util/requests";
+import type { DOIDimension } from "$lib/types/doi-dimension";
 import { writable } from "svelte/store";
 
-let currentSelectedScagnostics = ["outlying", "clumpy", "stringy"] as Scagnostic[];
-export const selectedScagnostics = writable(currentSelectedScagnostics);
+let currentlySelectedDoiDimensions = [] as DOIDimension[];
+export const selectedDoiDimensions = writable(currentlySelectedDoiDimensions);
 
-const weights = new Map<Scagnostic, number>();
-weights.set("outlying", 0.75);
-weights.set("clumpy", 0.125);
-weights.set("stringy", 0.125);
-export const scagnosticWeights = writable(weights);
 
-selectedScagnostics.subscribe((newSelection) => {
-  const oldLength = currentSelectedScagnostics.length;
+const weights = new Map<DOIDimension, number>();
+// weights.set("asdf", 0.75);
+// weights.set("sdfg", 0.125);
+// weights.set("sfg", 0.125);
+export const doiDimensionWeights = writable(weights);
+
+selectedDoiDimensions.subscribe((newSelection) => {
+  const oldLength = currentlySelectedDoiDimensions.length;
   const newLength = newSelection.length;
 
   // for simplicity, we assume that either items have been removed or added, but never both.
@@ -33,7 +33,7 @@ selectedScagnostics.subscribe((newSelection) => {
 
     // find the new items
     const newItems = newSelection.filter((item) => {
-      return currentSelectedScagnostics.indexOf(item) === -1;
+      return currentlySelectedDoiDimensions.indexOf(item) === -1;
     });
 
     // set their interest
@@ -46,12 +46,12 @@ selectedScagnostics.subscribe((newSelection) => {
     newSelection.forEach((item) => weights.set(item, weights.get(item) / newSum));
 
     // delete the weights for deselected scagn.
-    currentSelectedScagnostics
+    currentlySelectedDoiDimensions
       .filter((item) => newSelection.indexOf(item) === -1)
       .forEach((item) => weights.delete(item));
   }
 
-  currentSelectedScagnostics = newSelection;
-  sendScagnosticWeights(weights);
-  scagnosticWeights.set(weights);
+  currentlySelectedDoiDimensions = newSelection;
+  // sendScagnosticWeights(weights);
+  doiDimensionWeights.set(weights);
 });

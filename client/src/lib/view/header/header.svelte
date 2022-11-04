@@ -1,33 +1,32 @@
 <script lang="ts">
-  import ProgressionControls from "../main/progression-controls.svelte";
-  import { scagnosticWeights, selectedScagnostics } from "$lib/state/selected-scagnostics";
-  import { scagnostics } from "$lib/types/scagnostics";
-  import { sendScagnosticWeights } from "$lib/util/requests";
-  import type { Scagnostic } from "$lib/types/scagnostics";
+  import { dimensions } from "$lib/state/processed-data";
+  import { doiDimensionWeights, selectedDoiDimensions } from "$lib/state/selected-doi-dimensions";
+  import type { DOIDimension } from "$lib/types/doi-dimension";
   import Row from "$lib/widgets/row.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
   import Options from "$lib/widgets/options.svelte";
+  import ProgressionControls from "../main/progression-controls.svelte";
 
   export let height: number;
 
   const maxWidth = 700;
-  let selectedWeights = new Map<Scagnostic, number>();
+  let selectedDimensionWeights = new Map<DOIDimension, number>();
 
   let isSelected = {};
-  scagnostics.forEach((s) => (isSelected[s] = false));
-  $selectedScagnostics.forEach((s) => (isSelected[s] = true));
+  $dimensions.forEach((s) => (isSelected[s] = false));
+  $selectedDoiDimensions.forEach((d) => isSelected[d] = true);
 
-  $: selectedWeights.forEach((value, key) => $scagnosticWeights.set(key, value));
-  $: $selectedScagnostics = scagnostics.filter((s) => isSelected[s]);
+  $: selectedDimensionWeights.forEach((value, key) => $doiDimensionWeights.set(key, value));
+  $: $selectedDoiDimensions = $dimensions.filter((d) => isSelected[d]);
 
-  selectedScagnostics.subscribe((newSelection) => {
-    selectedWeights = new Map();
-    newSelection.forEach((scagnostic) => {
-      selectedWeights.set(scagnostic, $scagnosticWeights.get(scagnostic));
+  selectedDoiDimensions.subscribe((newDimension) => {
+    selectedDimensionWeights = new Map();
+    newDimension.forEach((dimension) => {
+      selectedDimensionWeights.set(dimension, $doiDimensionWeights.get(dimension));
     });
   });
 
-  function removeScagnostic(event: CustomEvent<string>) {
+  function removeDimension(event: CustomEvent<string>) {
     isSelected[event.detail] = false;
   }
 </script>
@@ -40,18 +39,18 @@
     <Row id="doi-configuration" style="align-items:center;height:{height * 0.8}px;flex-grow: 5">
       <h2>Configure DOI:</h2>
       <WeightedValues
-        id="selected-scagnostics"
+        id="selected-doi-dimensions"
         totalSize={maxWidth}
         weightsRemovable={true}
         useDarkmode={true}
         backgroundColor="#008080"
         isSelectable={false}
-        bind:valueWeights={selectedWeights}
-        on:remove-weight={removeScagnostic}
-        on:end={() => sendScagnosticWeights($scagnosticWeights)}
+        bind:valueWeights={selectedDimensionWeights}
+        on:remove-weight={removeDimension}
+        on:end={() => null}
       />
       <Options
-        options={scagnostics}
+        options={$dimensions}
         showActive={false}
         showInactive={false}
         bind:activeOptions={isSelected}
