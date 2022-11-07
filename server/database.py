@@ -170,10 +170,28 @@ def get_from_doi(query_filters: List, dimensions="*", distinct=False, as_df=Fals
   return get_from_db(DOI_DB, query_filters, dimensions, distinct, as_df)
 
 
-def get_next_chunk_from_db(chunk_size: int, as_df=False):
+def filters_to_query(filters: dict):
+  query = ""
+
+  for dim in filters:
+    if len(filters[dim]) != 2:
+      continue
+    minimum = filters[dim][0]
+    maximum = filters[dim][1]
+
+    if len(query) == 0:
+      query = f"{dim} > {minimum} AND {dim} < {maximum}"
+    else:
+      query = f"{query} AND {dim} > {minimum} AND {dim} < {maximum}"
+
+  return query
+
+
+def get_next_chunk_from_db(chunk_size: int, as_df=False, filters: dict = {}):
   query = f"SELECT * \
             FROM {DATA_DB} \
             WHERE {ID} NOT IN (SELECT {ID} FROM {PROCESSED_DB}) \
+            {'' if len(filters) == 0 else ' AND (' + filters_to_query(filters) + ') '} \
             LIMIT {chunk_size}"
 
   next_chunk = cursor.execute(query).fetchdf()
@@ -263,15 +281,6 @@ def get_data_size():
   # query = f"SELECT COUNT(*) FROM {TABLE}"
   # size = cursor.execute(query).fetchall()[0]
   return TOTAL_SIZE
-
-
-def get_random_sample(chunk_size: int):
-  dimensions = 5
-  return [[random.random() for __ in range(dimensions)] for _ in range(chunk_size)]
-
-
-def get_random_dims(dimensions: int):
-  return [f"dimension_{str(i)}" for i in range(dimensions)]
 
 
 def get_dimension_extent(dimension: str):

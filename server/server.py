@@ -32,7 +32,7 @@ def get_dim_extent(dimension):
 @app.route("/next_chunk", methods=["GET"])
 def get_next_chunk():
   chunk_size = int(request.args.get("size"))
-  chunk = get_next_chunk_from_db(chunk_size)
+  chunk = get_next_chunk_from_db(chunk_size, filters=STEERING_FILTERS)
 
   ids = np.array(chunk)[:, 0].tolist()
   dois, updated_ids, updated_dois = compute_dois(chunk)
@@ -94,6 +94,23 @@ def send_interesting_range():
   min_value = res["min"]
   max_value = res["max"]
   set_dimension_range_of_interest(dimension, min_value, max_value)
+
+  return cors_response(True)
+
+
+STEERING_FILTERS = {}
+
+
+def set_steering_filters(filters: dict):
+  global STEERING_FILTERS
+  STEERING_FILTERS = filters
+
+
+@app.route("/steer", methods=["POST"])
+def send_steering_filters():
+  res = json.loads(request.data)
+  filters = res["filters"]
+  set_steering_filters(filters)
 
   return cors_response(True)
 
