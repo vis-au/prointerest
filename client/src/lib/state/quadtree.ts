@@ -8,6 +8,7 @@ import { scaleX, scaleY } from "./scales";
 import { activeViewEncodings } from "./active-view-encodings";
 import { dimensions } from "./processed-data";
 import { CHUNK_SIZE } from "./progression";
+import { latestChunk } from "./latest-chunk";
 
 let currentQuadtree = createQuadtree();
 export const quadtree = writable(currentQuadtree);
@@ -63,6 +64,10 @@ setTimeout(() => {
       recreateQuadtree();
     } else {
       const newItems = insertIntoQuadtree(currentQuadtree, newDatas);
+
+      // latestItemIds.set(chunk.chunk.map(item => item[0]));
+      latestChunk.set(newItems);
+
       processedItems.update((items) => items.concat(newItems));
       quadtree.set(currentQuadtree);
     }
