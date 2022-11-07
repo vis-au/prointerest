@@ -1,6 +1,7 @@
 <script lang="ts">
   import { colorScale } from "$lib/state/active-color-scale";
   import { activeViewMode } from "$lib/state/active-view-mode";
+  import { isRecentChunkVisible } from "$lib/state/is-recent-chunk-visible";
   import BrushLayer from "../layers/interaction/brushed-regions-layer.svelte";
   import InteractionLayer from "../layers/interaction/interaction-layer.svelte";
   import ScatterplotView from "../layers/visualization/scatterplot-view.svelte";
@@ -22,7 +23,9 @@
     <BinnedScatterplotView {width} {height} />
   {/if}
 
-  <RecentPoints {width} {height} />
+  {#if $isRecentChunkVisible }
+    <RecentPoints {width} {height} />
+  {/if}
 
   <Axes {width} {height} />
   <!-- <SuggestionLayer {width} {height} /> -->

@@ -3,6 +3,7 @@
   import { activeBinMode } from "$lib/state/active-bin-mode";
   import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { activeViewMode } from "$lib/state/active-view-mode";
+  import { isRecentChunkVisible } from "$lib/state/is-recent-chunk-visible";
   import { dimensions } from "$lib/state/processed-data";
   import { binModes } from "$lib/types/bin-mode";
   import { brushModes } from "$lib/types/brush-mode";
@@ -12,6 +13,7 @@
   import Row from "$lib/widgets/row.svelte";
   import Slider from "$lib/widgets/slider.svelte";
   import { doiLimit } from "$lib/state/doi-limit";
+    import Toggle from "$lib/widgets/toggle.svelte";
 </script>
 
 <Row id="view-controls">
@@ -21,6 +23,13 @@
       name="view-modes"
       alternatives={viewModes}
       bind:activeAlternative={$activeViewMode}
+    />
+  </div>
+  <div class="configuration">
+    <h2>Recent</h2>
+    <Toggle
+      id="show-recent-chunk"
+      bind:active={$isRecentChunkVisible}
     />
   </div>
   <div class="configuration">
@@ -68,7 +77,7 @@
   :global(div#view-controls) {
     position: absolute;
     box-sizing: border-box;
-    justify-content: center;
+    justify-content: space-around;
     padding-top: 20px;
     width: 100%;
     background: rgba(255, 255, 255, 0.73);
@@ -93,7 +102,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-right: 100px;
+    margin-right: 10px;
   }
 
   h2 {
