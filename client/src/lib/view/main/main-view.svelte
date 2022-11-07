@@ -9,6 +9,7 @@
   import ColorLegend from "./color-legend.svelte";
   import Tooltip from "./tooltip.svelte";
   import ViewControls from "./view-controls.svelte";
+  import RecentPoints from "../layers/visualization/recent-points.svelte";
 
   export let width: number;
   export let height: number;
@@ -21,11 +22,13 @@
     <BinnedScatterplotView {width} {height} />
   {/if}
 
+  <RecentPoints {width} {height} />
+
   <Axes {width} {height} />
   <!-- <SuggestionLayer {width} {height} /> -->
   <BrushLayer {width} {height} />
-  <Tooltip />
   <InteractionLayer {width} {height} />
+  <Tooltip />
 
   {#if $activeViewMode === "binned"}
     <ColorLegend
