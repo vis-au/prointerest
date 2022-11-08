@@ -1,9 +1,11 @@
+import { range } from "d3";
 import type { DoiInteraction } from "$lib/provenance/doi-interaction";
 import type DataItem from "$lib/types/data-item";
 import type { DOIDimension } from "$lib/types/doi-dimension";
 import type { OutliernessMeasure } from "$lib/types/outlier-measures";
 import type { ProvenanceConfig } from "$lib/types/provenance-config";
 import { scagnostics, type Scagnostic } from "$lib/types/scagnostics";
+import type { SteeringFilter } from "$lib/types/steering-filters";
 import { dataItemToList } from "./item-transform";
 import { mapToRecord } from "./map-to-record";
 import { sample } from "./sample-list";
@@ -153,4 +155,27 @@ export function sendInteraction(interaction: DoiInteraction): Promise<void> {
 export async function getDoiValues(items: DataItem[]): Promise<[number, number][]> {
   const values = items.map(dataItemToList);
   return sendRequestToBaseURL("/doi", "POST", { items: values });
+}
+
+export async function sendSteeringFilters(filters: SteeringFilter) {
+  return sendRequestToBaseURL("/steer", "POST", { filters });
+}
+
+export async function sendSteeringByExampleItems(interestings: DataItem[], uninterestings: DataItem[], dimensions: string[]) {
+  // NOTE: to train the steering-by-example classifier, we need interesting AND uninteresting items!
+
+  const items = interestings
+    .concat(uninterestings)
+    .map(d => d.values);
+
+  // simple vector indicating whether item in the request is marked as interesting or not
+  const isInteresting = range(items.length).map((i) => {
+    return i < interestings.length ? 1 : 0;
+  });
+
+  return sendRequestToBaseURL("/steer-by-example", "POST", {
+    items,
+    isInteresting,
+    dimensions
+  });
 }

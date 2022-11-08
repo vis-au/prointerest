@@ -1,0 +1,1 @@
+export type SteeringFilter = Record<string, [number, number]>;

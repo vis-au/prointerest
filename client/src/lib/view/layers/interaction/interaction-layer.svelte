@@ -2,6 +2,8 @@
   import type { DoiInteraction } from "$lib/provenance/doi-interaction";
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import { interactionLog } from "$lib/provenance/interaction-log";
+  import type ScatterplotBrush from "$lib/provenance/scatterplot-brush-interaction";
+  import type ScatterplotLassoBrush from "$lib/provenance/scatterplot-lasso-brush-interaction";
 
   import { bins } from "$lib/state/bins";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
@@ -22,6 +24,8 @@
 
   import { getDummyDataItem } from "$lib/util/dummy-data-item";
   import { getPointsInPolygon, getPointsInRect } from "$lib/util/find-in-quadtree";
+  import { dimensions } from "$lib/state/processed-data";
+  import { sendSteeringByExampleItems } from "$lib/util/requests";
 
   import BrushLayer from "./brush-layer.svelte";
   import SelectionLayer from "./selection-layer.svelte";
@@ -60,6 +64,13 @@
     $interactionLog.add(interaction);
   }
 
+  function steer(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
+    const interesting = brushInteraction.getAffectedItems();
+    const uninteresting = $sampledQuadtree.data().filter((item) => interesting.indexOf(item) === -1)
+
+    sendSteeringByExampleItems(interesting, uninteresting, $dimensions)
+  }
+
   function onBrushEnd() {
     // can be null when using the lasso brush
     if ($activeBrush !== null) {
@@ -70,12 +81,14 @@
       const y1_ = $scaleY(y1);
       const interaction = interactionFactory.createScatterplotBrushInteraction(x0_, y0_, x1_, y1_);
       onInteraction(interaction);
+      steer(interaction);
     } else if ($activeLasso !== null) {
       const polygon = $activeLasso.map(
         (pos) => [$scaleX(pos[0]), $scaleY(pos[1])] as [number, number]
       );
       const interaction = interactionFactory.createLassoBrushInteraction(polygon);
       onInteraction(interaction);
+      steer(interaction);
     }
   }
 
