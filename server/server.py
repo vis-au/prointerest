@@ -2,6 +2,7 @@ from flask import Flask, json, jsonify, request
 
 from database import *
 from doi_function import *
+from steering import *
 
 app = Flask(__name__)
 
@@ -98,10 +99,10 @@ def send_interesting_range():
   return cors_response(True)
 
 
-STEERING_FILTERS = {}
+STEERING_FILTERS: str or dict = {}  # HACK to allow for both sherpa-like and sbe-like steering
 
 
-def set_steering_filters(filters: dict):
+def set_steering_filters(filters: str or dict):
   global STEERING_FILTERS
   STEERING_FILTERS = filters
 
@@ -109,7 +110,31 @@ def set_steering_filters(filters: dict):
 @app.route("/steer", methods=["POST"])
 def send_steering_filters():
   res = json.loads(request.data)
-  filters = res["filters"]
+  filters = res["filters"]  # dict containing min/max filters (val) for dimensions in the data (key)
+  set_steering_filters(filters)
+
+  return cors_response(True)
+
+
+@app.route("/steer-by-example", methods=["POST"])
+def send_steering_by_examples():
+  res = json.loads(request.data)
+
+  # list of items that are of interest to the user
+  items = res["items"]
+  columns = res["dimensions"]
+  items = pd.DataFrame(np.array(items), columns=columns)
+
+  # FIXME: use the actual subspace of interest!
+  items = items[["trip_distance", "total_amount", "tip_amount", "trip_duration"]]
+
+  # vector indicating whether an item is marked as interesting in the frontend
+  is_interesting = res["isInteresting"]
+  is_interesting = np.array(is_interesting)
+
+  # The decision tree is trained on all dimensions in the items
+  filters = get_steering_condition(items, is_interesting, 'sql')
+
   set_steering_filters(filters)
 
   return cors_response(True)

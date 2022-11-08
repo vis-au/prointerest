@@ -170,8 +170,11 @@ def get_from_doi(query_filters: List, dimensions="*", distinct=False, as_df=Fals
   return get_from_db(DOI_DB, query_filters, dimensions, distinct, as_df)
 
 
-def filters_to_query(filters: dict):
+def filters_to_query(filters: str or dict):
   query = ""
+
+  if type(filters) == str:
+    return filters  # HACK: to support the filters generated via the steering-by-example module
 
   for dim in filters:
     if len(filters[dim]) != 2:
@@ -187,7 +190,7 @@ def filters_to_query(filters: dict):
   return query
 
 
-def get_next_chunk_from_db(chunk_size: int, as_df=False, filters: dict = {}):
+def get_next_chunk_from_db(chunk_size: int, as_df=False, filters: str or dict = {}):
   query = f"SELECT * \
             FROM {DATA_DB} \
             WHERE {ID} NOT IN (SELECT {ID} FROM {PROCESSED_DB}) \
