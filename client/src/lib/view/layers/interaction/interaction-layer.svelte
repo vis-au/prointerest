@@ -66,7 +66,11 @@
 
   function steer(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
     const interesting = brushInteraction.getAffectedItems();
-    const uninteresting = $sampledQuadtree.data().filter((item) => interesting.indexOf(item) === -1)
+
+    // find data to train against, by finding (at most twice as many) uninteresting items
+    const uninteresting = $sampledQuadtree.data()
+      .filter((item) => interesting.indexOf(item) === -1)
+      .filter((_, i) => i < interesting.length*2);
 
     sendSteeringByExampleItems(interesting, uninteresting, $dimensions)
   }
@@ -81,14 +85,14 @@
       const y1_ = $scaleY(y1);
       const interaction = interactionFactory.createScatterplotBrushInteraction(x0_, y0_, x1_, y1_);
       onInteraction(interaction);
-      steer(interaction);
+      steer(interaction);  // FIXME: steers every time user brushes
     } else if ($activeLasso !== null) {
       const polygon = $activeLasso.map(
         (pos) => [$scaleX(pos[0]), $scaleY(pos[1])] as [number, number]
       );
       const interaction = interactionFactory.createLassoBrushInteraction(polygon);
       onInteraction(interaction);
-      steer(interaction);
+      steer(interaction);  // FIXME: steers every time user brushes
     }
   }
 
