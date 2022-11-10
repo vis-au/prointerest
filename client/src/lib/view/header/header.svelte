@@ -1,6 +1,6 @@
 <script lang="ts">
   import { dimensions } from "$lib/state/processed-data";
-  import { doiDimensionWeights, selectedDoiDimensions } from "$lib/state/selected-doi-dimensions";
+  import { doiDimensionWeights, isDimensionInteresting, selectedDoiDimensions } from "$lib/state/interesting-dimensions";
   import type { DOIDimension } from "$lib/types/doi-dimension";
   import { sendDimenionWeights } from "$lib/util/requests";
   import Row from "$lib/widgets/row.svelte";
@@ -13,12 +13,11 @@
   const maxWidth = 700;
   let selectedDimensionWeights = new Map<DOIDimension, number>();
 
-  let isSelected = {};
-  $dimensions.forEach((s) => (isSelected[s] = false));
-  $selectedDoiDimensions.forEach((d) => isSelected[d] = true);
+  $dimensions.forEach((s) => ($isDimensionInteresting[s] = false));
+  $selectedDoiDimensions.forEach((d) => $isDimensionInteresting[d] = true);
 
   $: selectedDimensionWeights.forEach((value, key) => $doiDimensionWeights.set(key, value));
-  $: $selectedDoiDimensions = $dimensions.filter((d) => isSelected[d]);
+  $: $selectedDoiDimensions = $dimensions.filter((d) => $isDimensionInteresting[d]);
 
   selectedDoiDimensions.subscribe((newDimension) => {
     selectedDimensionWeights = new Map();
@@ -28,7 +27,7 @@
   });
 
   function removeDimension(event: CustomEvent<string>) {
-    isSelected[event.detail] = false;
+    $isDimensionInteresting[event.detail] = false;
   }
 </script>
 
@@ -54,7 +53,7 @@
         options={$dimensions}
         showActive={false}
         showInactive={false}
-        bind:activeOptions={isSelected}
+        bind:activeOptions={$isDimensionInteresting}
         useDarkMode={true}
         style="margin-left: 25px"
       />
