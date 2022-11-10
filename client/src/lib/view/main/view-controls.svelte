@@ -13,7 +13,7 @@
   import Row from "$lib/widgets/row.svelte";
   import Slider from "$lib/widgets/slider.svelte";
   import { doiLimit } from "$lib/state/doi-limit";
-    import Toggle from "$lib/widgets/toggle.svelte";
+  import Toggle from "$lib/widgets/toggle.svelte";
 </script>
 
 <Row id="view-controls">

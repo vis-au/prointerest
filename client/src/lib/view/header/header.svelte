@@ -6,7 +6,7 @@
   import Row from "$lib/widgets/row.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
   import Options from "$lib/widgets/options.svelte";
-  import ProgressionControls from "../main/progression-controls.svelte";
+    import ProgressionControls from "./progression-controls.svelte";
 
   export let height: number;
 
