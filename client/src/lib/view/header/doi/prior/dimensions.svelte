@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { interestingDimensions, interestingIntervals } from "$lib/state/interesting-dimensions";
+  import { isDimensionInteresting, interestingIntervals } from "$lib/state/interesting-dimensions";
   import { dimensions } from "$lib/state/processed-data";
   import { randomlySampledItems } from "$lib/state/randomly-sampled-items";
   import { dataItemToRecord } from "$lib/util/item-transform";
@@ -26,8 +26,8 @@
   }
 
   function getSelectedDimensionExtents() {
-    Object.keys($interestingDimensions)
-      .filter((d) => $interestingDimensions[d])
+    Object.keys($isDimensionInteresting)
+      .filter((d) => $isDimensionInteresting[d])
       .forEach((d) => {
         if (extents[d] === undefined) {
           getDimensionExtent(d).then((extent) => {
@@ -50,10 +50,10 @@
     <Column style="margin:10px 0">
       <Row>
         <label for={dim}>{dim}</label>
-        <input id={dim} type="checkbox" value={dim} bind:checked={$interestingDimensions[dim]} />
+        <input id={dim} type="checkbox" value={dim} bind:checked={$isDimensionInteresting[dim]} />
 
         <span class="interesting-range">
-          {#if $interestingDimensions[dim] && $interestingIntervals[dim] !== null}
+          {#if $isDimensionInteresting[dim] && $interestingIntervals[dim] !== null}
             [
             {truncateFloat($interestingIntervals[dim][0])},
             {truncateFloat($interestingIntervals[dim][1])}
@@ -62,7 +62,7 @@
         </span>
       </Row>
 
-      {#if $interestingDimensions[dim]}
+      {#if $isDimensionInteresting[dim]}
         <Histogram
           id="all-data-dim-{i}"
           data={tabularData}

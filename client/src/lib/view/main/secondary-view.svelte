@@ -2,7 +2,7 @@
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import type HistogramBrushInteraction from "$lib/provenance/histogram-brush-interaction";
   import { interactionLog } from "$lib/provenance/interaction-log";
-  import { interestingDimensions } from "$lib/state/interesting-dimensions";
+  import { isDimensionInteresting } from "$lib/state/interesting-dimensions";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
   import { randomlySampledBinItems } from "$lib/state/randomly-sampled-items";
@@ -35,8 +35,8 @@
     (d) => d !== null
   );
 
-  $: selectedDimensions = Object.keys($interestingDimensions)
-    .filter((d) => $interestingDimensions[d])
+  $: selectedDimensions = Object.keys($isDimensionInteresting)
+    .filter((d) => $isDimensionInteresting[d])
     .concat(selectedDoiDimensions);
 
   function onBrush(event: CustomEvent) {
@@ -87,7 +87,7 @@
       <Options
         options={$dimensions}
         showInactive={false}
-        bind:activeOptions={$interestingDimensions}
+        bind:activeOptions={$isDimensionInteresting}
       />
       <Toggle id="doi-values" style="margin-right:10px" bind:active={showDoiValues}
         >doi values</Toggle
