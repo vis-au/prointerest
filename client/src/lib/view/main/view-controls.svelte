@@ -1,11 +1,9 @@
 <script>
   import { scatterplotBrush } from "$lib/state/active-scatterplot-brush";
-  import { activeBinMode } from "$lib/state/active-bin-mode";
   import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { activeViewMode } from "$lib/state/active-view-mode";
   import { isRecentChunkVisible } from "$lib/state/is-recent-chunk-visible";
   import { dimensions } from "$lib/state/processed-data";
-  import { binModes } from "$lib/types/bin-mode";
   import { brushModes } from "$lib/types/brush-mode";
   import { viewModes } from "$lib/types/view-modes";
   import Alternatives from "$lib/widgets/alternatives.svelte";
@@ -26,19 +24,7 @@
     />
   </div>
   <div class="configuration">
-    <h2>Recent</h2>
-    <Toggle
-      id="show-recent-chunk"
-      bind:active={$isRecentChunkVisible}
-    />
-  </div>
-  <div class="configuration">
-    <h2>Bin by</h2>
-    <Alternatives
-      name="bin-modes"
-      alternatives={binModes}
-      bind:activeAlternative={$activeBinMode}
-    />
+    <Toggle id="show-recent-chunk" bind:active={$isRecentChunkVisible}>Show recent chunk</Toggle>
   </div>
   <div class="configuration">
     <h2>Axes</h2>

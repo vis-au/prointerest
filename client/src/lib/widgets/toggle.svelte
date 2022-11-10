@@ -26,6 +26,7 @@
     cursor: pointer;
   }
   label.toggle span {
+    user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
   }

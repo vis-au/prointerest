@@ -1,13 +1,11 @@
 <script lang="ts">
-  import { max, median, min } from "d3-array";
+  import { max, min } from "d3-array";
   import type { HexbinBin } from "d3-hexbin";
   import { afterUpdate, onMount } from "svelte";
 
   import type DataItem from "$lib/types/data-item";
-  import { activeBinMode } from "$lib/state/active-bin-mode";
   import { colorScale } from "$lib/state/active-color-scale";
   import { bins } from "$lib/state/bins";
-  import { doiValues } from "$lib/state/doi-values";
   import { hexbinning } from "$lib/state/hexbinning";
 
   export let id = "binned-scatterplot-view";
@@ -17,42 +15,33 @@
   let updateInterval: number;
   let canvasElement: HTMLCanvasElement;
 
-  function getBinValue(bin: HexbinBin<DataItem>) {
-    if ($activeBinMode === "density") {
-      return bin.length;
-    } else {
-      return median(bin.map(item => +$doiValues.get(item.id)));
-    }
-  }
-
   function renderBins(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
     clearInterval(updateInterval);
+
     ctx.clearRect(0, 0, width, height);
     ctx.beginPath();
     ctx.strokeStyle = "rgba(255,255,255,1)";
     ctx.lineWidth = 2;
+
     $bins.forEach((bin) => {
       ctx.translate(bin.x, bin.y);
-      ctx.fillStyle = $colorScale(getBinValue(bin));
+      ctx.fillStyle = $colorScale(bin.length);
       ctx.stroke(hexagonPath);
       ctx.fill(hexagonPath);
       ctx.translate(-bin.x, -bin.y);
     });
+
     ctx.closePath();
   }
 
   function updateColorScale() {
-    const minCount = min($bins, (d: HexbinBin<DataItem>) => getBinValue(d)) || 0;
-    const maxCount = max($bins, (d: HexbinBin<DataItem>) => getBinValue(d)) || 1;
+    const minCount = min($bins, (d: HexbinBin<DataItem>) => d.length) || 0;
+    const maxCount = max($bins, (d: HexbinBin<DataItem>) => d.length) || 1;
 
-    if ($activeBinMode === "doi") {
-      $colorScale.domain([0, 1]);
-    } else if ($activeBinMode === "density") {
-      if ($colorScale.range().length === 3) {
-        $colorScale.domain([maxCount, 0, minCount]);
-      } else {
-        $colorScale.domain([minCount, maxCount]);
-      }
+    if ($colorScale.range().length === 3) {
+      $colorScale.domain([maxCount, 0, minCount]);
+    } else {
+      $colorScale.domain([minCount, maxCount]);
     }
   }
 
@@ -70,7 +59,7 @@
   }
 
   afterUpdate(() => {
-    updateInterval = (setTimeout(render, 0) as unknown) as number;
+    updateInterval = setTimeout(render, 0) as unknown as number;
   });
   onMount(render);
 </script>

@@ -2,7 +2,7 @@
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import type HistogramBrushInteraction from "$lib/provenance/histogram-brush-interaction";
   import { interactionLog } from "$lib/provenance/interaction-log";
-  import { isDimensionInteresting } from "$lib/state/interesting-dimensions";
+  import { selectedDoiDimensions } from "$lib/state/interesting-dimensions";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
   import { randomlySampledBinItems } from "$lib/state/randomly-sampled-items";
@@ -15,7 +15,6 @@
   import Alternatives from "$lib/widgets/alternatives.svelte";
   import Column from "$lib/widgets/column.svelte";
   import ControlButton from "$lib/widgets/control-button.svelte";
-  import Options from "$lib/widgets/options.svelte";
   import Row from "$lib/widgets/row.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
 
@@ -29,15 +28,6 @@
 
   $: items = histogramMode === "all" ? $randomlySampledBinItems : $selectedItems;
   $: data = items.map(dataItemToRecord);
-
-  // include the doi distribution if active
-  $: selectedDoiDimensions = [showDoiValues ? "doi" : null].filter(
-    (d) => d !== null
-  );
-
-  $: selectedDimensions = Object.keys($isDimensionInteresting)
-    .filter((d) => $isDimensionInteresting[d])
-    .concat(selectedDoiDimensions);
 
   function onBrush(event: CustomEvent) {
     const selections: Record<string, [number, number]> = event.detail;
@@ -84,14 +74,10 @@
           bind:activeAlternative={histogramMode}
         />
       </Row>
-      <Options
-        options={$dimensions}
-        showInactive={false}
-        bind:activeOptions={$isDimensionInteresting}
-      />
-      <Toggle id="doi-values" style="margin-right:10px" bind:active={showDoiValues}
-        >doi values</Toggle
-      >
+
+      <Toggle id="doi-values" style="margin-right:10px" bind:active={showDoiValues}>
+        show DOI histogram
+      </Toggle>
       <!-- <Toggle id="doi-labels" bind:active={showDoiLabels}>doi labels</Toggle> -->
     </Row>
     <ControlButton on:click={() => ($isSecondaryViewCollapsed = true)}>close</ControlButton>
@@ -100,7 +86,7 @@
     <MultiHistogram
       id="secondary-selected-dims"
       {data}
-      dimensions={selectedDimensions}
+      dimensions={$selectedDoiDimensions.concat(showDoiValues ? ["doi"] : [])}
       showTitle={false}
       groupDimension="selected"
       width={310}
