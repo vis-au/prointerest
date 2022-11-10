@@ -115,6 +115,7 @@
         name={id}
         value={entry[0]}
         bind:group={activeWeight}
+        disabled={!isSelectable}
         on:click={() => isSelectable ? selectWeight(entry[0]): null}
       />
       {#if weightsRemovable}
@@ -150,6 +151,7 @@
     border-radius: 4px;
     color: black;
     font-weight: bold;
+    user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
   }
