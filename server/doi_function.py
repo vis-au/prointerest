@@ -29,6 +29,12 @@ update: OutdatedItemSelectionStrategy = None
 WEIGHTS = {}
 
 
+def reset_doi_component():
+  global storage, context
+  storage = WindowingStorage(STORAGE_SIZE)
+  context = DoiBasedContext(n_dims=20, storage=storage, n_bins=25)
+
+
 def set_component_weights(weights: dict):
   # FIXME: legacy function
   # COMPONENT_WEIGHTS["prior"] = weights["prior"]

@@ -6,6 +6,8 @@ from steering import *
 
 app = Flask(__name__)
 
+STEERING_FILTERS: str or dict = {}  # HACK to allow for both sherpa-like and sbe-like steering
+
 
 def cors_response(payload):
   response = jsonify(payload)
@@ -55,7 +57,10 @@ def get_size():
 
 @app.route("/reset", methods=["GET"])
 def reset():
+  global STEERING_FILTERS
+  STEERING_FILTERS = {}
   reset_progression()
+  reset_doi_component()
   return cors_response(True)
 
 
@@ -97,9 +102,6 @@ def send_interesting_range():
   set_dimension_range_of_interest(dimension, min_value, max_value)
 
   return cors_response(True)
-
-
-STEERING_FILTERS: str or dict = {}  # HACK to allow for both sherpa-like and sbe-like steering
 
 
 def set_steering_filters(filters: str or dict):
