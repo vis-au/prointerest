@@ -31,7 +31,7 @@ function insertIntoQuadtree(tree: Quadtree<DataItem>, rawItems: number[][]) {
   return dataItems;
 }
 
-function arrayToDataItem(item: number[]) {
+export function arrayToDataItem(item: number[]) {
   const newItem: DataItem = {
     id: item[idIndex],
     position: {
@@ -65,8 +65,7 @@ setTimeout(() => {
     } else {
       const newItems = insertIntoQuadtree(currentQuadtree, newDatas);
 
-      // latestItemIds.set(chunk.chunk.map(item => item[0]));
-      latestChunk.set(newItems);
+      latestChunk.set(newDatas);
 
       processedItems.update((items) => items.concat(newItems));
       quadtree.set(currentQuadtree);

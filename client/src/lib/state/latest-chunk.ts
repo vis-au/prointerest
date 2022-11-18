@@ -3,11 +3,34 @@ import { derived, writable } from "svelte/store";
 import { doiLimit } from "./doi-limit";
 import { doiValues } from "./doi-values";
 import { processedData } from "./processed-data";
+import { arrayToDataItem } from "./quadtree";
+import { scaleX, scaleY } from "./scales";
 
-export const latestChunk = writable([] as DataItem[]);
+// stores the "raw" latest chunk as numbers, so that we can respond to changes in the position
+// encoding
+export const latestChunk = writable([] as number[][]);
+let currentLatestChunk: number[][] = [];
 
-export const latestInterestingItems = derived([doiLimit, latestChunk, doiValues], ([$doiLimit, $latestChunk, $doiValues]) => {
-  return $latestChunk.filter((item) => {
+// stores the chunk as data items, derived from the raw data
+export const latestItems = writable([] as DataItem[]);
+
+// whenever the raw data changes, so should the items
+latestChunk.subscribe((newChunk) => {
+  currentLatestChunk = newChunk;
+  updateLatestItems();
+});
+
+// transforms raw data into items, thereby also updating its position.
+function updateLatestItems() {
+  latestItems.set(currentLatestChunk.map(arrayToDataItem));
+}
+
+scaleX.subscribe(updateLatestItems);
+scaleY.subscribe(updateLatestItems);
+
+
+export const latestInterestingItems = derived([doiLimit, latestItems, doiValues], ([$doiLimit, $latestItems, $doiValues]) => {
+  return $latestItems.filter((item) => {
     return $doiValues.get(item.id) > $doiLimit;
   });
 });
