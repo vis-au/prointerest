@@ -5,8 +5,8 @@
 
   export let width: number;
   export let height: number;
-  export let color = "rgba(255, 165, 0, 1)";  // fill color of points
-  export let radius = 2;  // size of points
+  export let color = "rgba(255, 255, 255, 0.73)";  // black color of points
+  export let radius = 4;  // size of points
 
   let canvasElement: HTMLCanvasElement = null;
 
@@ -14,6 +14,8 @@
     const ctx = canvasElement.getContext("2d");
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = color;
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.73)";
+    ctx.lineWidth = 2;
 
     const t = $currentTransform;
 
@@ -21,6 +23,7 @@
       ctx.beginPath();
       ctx.arc(t.applyX(item.position.x), t.applyY(item.position.y), radius, 0, 2 * Math.PI);
       ctx.fill();
+      ctx.stroke();
       ctx.closePath();
     });
   }
