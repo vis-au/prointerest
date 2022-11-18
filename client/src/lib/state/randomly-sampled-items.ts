@@ -35,22 +35,25 @@ export const randomlySampledBinItems = derived(bins, (newBins) => {
     .flat();
 });
 
-quadtree.subscribe((newTree) => {
-  // check if quadtree has changed (for exaxmple when opening the secondary view panel)
-  if (iteration % iterationsBetweenUpdates === 0 || currentQuadtree !== newTree) {
-    currentProcessedItems = newTree.data();
-    currentQuadtree = newTree;
-    smallSampleProbabilty = currentSmallSampleSize / currentProcessedItems.length;
-    largeSampleProbability = currentLargeSampleSize / currentProcessedItems.length;
+// put into timeout to prevent page from crashing when quadtree is still undefined
+window.setTimeout(() => {
+  quadtree.subscribe((newTree) => {
+    // check if quadtree has changed (for exaxmple when opening the secondary view panel)
+    if (iteration % iterationsBetweenUpdates === 0 || currentQuadtree !== newTree) {
+      currentProcessedItems = newTree.data();
+      currentQuadtree = newTree;
+      smallSampleProbabilty = currentSmallSampleSize / currentProcessedItems.length;
+      largeSampleProbability = currentLargeSampleSize / currentProcessedItems.length;
 
-    smallRandomSample = currentProcessedItems.filter(() => sample(smallSampleProbabilty));
-    largeRandomSample = currentProcessedItems.filter(() => sample(largeSampleProbability));
+      smallRandomSample = currentProcessedItems.filter(() => sample(smallSampleProbabilty));
+      largeRandomSample = currentProcessedItems.filter(() => sample(largeSampleProbability));
 
-    lessRandomlySampledItems.set(smallRandomSample);
-    randomlySampledItems.set(largeRandomSample);
-  }
+      lessRandomlySampledItems.set(smallRandomSample);
+      randomlySampledItems.set(largeRandomSample);
+    }
 
-  if (currentProcessedItems.length > 0) {
-    iteration += 1;
-  }
+    if (currentProcessedItems.length > 0) {
+      iteration += 1;
+    }
+  });
 });

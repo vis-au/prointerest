@@ -17,7 +17,7 @@
   const dispatch = createEventDispatcher();
 
   const zoomBehavior = zoom()
-    .scaleExtent([0.75, 10])
+    .scaleExtent([0.75, 500])
     .on("start", () => ($isZooming = true))
     .on("zoom", onZoom)
     .on("end", onZoomEnd);
