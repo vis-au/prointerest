@@ -1,4 +1,5 @@
 import type { HexbinBin } from "d3-hexbin";
+import type { Quadtree } from "d3-quadtree";
 import type { ScaleLinear } from "d3-scale";
 import { writable } from "svelte/store";
 
@@ -21,12 +22,18 @@ let currentLasso: [number, number][] = null;
 let x: ScaleLinear<number, number> = null;
 let y: ScaleLinear<number, number> = null;
 
+let currentQuadtree: Quadtree<DataItem> = null;
+
+quadtree.subscribe(newTree => {
+  currentQuadtree = newTree;
+});
+
 function getItemsInRectBrush() {
   if (currentBrush === null || currentBrush[0] === null) {
     return [];
   }
   const [[x0, y0], [x1, y1]] = currentBrush;
-  return getPointsInRect(x(x0), y(y0), x(x1), y(y1));
+  return getPointsInRect(x(x0), y(y0), x(x1), y(y1), currentQuadtree);
 }
 
 function getItemsInLassoBrush() {
@@ -37,7 +44,7 @@ function getItemsInLassoBrush() {
   const scaledPolygon = currentLasso.map((position) => {
     return [x(position[0]), y(position[1])] as [number, number];
   });
-  return getPointsInPolygon(scaledPolygon);
+  return getPointsInPolygon(scaledPolygon, currentQuadtree);
 }
 
 function getBrushedItems() {

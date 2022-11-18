@@ -17,4 +17,4 @@ processedData.subscribe(newData => {
   if (newData.length === 0) {
     latestChunk.set([]);
   }
-})
+});
