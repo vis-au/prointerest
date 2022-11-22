@@ -6,11 +6,13 @@
   import type ScatterplotLassoBrush from "$lib/provenance/scatterplot-lasso-brush-interaction";
 
   import { bins } from "$lib/state/bins";
-  import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { activeBrush, activeLasso } from "$lib/state/active-brush";
+  import { activeDecisionTree } from "$lib/state/active-decision-tree";
   import { activeInteractionMode } from "$lib/state/active-interaction-mode";
   import { hexbinning } from "$lib/state/hexbinning";
   import { hoveredPosition } from "$lib/state/hovered-position";
+  import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
+  import { dimensions } from "$lib/state/processed-data";
   import { sampledQuadtree } from "$lib/state/sampled-quadtree";
   import { scaleX, scaleY } from "$lib/state/scales";
   import { selectedBins } from "$lib/state/selected-bins";
@@ -24,8 +26,7 @@
 
   import { getDummyDataItem } from "$lib/util/dummy-data-item";
   import { getPointsInPolygon, getPointsInRect } from "$lib/util/find-in-quadtree";
-  import { dimensions } from "$lib/state/processed-data";
-  import { sendSteeringByExampleItems } from "$lib/util/requests";
+  import { getDecisionTree } from "$lib/util/requests";
 
   import BrushLayer from "./brush-layer.svelte";
   import SelectionLayer from "./selection-layer.svelte";
@@ -64,7 +65,7 @@
     $interactionLog.add(interaction);
   }
 
-  function steer(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
+  async function steer(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
     const interesting = brushInteraction.getAffectedItems();
 
     // find data to train against, by finding (at most twice as many) uninteresting items
@@ -72,7 +73,7 @@
       .filter((item) => interesting.indexOf(item) === -1)
       .filter((_, i) => i < interesting.length*2);
 
-    sendSteeringByExampleItems(interesting, uninteresting, $dimensions)
+    $activeDecisionTree = await getDecisionTree(interesting, uninteresting, $dimensions);
   }
 
   function onBrushEnd() {

@@ -161,7 +161,7 @@ export async function sendSteeringFilters(filters: SteeringFilter) {
   return sendRequestToBaseURL("/steer", "POST", { filters });
 }
 
-export async function sendSteeringByExampleItems(interestings: DataItem[], uninterestings: DataItem[], dimensions: string[]) {
+export async function _sendSteeringByExampleItems(interestings: DataItem[], uninterestings: DataItem[], dimensions: string[]) {
   // NOTE: to train the steering-by-example classifier, we need interesting AND uninteresting items!
 
   const items = interestings
@@ -178,4 +178,39 @@ export async function sendSteeringByExampleItems(interestings: DataItem[], unint
     isInteresting,
     dimensions
   });
+}
+
+function decisionRulesToTree(decisionRules: [string[]][]): Record<string, unknown> {
+  const rules = {};
+
+  decisionRules.forEach((statements: [string[]]) => {
+    let workingNode = rules;
+    statements[0].forEach(statement => {
+      if (!workingNode[statement]) {
+        workingNode[statement] = {};
+      }
+      workingNode = workingNode[statement];
+    });
+  });
+
+  return rules;
+}
+
+export async function getDecisionTree(interestings: DataItem[], uninterestings: DataItem[], dimensions: string[]) {
+  // NOTE: to train the steering-by-example classifier, we need interesting AND uninteresting items!
+
+  const items = interestings
+    .concat(uninterestings)
+    .map(d => d.values);
+
+  // simple vector indicating whether item in the request is marked as interesting or not
+  const isInteresting = range(items.length).map((i) => {
+    return i < interestings.length ? 1 : 0;
+  });
+
+  return sendRequestToBaseURL("/decision_tree", "POST", {
+    items,
+    isInteresting,
+    dimensions
+  }).then(decisionRulesToTree);
 }
