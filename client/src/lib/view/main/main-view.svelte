@@ -11,6 +11,7 @@
   import Tooltip from "./tooltip.svelte";
   import ViewControls from "./view-controls.svelte";
   import RecentPoints from "../layers/visualization/recent-points.svelte";
+  import DecisionTreeViewer from "$lib/view/main/decision-tree-viewer.svelte";
 
   export let width: number;
   export let height: number;
@@ -31,6 +32,13 @@
   <!-- <SuggestionLayer {width} {height} /> -->
   <BrushLayer {width} {height} />
   <InteractionLayer {width} {height} />
+
+  <DecisionTreeViewer
+    x={10}
+    y={80}
+    title="Decision Tree"
+  />
+
   <Tooltip />
 
   {#if $activeViewMode === "binned"}
