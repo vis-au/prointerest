@@ -1,3 +1,4 @@
+import json
 from flask import Flask, json, jsonify, request
 
 from database import *
@@ -116,6 +117,31 @@ def send_steering_filters():
   set_steering_filters(filters)
 
   return cors_response(True)
+
+
+@app.route("/decision_tree", methods=["POST"])
+def get_train_decision_tree():
+  res = json.loads(request.data)
+
+  # make dataframe with items that are of interest to the user
+  items = res["items"]
+  columns = res["dimensions"]
+  items_df = pd.DataFrame(np.array(items), columns=columns)
+
+  # FIXME: use the actual subspace of interest!
+  items_df = items_df[[
+    "trip_distance", "total_amount", "tip_amount", "trip_duration", "passenger_count",
+    "fare_amount"
+  ]]
+
+  # vector indicating whether an item is marked as interesting in the frontend
+  is_interesting = res["isInteresting"]
+  is_interesting = np.array(is_interesting)
+
+  # The decision tree is trained on all dimensions in the items
+  _, disjunction_list = get_steering_condition(items_df, is_interesting, 'sql', with_paths=True)
+
+  return cors_response(disjunction_list)
 
 
 @app.route("/steer-by-example", methods=["POST"])

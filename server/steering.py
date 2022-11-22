@@ -108,7 +108,23 @@ def _generate_expression(sample, tree, paths, mode):
     return expression
 
 
-def get_steering_condition(features: pd.DataFrame, labels: pd.DataFrame, mode="pandas"):
+def _generate_tree_list(sample, tree, paths, mode):
+    rules = {}
+    disjunctions = []
+    conjunctor = "AND"
+
+    for key in paths:
+        rules[key] = _get_rule(tree, paths[key], sample.columns)
+        new_conjunction = _extract_conjunction(rules[key], conjunctor)
+        new_conjunction = new_conjunction.split(conjunctor)
+
+        disjunctions += [[new_conjunction]]
+
+    return disjunctions
+
+
+def get_steering_condition(features: pd.DataFrame, labels: pd.DataFrame, mode="pandas",
+                           with_paths: bool = False):
     global feature, threshold
 
     if mode not in ["pandas", "sql"]:
@@ -128,5 +144,9 @@ def get_steering_condition(features: pd.DataFrame, labels: pd.DataFrame, mode="p
 
     print("generate conditional expression")
     expression = _generate_expression(features, tree, paths, mode)
+
+    if with_paths:
+        expression_list = _generate_tree_list(features, tree, paths, mode)
+        return expression, expression_list
 
     return expression
