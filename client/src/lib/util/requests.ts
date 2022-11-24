@@ -180,22 +180,6 @@ export async function _sendSteeringByExampleItems(interestings: DataItem[], unin
   });
 }
 
-function decisionRulesToTree(decisionRules: [string[]][]): Record<string, unknown> {
-  const rules = {};
-
-  decisionRules.forEach((statements: [string[]]) => {
-    let workingNode = rules;
-    statements[0].forEach(statement => {
-      if (!workingNode[statement]) {
-        workingNode[statement] = {};
-      }
-      workingNode = workingNode[statement];
-    });
-  });
-
-  return rules;
-}
-
 export async function getDecisionTree(interestings: DataItem[], uninterestings: DataItem[], dimensions: string[]) {
   // NOTE: to train the steering-by-example classifier, we need interesting AND uninteresting items!
 
@@ -212,5 +196,5 @@ export async function getDecisionTree(interestings: DataItem[], uninterestings: 
     items,
     isInteresting,
     dimensions
-  }).then(decisionRulesToTree);
+  });
 }

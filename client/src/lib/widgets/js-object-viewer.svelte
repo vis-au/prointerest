@@ -3,6 +3,8 @@
   import ControlButton from "./control-button.svelte";
 
   export let title = "Hierarchy";
+  export let width = 1000;
+  export let height = 1200;
   export let input: Record<string, unknown> | Record<string, unknown>[];
   export let style = "";
 
@@ -24,7 +26,7 @@
       <div style="transform:rotate(45deg)">+</div>
     </ControlButton>
   </h2>
-  <pre>{ JSON.stringify(input, null, 4) }</pre>
+  <pre style="max-width:{width}px;max-height:{height}px">{ JSON.stringify(input, null, 4) }</pre>
 </div>
 
 <style>

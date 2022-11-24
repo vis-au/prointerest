@@ -7,6 +7,7 @@
   export let x = 0;
   export let y = 0;
   export let width = 1000;
+  export let height = 500;
 
   let isHidden = false;
 
@@ -26,8 +27,9 @@
   {:else}
     <JsObjectViewer
       {title}
+      {width}
+      {height}
       input={$activeDecisionTree}
-      style="max-width:{width}px"
       on:close={hide} />
   {/if}
 </div>
