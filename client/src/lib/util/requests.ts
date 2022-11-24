@@ -1,6 +1,7 @@
 import { range } from "d3";
 import type { DoiInteraction } from "$lib/provenance/doi-interaction";
 import type DataItem from "$lib/types/data-item";
+import type { DecisionTree } from "$lib/types/decision-tree";
 import type { DOIDimension } from "$lib/types/doi-dimension";
 import type { OutliernessMeasure } from "$lib/types/outlier-measures";
 import type { ProvenanceConfig } from "$lib/types/provenance-config";
@@ -180,7 +181,7 @@ export async function _sendSteeringByExampleItems(interestings: DataItem[], unin
   });
 }
 
-export async function getDecisionTree(interestings: DataItem[], uninterestings: DataItem[], dimensions: string[]) {
+export async function getDecisionTree(interestings: DataItem[], uninterestings: DataItem[], dimensions: string[]): Promise<DecisionTree> {
   // NOTE: to train the steering-by-example classifier, we need interesting AND uninteresting items!
 
   const items = interestings

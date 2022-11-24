@@ -30,6 +30,7 @@
       {width}
       {height}
       input={$activeDecisionTree}
+      style="font-size:14px"
       on:close={hide} />
   {/if}
 </div>

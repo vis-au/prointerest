@@ -36,7 +36,6 @@
     box-shadow: 0 1px 3px -2px #aaa;
     border-radius: 4px;
     padding: 1rem;
-
   }
   .js-object-viewer h2 {
     display: flex;
