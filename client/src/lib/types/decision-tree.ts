@@ -5,7 +5,7 @@ export type DecisionTree = InternalNode | LeafNode;
 export type NodeType = "leaf" | "internal";
 
 export type InternalNode = {
-  type: NodeType,
+  type: "internal",
   feature: DOIDimension,
   threshold: number,
   left: DecisionTree,
@@ -13,6 +13,6 @@ export type InternalNode = {
 };
 
 export type LeafNode = {
-  type: NodeType,
+  type: "leaf",
   value: number[]
 };
