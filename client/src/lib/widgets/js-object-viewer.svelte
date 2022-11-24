@@ -17,8 +17,12 @@
 
 <div class="js-object-viewer" {style}>
   <h2>
-    <span>{title}</span>
-    <ControlButton on:click={close} style="padding:0.05rem 0.3rem">x</ControlButton>
+    <span style="margin-right:10px">{title}</span>
+    <ControlButton
+      on:click={close}
+      style="width:20px;height:20px;line-height:20px;padding:0">
+      <div style="transform:rotate(45deg)">+</div>
+    </ControlButton>
   </h2>
   <pre>{ JSON.stringify(input, null, 4) }</pre>
 </div>
@@ -39,6 +43,7 @@
     margin: 0;
     padding: 0;
     justify-content: space-between;
+    align-items: center;
   }
   .js-object-viewer pre {
     border: 1px solid #e8eaed;

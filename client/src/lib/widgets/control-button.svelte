@@ -24,5 +24,9 @@
     border: none;
     border-radius: 3px;
     font-size: 12pt;
+    transition: ease-in 0.05s;
+  }
+  button.control-button:hover {
+    background: #aaa;
   }
 </style>
