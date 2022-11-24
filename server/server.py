@@ -139,9 +139,9 @@ def get_train_decision_tree():
   is_interesting = np.array(is_interesting)
 
   # The decision tree is trained on all dimensions in the items
-  _, disjunction_list = get_steering_condition(items_df, is_interesting, 'sql', with_paths=True)
+  _, tree_dict = get_steering_condition(items_df, is_interesting, 'sql', with_dict=True)
 
-  return cors_response(disjunction_list)
+  return cors_response(tree_dict)
 
 
 @app.route("/steer-by-example", methods=["POST"])

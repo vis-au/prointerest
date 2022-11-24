@@ -1,8 +1,9 @@
 # steering-by-example module, reproduced from
 # https://github.com/vis-au/progressive-steering/blob/master/backend/steering_duckdb.py
+import json
 import numpy as np
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, _tree, BaseDecisionTree
 
 # global variables used for generating the steering condition
 feature = None
@@ -108,23 +109,48 @@ def _generate_expression(sample, tree, paths, mode):
     return expression
 
 
-def _generate_tree_list(sample, tree, paths, mode):
-    rules = {}
-    disjunctions = []
-    conjunctor = "AND"
+# adapted from
+# https://mljar.com/blog/extract-rules-decision-tree/
+def _tree_to_json(tree: BaseDecisionTree, feature_names: list):
+    ''' transform the internal tree format into a reusable python dict '''
 
-    for key in paths:
-        rules[key] = _get_rule(tree, paths[key], sample.columns)
-        new_conjunction = _extract_conjunction(rules[key], conjunctor)
-        new_conjunction = new_conjunction.split(conjunctor)
+    tree_ = tree.tree_
+    feature_name = [
+        feature_names[i] if i != _tree.TREE_UNDEFINED else "undefined!"
+        for i in tree_.feature
+    ]
+    feature_names = [f.replace(" ", "_")[:-5] for f in feature_names]
 
-        disjunctions += [[new_conjunction]]
+    OPEN_BRACE = "{"
+    CLOSE_BRACE = "}"
 
-    return disjunctions
+    def traverse(node, depth):
+        __node = ""
+
+        if tree_.feature[node] != _tree.TREE_UNDEFINED:
+            name = feature_name[node]
+            threshold = tree_.threshold[node]
+
+            __node = f"\"type\": \"internal\", \"feature\": \"{name}\", \"threshold\": {threshold}"
+
+            __left = traverse(tree_.children_left[node], depth + 1)
+            __node = f"{__node}, \"left\": {__left}"
+
+            __right = traverse(tree_.children_right[node], depth + 1)
+            __node = f"{__node}, \"right\": {__right}"
+        else:
+            __node = f"\"type\": \"leaf\", \"value\": {tree_.value[node].tolist()}"
+
+        __node = f"{OPEN_BRACE}{__node}{CLOSE_BRACE}"
+        return __node
+
+    __tree = traverse(0, 1)
+    __tree = json.loads(__tree)
+    return __tree
 
 
 def get_steering_condition(features: pd.DataFrame, labels: pd.DataFrame, mode="pandas",
-                           with_paths: bool = False):
+                           with_dict: bool = False):
     global feature, threshold
 
     if mode not in ["pandas", "sql"]:
@@ -145,8 +171,8 @@ def get_steering_condition(features: pd.DataFrame, labels: pd.DataFrame, mode="p
     print("generate conditional expression")
     expression = _generate_expression(features, tree, paths, mode)
 
-    if with_paths:
-        expression_list = _generate_tree_list(features, tree, paths, mode)
+    if with_dict:
+        expression_list = _tree_to_json(model, features.columns)
         return expression, expression_list
 
     return expression
