@@ -2,7 +2,7 @@
   import {activeDecisionTree} from "$lib/state/active-decision-tree";
   import JsObjectViewer from "$lib/widgets/js-object-viewer.svelte";
   import ControlButton from "../../widgets/control-button.svelte";
-  import DecisionTreeViewer from "./decision-tree-viewer/decision-tree-viewer.svelte";
+  import DecisionTreeViewer from "./decision-tree-viewer.svelte";
 
   export let title = "Decision Tree";
   export let x = 0;
