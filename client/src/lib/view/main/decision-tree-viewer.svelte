@@ -5,6 +5,7 @@
 
   import type { DecisionTree, InternalNode, LeafNode } from "$lib/types/decision-tree";
   import { truncateFloat } from "$lib/util/number-transform";
+  import { doiLimit } from "$lib/state/doi-limit";
 
   export let decisionTree: DecisionTree;
   export let height = 500;
@@ -46,18 +47,27 @@
     );
 
   // turn decision tree in to d3 hierarchy format
-  $: root = hierarchy(decisionTree, d => d.type === "internal" ? [d.left, d.right] : null);
+  $: root = hierarchy(decisionTree, d => d?.type === "internal" ? [d.left, d.right] : null);
 
   // compute the tree layout
-  $: treeData = tree(root);
+  $: treeData = root ? tree(root) : null;
+
+  $: links = treeData?.links();
+  $: console.log(links);
 
   // derive partitions of internal and leaf nodes
-  $: internalNodes = treeData.descendants()
-    .filter(d => d.data.type === "internal") as HierarchyPointNode<InternalNode>[];
+  $: internalNodes = treeData?.descendants()
+    .filter(d => d.data?.type === "internal") as HierarchyPointNode<InternalNode>[];
 
-  $: leafNodes = treeData.descendants()
-    .filter(d => d.data.type === "leaf") as HierarchyPointNode<LeafNode>[];
+  $: leafNodes = treeData?.descendants()
+    .filter(d => d.data?.type === "leaf") as HierarchyPointNode<LeafNode>[];
 
+
+  $: isNodeInteresting = (node: DecisionTree) => {
+    return node.type === "internal"
+      ? isNodeInteresting(node.left) || isNodeInteresting(node.right)
+      : node.value[0] > $doiLimit;
+  };
 </script>
 
 <div class="decision-tree-viewer" {style}>
@@ -71,37 +81,45 @@
 
       <g class="decision-tree-container" transform="translate({MARGIN.left}, {MARGIN.top})">
         <g class="links">
-          { #each treeData.links() as link }
-            <path class="link" d={path(link)} />
+          { #each links as link }
+            <path
+              class="link {isNodeInteresting(link["target"]["data"]) ? "interesting" : ""}"
+              d={path(link)}
+            />
           {/each}
         </g>
 
         <g class="nodes">
           <g class="internal-nodes">
             {#each internalNodes as node}
-              <g class="internal-node" transform="translate({node.x},{node.y})">
+              <g class="internal-node {isNodeInteresting(node.data) ? "interesting" : ""}"
+                transform="translate({node.x},{node.y})">
                 <circle class="node" r={INTERNAL_NODE_SIZE} />
-                <text class="label"
-                  font-size={FONT_SIZE}
-                  alignment-baseline="middle"
-                  dx={10}
-                  dy={-INTERNAL_NODE_SIZE - 5}>
 
-                  {`${node.data.feature} <= ${truncateFloat(node.data.threshold)}`}
+                {#if isNodeInteresting(node.data)}
+                  <text class="label"
+                    font-size={FONT_SIZE}
+                    alignment-baseline="middle"
+                    dx={10}
+                    dy={-INTERNAL_NODE_SIZE - 5}>
+
+                    {`${node.data.feature} <= ${truncateFloat(node.data.threshold)}`}
                 </text>
+                {/if}
               </g>
             {/each}
           </g>
 
           <g class="leaf-nodes">
             {#each leafNodes as node}
-              <g class="leaf-node" transform="translate({node.x - LEAF_NODE_WIDTH/2},{node.y})">
+              <g class="leaf-node {isNodeInteresting(node.data) ? "interesting" : ""}"
+                transform="translate({node.x - LEAF_NODE_WIDTH/2},{node.y})">
                 <rect class="background"
                   width={LEAF_NODE_WIDTH}
                   height={scaleLeafSize.range()[1]} />
                 <rect class="value"
                   width={LEAF_NODE_WIDTH}
-                  height={node.data.type === "leaf" ? scaleLeafSize(node.data.value[0]) : 0} />
+                  height={scaleLeafSize(node.data.value[0])} />
               </g>
             {/each}
           </g>
@@ -117,23 +135,34 @@
     stroke: #aaa;
     stroke-width: 1;
   }
-  .decision-tree-viewer .nodes .internal-nodes circle.node {
-    fill: white;
-    stroke: #555;
-    stroke-width: 1;
+  .decision-tree-viewer .links path.link.interesting {
+    stroke: black;
+    stroke-width: 2;
   }
-  .decision-tree-viewer text {
-    font-family: Lato;
-  }
-  .decision-tree-viewer .nodes .internal-nodes text.label {
-    text-anchor: middle;
-  }
-  .decision-tree-viewer .nodes .leaf-nodes rect.background {
+  .decision-tree-viewer .nodes .internal-node circle.node {
     fill: white;
     stroke: #aaa;
     stroke-width: 1;
   }
-  .decision-tree-viewer .ndoes .leaf-nodes rect.value {
+  .decision-tree-viewer .nodes .internal-node.interesting circle.node {
+    stroke: black;
+    fill: black;
+  }
+  .decision-tree-viewer text {
+    font-family: Lato;
+  }
+  .decision-tree-viewer .nodes .internal-node text.label {
+    text-anchor: middle;
+  }
+  .decision-tree-viewer .nodes .leaf-node rect.background {
+    fill: white;
+    stroke: #aaa;
+    stroke-width: 1;
+  }
+  .decision-tree-viewer .nodes .leaf-node rect.value {
+    fill: #aaa;
+  }
+  .decision-tree-viewer .nodes .leaf-node.interesting rect.value {
     fill: black;
   }
 </style>
