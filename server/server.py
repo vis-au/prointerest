@@ -119,14 +119,14 @@ def send_steering_filters():
   return cors_response(True)
 
 
-@app.route("/decision_tree", methods=["POST"])
+@app.route("/train_tree", methods=["POST"])
 def get_train_decision_tree():
   res = json.loads(request.data)
 
   # make dataframe with items that are of interest to the user
   items = res["items"]
-  columns = res["dimensions"]
-  items_df = pd.DataFrame(np.array(items), columns=columns)
+  dimensions = res["dimensions"]
+  items_df = pd.DataFrame(np.array(items), columns=dimensions)
 
   # FIXME: use the actual subspace of interest!
   items_df = items_df[[
@@ -134,12 +134,16 @@ def get_train_decision_tree():
     "fare_amount"
   ]]
 
-  # vector indicating whether an item is marked as interesting in the frontend
-  is_interesting = res["isInteresting"]
-  is_interesting = np.array(is_interesting)
+  # a vector indicating either whether an item is marked as interesting in the frontend (for
+  # classification) or its current inteterest as numeric value (for regression)
+  label = res["label"]
+  label = np.array(label)
 
-  # The decision tree is trained on all dimensions in the items
-  _, tree_dict = get_steering_condition(items_df, is_interesting, 'sql', with_dict=True)
+  # which task to perform on the data, i.e., whether to use a regression/classification tree
+  use_regression = res["use_regression"]
+
+  # get the tree model
+  tree_dict = get_decision_tree(items_df, label, use_regression=use_regression)
 
   return cors_response(tree_dict)
 

@@ -193,9 +193,21 @@ export async function getDecisionTree(interestings: DataItem[], uninterestings: 
     return i < interestings.length ? 1 : 0;
   });
 
-  return sendRequestToBaseURL("/decision_tree", "POST", {
+  return sendRequestToBaseURL("/train_tree", "POST", {
     items,
-    isInteresting,
-    dimensions
+    dimensions,
+    label: isInteresting,
+    use_regression: false
+  });
+}
+
+
+export async function getRegressionTree(items: DataItem[], interest: number[], dimensions: string[]): Promise<DecisionTree> {
+
+  return sendRequestToBaseURL("/train_tree", "POST", {
+    items,
+    dimensions,
+    label: interest,
+    use_regression: true
   });
 }

@@ -3,7 +3,7 @@
 import json
 import numpy as np
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier, _tree, BaseDecisionTree
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, _tree, BaseDecisionTree
 
 # global variables used for generating the steering condition
 feature = None
@@ -109,10 +109,35 @@ def _generate_expression(sample, tree, paths, mode):
     return expression
 
 
+def get_steering_condition(features: pd.DataFrame, labels: pd.DataFrame, mode="pandas"):
+    global feature, threshold
+
+    if mode not in ["pandas", "sql"]:
+        print("mode must be one of 'pandas' and 'sql'")
+        return ""
+
+    classifier = DecisionTreeClassifier(criterion="entropy", max_depth=None)
+
+    print("training tree")
+    model = classifier.fit(features, y=labels)
+    tree = model.tree_
+    feature = tree.feature
+    threshold = tree.threshold
+
+    print("extract paths from tree")
+    paths = _extract_paths(features, model)
+
+    print("generate conditional expression")
+    expression = _generate_expression(features, tree, paths, mode)
+
+    return expression
+
+
 # adapted from
 # https://mljar.com/blog/extract-rules-decision-tree/
 def _tree_to_json(tree: BaseDecisionTree, feature_names: list):
-    ''' transform the internal tree format into a reusable python dict '''
+    ''' Transforms a trained tree model from the internal tree format into a simplified, reusable
+    python dict. '''
 
     tree_ = tree.tree_
     feature_name = [
@@ -149,30 +174,14 @@ def _tree_to_json(tree: BaseDecisionTree, feature_names: list):
     return __tree
 
 
-def get_steering_condition(features: pd.DataFrame, labels: pd.DataFrame, mode="pandas",
-                           with_dict: bool = False):
+def get_decision_tree(features: pd.DataFrame, labels: pd.DataFrame, use_regression: bool = False):
+    ''' Helper function for cases where not the steering query, but the model is needed. '''
     global feature, threshold
 
-    if mode not in ["pandas", "sql"]:
-        print("mode must be one of 'pandas' and 'sql'")
-        return ""
-
-    classifier = DecisionTreeClassifier(criterion="entropy", max_depth=None)
+    model = DecisionTreeRegressor(criterion="entropy", max_depth=None) if use_regression \
+      else DecisionTreeClassifier(criterion="entropy", max_depth=None)
 
     print("training tree")
-    model = classifier.fit(features, y=labels)
-    tree = model.tree_
-    feature = tree.feature
-    threshold = tree.threshold
-
-    print("extract paths from tree")
-    paths = _extract_paths(features, model)
-
-    print("generate conditional expression")
-    expression = _generate_expression(features, tree, paths, mode)
-
-    if with_dict:
-        expression_list = _tree_to_json(model, features.columns)
-        return expression, expression_list
-
-    return expression
+    model = model.fit(features, y=labels)
+    as_tree = _tree_to_json(model, features.columns)
+    return as_tree
