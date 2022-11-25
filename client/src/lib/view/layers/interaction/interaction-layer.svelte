@@ -26,7 +26,7 @@
 
   import { getDummyDataItem } from "$lib/util/dummy-data-item";
   import { getPointsInPolygon, getPointsInRect } from "$lib/util/find-in-quadtree";
-  import { getDecisionTree } from "$lib/util/requests";
+  import { getDecisionTree, getRegressionTree } from "$lib/util/requests";
 
   import BrushLayer from "./brush-layer.svelte";
   import SelectionLayer from "./selection-layer.svelte";
@@ -65,7 +65,7 @@
     $interactionLog.add(interaction);
   }
 
-  async function steer(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
+  async function _steer(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
     const interesting = brushInteraction.getAffectedItems();
 
     // find data to train against, by finding (at most twice as many) uninteresting items
@@ -74,6 +74,14 @@
       .filter((_, i) => i < interesting.length*2);
 
     $activeDecisionTree = await getDecisionTree(interesting, uninteresting, $dimensions);
+  }
+
+  async function steer(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
+    const interesting = brushInteraction.getAffectedItems();
+
+    const scores = Array.from({length: interesting.length}).map(Math.random);
+
+    $activeDecisionTree = await getRegressionTree(interesting, scores, $dimensions);
   }
 
   function onBrushEnd() {

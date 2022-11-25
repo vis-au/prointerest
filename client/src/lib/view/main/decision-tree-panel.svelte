@@ -38,7 +38,7 @@
         </ControlButton>
       </h2>
 
-      <DecisionTreeViewer tree={$activeDecisionTree}/>
+      <DecisionTreeViewer decisionTree={$activeDecisionTree}/>
 
       {#if showRaw}
         <JsObjectViewer

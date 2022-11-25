@@ -178,8 +178,8 @@ def get_decision_tree(features: pd.DataFrame, labels: pd.DataFrame, use_regressi
     ''' Helper function for cases where not the steering query, but the model is needed. '''
     global feature, threshold
 
-    model = DecisionTreeRegressor(criterion="entropy", max_depth=None) if use_regression \
-      else DecisionTreeClassifier(criterion="entropy", max_depth=None)
+    model = DecisionTreeRegressor(max_depth=5, random_state=0) if use_regression \
+      else DecisionTreeClassifier(criterion="entropy", max_depth=5, random_state=0)
 
     print("training tree")
     model = model.fit(features, y=labels)

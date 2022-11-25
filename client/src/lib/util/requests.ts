@@ -201,11 +201,10 @@ export async function getDecisionTree(interestings: DataItem[], uninterestings: 
   });
 }
 
-
 export async function getRegressionTree(items: DataItem[], interest: number[], dimensions: string[]): Promise<DecisionTree> {
 
   return sendRequestToBaseURL("/train_tree", "POST", {
-    items,
+    items: items.map(d => d.values),
     dimensions,
     label: interest,
     use_regression: true

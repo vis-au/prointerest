@@ -14,19 +14,23 @@ let currentLatestChunk: number[][] = [];
 // stores the chunk as data items, derived from the raw data
 export const latestItems = writable([] as DataItem[]);
 
+// transforms raw data into items, thereby also updating its position.
+function updateLatestItems() {
+  if (!latestItems || !currentLatestChunk) {
+    return;
+  }
+
+  latestItems?.set(currentLatestChunk?.map(arrayToDataItem));
+}
+
 // whenever the raw data changes, so should the items
-latestChunk.subscribe((newChunk) => {
+latestChunk?.subscribe((newChunk) => {
   currentLatestChunk = newChunk;
   updateLatestItems();
 });
 
-// transforms raw data into items, thereby also updating its position.
-function updateLatestItems() {
-  latestItems.set(currentLatestChunk.map(arrayToDataItem));
-}
-
-scaleX.subscribe(updateLatestItems);
-scaleY.subscribe(updateLatestItems);
+scaleX?.subscribe(updateLatestItems);
+scaleY?.subscribe(updateLatestItems);
 
 
 export const latestInterestingItems = derived([doiLimit, latestItems, doiValues], ([$doiLimit, $latestItems, $doiValues]) => {
