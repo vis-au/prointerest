@@ -1,32 +1,34 @@
 import type { DecisionTree, InternalNode, LeafNode } from "$lib/types/decision-tree";
 import type { DOIDimension } from "$lib/types/doi-dimension";
 import { writable } from "svelte/store";
-import { interestingIntervals, selectedDoiDimensions } from "./interesting-dimensions";
+import { doiDimensionWeights, interestingIntervals, selectedDoiDimensions } from "./interesting-dimensions";
 
 export const activeFDLTree = writable(null as DecisionTree);
 
 let currentIntervals: Record<DOIDimension, [number, number]> = null
 let currentSelectedDoiDimension: DOIDimension[] = [];
+let currentDoiWeights: Map<DOIDimension, number> = null;
 
 
-function createEmptyInternalNode(): InternalNode {
+function createEmptyInternalNode(accumulatedInterest: number): InternalNode {
   return {
     type: "internal",
     feature: null,
     threshold: null,
     left: {
       type: "leaf",
-      value: [0]
+      value: [accumulatedInterest]
     },
     right: {
       type: "leaf",
-      value: [1]
+      value: [accumulatedInterest]
     }
   };
 }
 
 function createTreeFromDimensions(dimensions: DOIDimension[]) {
-  const newTree: DecisionTree = createEmptyInternalNode();
+  let accumulatedInterest = 0;
+  const newTree: DecisionTree = createEmptyInternalNode(accumulatedInterest);
   let currentNode = newTree;
 
   dimensions
@@ -39,18 +41,22 @@ function createTreeFromDimensions(dimensions: DOIDimension[]) {
       currentNode.feature = dimension;
       currentNode.threshold = interval[1];
 
-      (currentNode.right as LeafNode).value = [0];
+      (currentNode.right as LeafNode).value = [accumulatedInterest];
 
+      console.log(accumulatedInterest, currentDoiWeights)
+      accumulatedInterest += currentDoiWeights.get(dimension);
 
-      currentNode.left = createEmptyInternalNode() as InternalNode;
+      currentNode.left = createEmptyInternalNode(accumulatedInterest) as InternalNode;
       currentNode.left.feature = dimension;
       currentNode.left.threshold = interval[0];
 
-      (currentNode.left.left as LeafNode).value = [0];
 
       if (i < dimensions.length - 1) {
-        currentNode.left.right = createEmptyInternalNode();
+        (currentNode.left.left as LeafNode).value = [accumulatedInterest];
+        currentNode.left.right = createEmptyInternalNode(accumulatedInterest);
         currentNode = currentNode.left.right;
+      } else {
+        (currentNode.left.left as LeafNode).value = [0];
       }
     });
 
@@ -63,15 +69,16 @@ function updateFDLTree() {
     return;
   }
 
-  const rangedDimensions = currentSelectedDoiDimension
-    .filter(dimension => currentIntervals[dimension]);
+  const rangedWeightedDimensions = currentSelectedDoiDimension
+    .filter(dimension => currentIntervals[dimension])
+    .filter(dimension => currentDoiWeights?.has(dimension));
 
-  if (rangedDimensions.length === 0) {
+  if (rangedWeightedDimensions.length === 0) {
     activeFDLTree.set(null);
     return;
   }
 
-  const newTree = createTreeFromDimensions(rangedDimensions);
+  const newTree = createTreeFromDimensions(rangedWeightedDimensions);
   activeFDLTree.set(newTree);
 }
 
@@ -82,5 +89,10 @@ interestingIntervals.subscribe(newIntervals => {
 
 selectedDoiDimensions.subscribe(newDimension => {
   currentSelectedDoiDimension = newDimension;
+  updateFDLTree();
+});
+
+doiDimensionWeights.subscribe(newWeights => {
+  currentDoiWeights = newWeights;
   updateFDLTree();
 });
