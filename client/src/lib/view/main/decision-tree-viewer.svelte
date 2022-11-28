@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { hierarchy, tree as d3tree, type HierarchyPointNode } from "d3-hierarchy";
+  import { hierarchy, tree as d3tree, type HierarchyPointLink, type HierarchyPointNode } from "d3-hierarchy";
   import { scaleLinear } from "d3-scale";
   import { linkVertical } from "d3-shape";
 
@@ -36,7 +36,7 @@
   const scaleLeafSize = scaleLinear([0, 1], [0, MAX_LEAF_NODE_HEIGHT]);
 
   // path generator function
-  const path = linkVertical<unknown, unknown>()
+  const path = linkVertical<HierarchyPointLink<DecisionTree>, HierarchyPointLink<DecisionTree>>()
     .x(d => d["x"])
     .y(d => d["y"]);
 
