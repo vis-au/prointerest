@@ -53,7 +53,6 @@
   $: treeData = root ? tree(root) : null;
 
   $: links = treeData?.links();
-  $: console.log(links);
 
   // derive partitions of internal and leaf nodes
   $: internalNodes = treeData?.descendants()
