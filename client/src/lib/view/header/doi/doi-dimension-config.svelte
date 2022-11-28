@@ -71,7 +71,7 @@
     domain={extents[$selectedDoiWeight]}
     selectedInterval={$interestingIntervals[$selectedDoiWeight]}
     bins={100}
-    width={550}
+    width={750}
     height={100}
     bind:usePresetInterval={usePresetInterval}
     on:interval={(event) => (selectedInterval = event.detail[$selectedDoiWeight])}

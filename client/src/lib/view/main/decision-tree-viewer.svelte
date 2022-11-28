@@ -7,6 +7,7 @@
   import { truncateFloat } from "$lib/util/number-transform";
   import { doiLimit } from "$lib/state/doi-limit";
 
+  export let id: string;
   export let decisionTree: DecisionTree;
   export let height = 500;
   export let width = 500;
@@ -71,9 +72,10 @@
 
 <div class="decision-tree-viewer" {style}>
   {#if !decisionTree}
-    <span>no dt, yet</span>
+    <div style="width:{canvasWidth}px">no dt, yet</div>
   {:else}
-    <svg class="canvas"
+    <svg id="{id}-canvas"
+      class="canvas"
       viewBox="0 0 {width} {height}"
       width={canvasWidth}
       height={canvasHeight}>
@@ -129,6 +131,10 @@
 </div>
 
 <style>
+  .decision-tree-viewer svg {
+    text-rendering: optimizeSpeed;
+    shape-rendering: geometricPrecision;
+  }
   .decision-tree-viewer .links path.link {
     fill: none;
     stroke: #aaa;

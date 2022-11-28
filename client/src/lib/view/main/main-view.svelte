@@ -36,7 +36,6 @@
   <DecisionTreePanel
     x={10}
     y={80}
-    title="Decision Tree"
   />
 
   <Tooltip />

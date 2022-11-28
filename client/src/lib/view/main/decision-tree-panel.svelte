@@ -1,17 +1,19 @@
 <script lang="ts">
   import {activeDecisionTree} from "$lib/state/active-decision-tree";
+  import {activeFDLTree} from "$lib/state/active-fdl-tree";
+  import Alternatives from "$lib/widgets/alternatives.svelte";
   import JsObjectViewer from "$lib/widgets/js-object-viewer.svelte";
   import ControlButton from "../../widgets/control-button.svelte";
   import DecisionTreeViewer from "./decision-tree-viewer.svelte";
 
-  export let title = "Decision Tree";
   export let x = 0;
   export let y = 0;
   export let width = 1000;
   export let height = 500;
 
-  let isHidden = false;
-  let showRaw = false;
+  let isHidden = false;  // flag for whether the tree is visible or not
+  let showRaw = false;  // flag for showing the JSON viewer of the tree
+  let currentlyShownTree = "decision tree";
 
   function hide() {
     isHidden = true;
@@ -30,15 +32,29 @@
 
     <div class="container">
       <h2>
-        <span style="margin-right:10px">{title}</span>
-        <ControlButton
-          on:click={hide}
-          style="width:20px;height:20px;line-height:20px;padding:0">
-          <div style="transform:rotate(45deg)">+</div>
-        </ControlButton>
+        <div class="left">
+          Show
+          <Alternatives
+            name="currently-shown-tree"
+            alternatives={["decision tree", "FDL tree"]}
+
+            bind:activeAlternative={currentlyShownTree}
+          />
+        </div>
+
+        <div class="right">
+          <ControlButton
+            on:click={hide}
+            style="width:20px;height:20px;line-height:20px;padding:0">
+            <div style="transform:rotate(45deg)">+</div>
+          </ControlButton>
+        </div>
       </h2>
 
-      <DecisionTreeViewer decisionTree={$activeDecisionTree}/>
+      <DecisionTreeViewer
+        id="tree-viewer"
+        decisionTree={currentlyShownTree === "decision tree" ? $activeDecisionTree: $activeFDLTree}
+      />
 
       {#if showRaw}
         <JsObjectViewer
@@ -60,11 +76,23 @@
   .decision-tree-panel h2 {
     display: flex;
     font-size: 14px;
+    font-weight: normal;
     line-height: 1;
     margin: 0;
+    margin-bottom: 15px;
     padding: 0;
     justify-content: space-between;
     align-items: center;
+  }
+  .decision-tree-panel h2 div.left,
+  .decision-tree-panel h2 div.right {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .decision-tree-panel h2 div.left {
+    margin-right: 25px;
   }
   .decision-tree-panel .container {
     background: white;
