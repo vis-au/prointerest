@@ -29,7 +29,7 @@
   const MARGIN = {
     top: MAX_LEAF_NODE_HEIGHT / 2,
     right: 10,
-    bottom: MAX_LEAF_NODE_HEIGHT / 2,
+    bottom: MAX_LEAF_NODE_HEIGHT / 2 + FONT_SIZE,
     left: 10
   };
 
@@ -72,7 +72,6 @@
 
   let hoveredNode: HierarchyPointNode<DecisionTree> = null;
   let hoveredPath: DecisionTree[] = [];
-  let hoveredInterest: number = null
 
   $: {
     let focusNode = hoveredNode;
@@ -81,23 +80,14 @@
     hoveredPath = focusNode?.descendants().map(d => d.data) || [];
 
     // focus all predecessorss
-    while (focusNode !== null && focusNode !== undefined) {
-      hoveredPath.push(focusNode.data);
-      focusNode = focusNode.parent;
-    }
+    hoveredPath = hoveredPath.concat(focusNode?.ancestors().map(d => d.data) || []);
   }
   function hoverNode(node: HierarchyPointNode<DecisionTree>) {
     hoveredNode = node
-    hoveredInterest = node.data.type === "leaf" ? node.data.value[0] : null;
   }
 
   function unhoverNode() {
     hoveredNode = null;
-    hoveredInterest = null;
-  }
-
-  function focusNode(node: HierarchyPointNode<DecisionTree>) {
-    hoveredNode = hoveredNode === node ? null : node;
   }
 
   $: isNodeFocused = (node: HierarchyPointNode<DecisionTree>) => {
@@ -146,7 +136,7 @@
                 <circle
                   class="node {hoveredNode === node ? "hover" : ""}"
                   r={INTERNAL_NODE_SIZE}
-                  on:click={() => focusNode(node)}
+                  on:click={() => hoverNode(node)}
                   on:mouseover={() => hoverNode(node)}
                   on:focus={() => hoverNode(node)}
                   on:mouseout={() => unhoverNode()}
@@ -174,8 +164,9 @@
                   {isNodeFocused(node) ? "focus" : ""}
                 "
                 transform="translate({node.x - LEAF_NODE_WIDTH/2},{node.y})"
-                on:click={() => focusNode(node)}
-                on:mouseenter={() => hoverNode(node)}
+                on:click={() => hoverNode(node)}
+                on:mouseover={() => hoverNode(node)}
+                on:focus={() => hoverNode(node)}
                 on:mouseout={() => unhoverNode()}
                 on:blur={() => unhoverNode()}>
 
@@ -185,15 +176,19 @@
                 <rect class="value"
                   width={LEAF_NODE_WIDTH}
                   height={scaleLeafSize(node.data.value[0])} />
+
+                <text
+                  class="value"
+                  dx={LEAF_NODE_WIDTH/2}
+                  dy={scaleLeafSize.range()[1] + FONT_SIZE}>
+                  {truncateFloat(node.data.value[0])}
+                </text>
               </g>
             {/each}
           </g>
         </g>
       </g>
     </svg>
-  {/if}
-  {#if hoveredInterest !== null}
-    <span>{hoveredInterest}</span>
   {/if}
 </div>
 
@@ -236,6 +231,10 @@
   .decision-tree-viewer .nodes .internal-node text.label {
     text-anchor: middle;
   }
+
+  .decision-tree-viewer .nodes .leaf-node {
+    cursor: pointer;
+  }
   .decision-tree-viewer .nodes .leaf-node rect.background {
     fill: white;
     stroke: #aaa;
@@ -250,5 +249,13 @@
   .decision-tree-viewer .nodes .leaf-node.focus rect.value {
     fill: orange;
     stroke: none;
+  }
+  .decision-tree-viewer .nodes .leaf-node text.value {
+    display: none;
+    text-anchor: middle;
+  }
+  .decision-tree-viewer .nodes .leaf-node.focus text.value,
+  .decision-tree-viewer .nodes .leaf-node:hover text.value {
+    display: block;
   }
 </style>
