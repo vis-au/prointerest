@@ -2,7 +2,6 @@ from typing import Literal, List, Tuple
 import pandas as pd
 import numpy as np
 
-from benchmarks.progressive_doi_pipeline import ProgressiveDoiPipeline
 from database import *
 from doi_component.scagnostics_component import *
 from context_item_selection_strategy.context_item_selection_strategy import *
@@ -26,7 +25,11 @@ storage: StorageStrategy = WindowingStorage(STORAGE_SIZE)
 context: ContextItemSelectionStrategy = DoiBasedContext(n_dims=20, storage=storage, n_bins=25)
 update: OutdatedItemSelectionStrategy = None
 
-WEIGHTS = {}
+# contains the weights for the dimensions used in the DOI function
+DIMENSION_WEIGHTS = {}
+
+# contains the interesting value ranges within each dimension
+DIMENSION_RANGES = {}
 
 
 def reset_doi_component():
@@ -83,12 +86,24 @@ def set_outlierness_weights(weights: dict):
 
 
 def set_dimension_weights(weights: dict):
-  global WEIGHTS
+  global DIMENSION_WEIGHTS
 
-  WEIGHTS = {}
+  DIMENSION_WEIGHTS = {}
 
   for dimension in weights:
-    WEIGHTS[dimension] = weights[dimension]
+    DIMENSION_WEIGHTS[dimension] = weights[dimension]
+
+
+def set_dimension_range_of_interest(dimension: str, min_value: float, max_value: float):
+  global DIMENSION_RANGES
+
+  if min_value is None or max_value is None:
+    # if the frontend sets the interesting range to INFINITY, this corresponds to None here
+    # for simplicity, we treat INFINITY the same as having no interest at all.
+    del DIMENSION_RANGES[dimension]
+    return
+
+  DIMENSION_RANGES[dimension] = [min_value, max_value]
 
 
 def set_doi_classes(classes: int):
@@ -99,11 +114,6 @@ def set_doi_classes(classes: int):
 def set_dimensions_of_interest(dimensions: list):
   global dimensions_of_interest
   dimensions_of_interest = dimensions
-
-
-def set_dimension_range_of_interest(dimension: str, min_value: float, max_value: float):
-  global ranges_of_interest
-  ranges_of_interest[dimension] = [min_value, max_value]
 
 
 def set_outlierness_metric(metric: str):

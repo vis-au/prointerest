@@ -8,7 +8,7 @@
   import Histogram from "$lib/widgets/histogram.svelte";
   import Row from "$lib/widgets/row.svelte";
   import { truncateFloat } from "$lib/util/number-transform";
-  import { getDimensionExtent } from "$lib/util/requests";
+  import { getDimensionExtent, sendInterestingDimensionRange } from "$lib/util/requests";
   import type { DOIDimension } from "$lib/types/doi-dimension";
 
   let selectedInterval: [number, number] = null;
@@ -25,8 +25,8 @@
     } else {
       $interestingIntervals[dimension] = interval;
     }
-    // TODO: send the right info to the backend
-    // sendInterestingDimensionRange(dimension, interval);
+
+    sendInterestingDimensionRange(dimension, interval);
   }
 
   function getSelectedDimensionExtents() {

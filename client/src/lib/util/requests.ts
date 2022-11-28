@@ -113,6 +113,10 @@ export async function sendInterestingDimensionRange(
   dimension: string,
   range: [number, number]
 ): Promise<void> {
+  if (!range) {
+    range = [-Infinity, Infinity];
+  }
+
   return sendRequestToBaseURL("/dimension_range", "POST", {
     dimension,
     min: range[0],
