@@ -68,6 +68,44 @@
       ? isNodeInteresting(node.left) || isNodeInteresting(node.right)
       : node.value[0] > $doiLimit;
   };
+
+
+  let hoveredNode: HierarchyPointNode<DecisionTree> = null;
+  let hoveredPath: DecisionTree[] = [];
+
+  $: {
+    let focusNode = hoveredNode;
+
+    // focus all descendents
+    hoveredPath = focusNode?.descendants().map(d => d.data) || [];
+
+    // focus all predecessorss
+    while (focusNode !== null && focusNode !== undefined) {
+      hoveredPath.push(focusNode.data);
+      focusNode = focusNode.parent;
+    }
+  }
+  function hoverNode(node: HierarchyPointNode<DecisionTree>) {
+    hoveredNode = node
+  }
+
+  function unhoverNode() {
+    hoveredNode = null;
+  }
+
+  function focusNode(node: HierarchyPointNode<DecisionTree>) {
+    hoveredNode = hoveredNode === node ? null : node;
+  }
+
+  $: isNodeFocused = (node: HierarchyPointNode<DecisionTree>) => {
+    return hoveredPath.indexOf(node.data) > -1;
+  }
+
+  $: isLinkFocused = (link: HierarchyPointLink<DecisionTree>) => {
+    return hoveredPath.indexOf(link["source"].data) > -1
+           && hoveredPath.indexOf(link["target"].data) > -1;
+
+  }
 </script>
 
 <div class="decision-tree-viewer" {style}>
@@ -84,7 +122,10 @@
         <g class="links">
           { #each links as link }
             <path
-              class="link {isNodeInteresting(link["target"]["data"]) ? "interesting" : ""}"
+              class="link
+                {isNodeInteresting(link["target"]["data"]) ? "interesting" : ""}
+                {isLinkFocused(link) ? "focus" : ""}
+              "
               d={path(link)}
             />
           {/each}
@@ -93,9 +134,20 @@
         <g class="nodes">
           <g class="internal-nodes">
             {#each internalNodes as node}
-              <g class="internal-node {isNodeInteresting(node.data) ? "interesting" : ""}"
+              <g
+                class="internal-node
+                  {isNodeInteresting(node.data) ? "interesting" : ""}
+                  {isNodeFocused(node) ? "focus" : ""}
+                "
                 transform="translate({node.x},{node.y})">
-                <circle class="node" r={INTERNAL_NODE_SIZE} />
+                <circle
+                  class="node {hoveredNode === node ? "hover" : ""}"
+                  r={INTERNAL_NODE_SIZE}
+                  on:click={() => focusNode(node)}
+                  on:mouseenter={() => hoverNode(node)}
+                  on:mouseout={() => unhoverNode()}
+                  on:blur={() => unhoverNode()}
+                />
 
                 {#if isNodeInteresting(node.data)}
                   <text class="label"
@@ -113,14 +165,21 @@
 
           <g class="leaf-nodes">
             {#each leafNodes as node}
-              <g class="leaf-node {isNodeInteresting(node.data) ? "interesting" : ""}"
+              <g class="leaf-node
+              {isNodeInteresting(node.data) ? "interesting" : ""}
+              {isNodeFocused(node) ? "focus" : ""}
+            "
                 transform="translate({node.x - LEAF_NODE_WIDTH/2},{node.y})">
                 <rect class="background"
                   width={LEAF_NODE_WIDTH}
                   height={scaleLeafSize.range()[1]} />
                 <rect class="value"
                   width={LEAF_NODE_WIDTH}
-                  height={scaleLeafSize(node.data.value[0])} />
+                  height={scaleLeafSize(node.data.value[0])}
+                  on:click={() => focusNode(node)}
+                  on:mouseenter={() => hoverNode(node)}
+                  on:mouseout={() => unhoverNode()}
+                  on:blur={() => unhoverNode()} />
               </g>
             {/each}
           </g>
@@ -135,6 +194,10 @@
     text-rendering: optimizeSpeed;
     shape-rendering: geometricPrecision;
   }
+  .decision-tree-viewer text {
+    font-family: Lato;
+  }
+
   .decision-tree-viewer .links path.link {
     fill: none;
     stroke: #aaa;
@@ -144,6 +207,10 @@
     stroke: black;
     stroke-width: 2;
   }
+  .decision-tree-viewer .links path.link.focus {
+    stroke: orange;
+  }
+
   .decision-tree-viewer .nodes .internal-node circle.node {
     fill: white;
     stroke: #aaa;
@@ -152,9 +219,11 @@
   .decision-tree-viewer .nodes .internal-node.interesting circle.node {
     stroke: black;
     fill: black;
+    cursor: pointer;
   }
-  .decision-tree-viewer text {
-    font-family: Lato;
+  .decision-tree-viewer .nodes .internal-node.focus circle.node {
+    fill: orange;
+    stroke: none;
   }
   .decision-tree-viewer .nodes .internal-node text.label {
     text-anchor: middle;
@@ -169,5 +238,9 @@
   }
   .decision-tree-viewer .nodes .leaf-node.interesting rect.value {
     fill: black;
+  }
+  .decision-tree-viewer .nodes .leaf-node.focus rect.value {
+    fill: orange;
+    stroke: none;
   }
 </style>
