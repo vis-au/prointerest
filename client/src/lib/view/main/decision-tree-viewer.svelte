@@ -72,6 +72,7 @@
 
   let hoveredNode: HierarchyPointNode<DecisionTree> = null;
   let hoveredPath: DecisionTree[] = [];
+  let hoveredInterest: number = null
 
   $: {
     let focusNode = hoveredNode;
@@ -87,10 +88,12 @@
   }
   function hoverNode(node: HierarchyPointNode<DecisionTree>) {
     hoveredNode = node
+    hoveredInterest = node.data.type === "leaf" ? node.data.value[0] : null;
   }
 
   function unhoverNode() {
     hoveredNode = null;
+    hoveredInterest = null;
   }
 
   function focusNode(node: HierarchyPointNode<DecisionTree>) {
@@ -144,7 +147,8 @@
                   class="node {hoveredNode === node ? "hover" : ""}"
                   r={INTERNAL_NODE_SIZE}
                   on:click={() => focusNode(node)}
-                  on:mouseenter={() => hoverNode(node)}
+                  on:mouseover={() => hoverNode(node)}
+                  on:focus={() => hoverNode(node)}
                   on:mouseout={() => unhoverNode()}
                   on:blur={() => unhoverNode()}
                 />
@@ -166,26 +170,30 @@
           <g class="leaf-nodes">
             {#each leafNodes as node}
               <g class="leaf-node
-              {isNodeInteresting(node.data) ? "interesting" : ""}
-              {isNodeFocused(node) ? "focus" : ""}
-            "
-                transform="translate({node.x - LEAF_NODE_WIDTH/2},{node.y})">
+                  {isNodeInteresting(node.data) ? "interesting" : ""}
+                  {isNodeFocused(node) ? "focus" : ""}
+                "
+                transform="translate({node.x - LEAF_NODE_WIDTH/2},{node.y})"
+                on:click={() => focusNode(node)}
+                on:mouseenter={() => hoverNode(node)}
+                on:mouseout={() => unhoverNode()}
+                on:blur={() => unhoverNode()}>
+
                 <rect class="background"
                   width={LEAF_NODE_WIDTH}
                   height={scaleLeafSize.range()[1]} />
                 <rect class="value"
                   width={LEAF_NODE_WIDTH}
-                  height={scaleLeafSize(node.data.value[0])}
-                  on:click={() => focusNode(node)}
-                  on:mouseenter={() => hoverNode(node)}
-                  on:mouseout={() => unhoverNode()}
-                  on:blur={() => unhoverNode()} />
+                  height={scaleLeafSize(node.data.value[0])} />
               </g>
             {/each}
           </g>
         </g>
       </g>
     </svg>
+  {/if}
+  {#if hoveredInterest !== null}
+    <span>{hoveredInterest}</span>
   {/if}
 </div>
 

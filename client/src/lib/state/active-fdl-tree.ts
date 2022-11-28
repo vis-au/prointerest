@@ -43,7 +43,6 @@ function createTreeFromDimensions(dimensions: DOIDimension[]) {
 
       (currentNode.right as LeafNode).value = [accumulatedInterest];
 
-      console.log(accumulatedInterest, currentDoiWeights)
       accumulatedInterest += currentDoiWeights.get(dimension);
 
       currentNode.left = createEmptyInternalNode(accumulatedInterest) as InternalNode;
