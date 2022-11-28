@@ -68,7 +68,7 @@
           data={tabularData}
           dimension={dim}
           domain={extents[dim]}
-          selectedValues={$interestingIntervals[dim]}
+          selectedInterval={$interestingIntervals[dim]}
           bins={100}
           width={550}
           height={50}

@@ -6,7 +6,8 @@
   import Row from "$lib/widgets/row.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
   import Options from "$lib/widgets/options.svelte";
-    import ProgressionControls from "./progression-controls.svelte";
+  import ProgressionControls from "./progression-controls.svelte";
+  import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
 
   export let height: number;
 
@@ -34,15 +35,16 @@
   </div>
   <Row>
     <Row id="doi-configuration" style="align-items:center;height:{height * 0.8}px;flex-grow: 5">
-      <h2>Configure DOI:</h2>
+      <h2>DOI features:</h2>
       <WeightedValues
         id="selected-doi-dimensions"
         totalSize={maxWidth}
         weightsRemovable={true}
         useDarkmode={true}
         backgroundColor="#008080"
-        isSelectable={false}
+        isSelectable={true}
         bind:valueWeights={selectedDimensionWeights}
+        bind:activeWeight={$selectedDoiWeight}
         on:remove-weight={removeDimension}
         on:end={() => sendDimenionWeights($doiDimensionWeights)}
       />

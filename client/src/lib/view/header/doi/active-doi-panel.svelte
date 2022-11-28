@@ -5,6 +5,7 @@
   import Provenance from "./posterior/provenance.svelte";
   import Scagnostics from "./posterior/scagnostics.svelte";
   import ViewOverlay from "$lib/widgets/view-overlay.svelte";
+  import DoiDimension from "./doi-dimension-config.svelte";
 
   export let x: number;
   export let y: number;
@@ -25,5 +26,7 @@
     <Scagnostics />
   {:else if $selectedDoiWeight === "provenance"}
     <Provenance />
+  {:else}
+    <DoiDimension />
   {/if}
 </ViewOverlay>
