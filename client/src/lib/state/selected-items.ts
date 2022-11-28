@@ -24,7 +24,7 @@ let y: ScaleLinear<number, number> = null;
 
 let currentQuadtree: Quadtree<DataItem> = null;
 
-quadtree.subscribe(newTree => {
+quadtree?.subscribe(newTree => {
   currentQuadtree = newTree;
 });
 
@@ -88,7 +88,7 @@ scaleY.subscribe((scale) => {
   updateSelectedItems();
 });
 
-quadtree.subscribe(() => {
+quadtree?.subscribe(() => {
   updateSelectedItems();
 });
 

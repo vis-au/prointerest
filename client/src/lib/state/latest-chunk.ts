@@ -16,11 +16,11 @@ export const latestItems = writable([] as DataItem[]);
 
 // transforms raw data into items, thereby also updating its position.
 function updateLatestItems() {
-  if (!latestItems || !currentLatestChunk) {
+  if (!latestItems || !currentLatestChunk || !arrayToDataItem) {
     return;
   }
 
-  latestItems?.set(currentLatestChunk?.map(arrayToDataItem));
+  latestItems.set(currentLatestChunk.map(arrayToDataItem));
 }
 
 // whenever the raw data changes, so should the items
@@ -40,7 +40,7 @@ export const latestInterestingItems = derived([doiLimit, latestItems, doiValues]
 });
 
 // if the data is cleared/reset, so should be the latest chunk
-processedData.subscribe(newData => {
+processedData?.subscribe(newData => {
   if (newData.length === 0) {
     latestChunk.set([]);
   }

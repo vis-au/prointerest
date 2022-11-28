@@ -12,8 +12,8 @@ let x: ScaleLinear<number, number>;
 let y: ScaleLinear<number, number>;
 
 // this is async to avoid error when loading page caused by access to lexical declaration of quadtr.
-setTimeout(() => quadtree.subscribe((newQuadtree) => (currentQuadtree = newQuadtree)), 0);
-sampledQuadtree.subscribe((t) => (currentSampledQuadtree = t));
+setTimeout(() => quadtree?.subscribe((newQuadtree) => (currentQuadtree = newQuadtree)), 0);
+sampledQuadtree?.subscribe((t) => (currentSampledQuadtree = t));
 scaleX.subscribe((s) => (x = s));
 scaleY.subscribe((s) => (y = s));
 

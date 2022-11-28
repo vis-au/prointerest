@@ -119,7 +119,9 @@
         on:click={() => isSelectable ? selectWeight(entry[0]): null}
       />
       {#if weightsRemovable}
-        <button class="remove" on:click={() => onWeightRemoved(entry[0])}>x</button>
+        <button class="remove" on:click={() => onWeightRemoved(entry[0])}>
+          <div style="transform:rotate(45deg)">+</div>
+        </button>
       {/if}
     </div>
 

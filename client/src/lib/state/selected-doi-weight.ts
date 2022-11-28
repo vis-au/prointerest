@@ -1,6 +1,4 @@
-import type { DoiEntry } from "$lib/types/doi-weights";
 import { writable } from "svelte/store";
+import type { DOIDimension } from "$lib/types/doi-dimension";
 
-export const selectedDoiWeight = writable(null as DoiEntry);
-
-export const selectedDoiComponent = writable(null as "prior" | "posterior");
+export const selectedDoiWeight = writable(null as DOIDimension);

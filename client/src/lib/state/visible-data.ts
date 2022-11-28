@@ -24,7 +24,7 @@ export const interestingData = derived([visibleData, doiValues, doiLimit], ([$vi
 // TODO: if this function is run synchronously, the application crashes on load, due to an error
 // with accessing "quadtree" before its declaration.
 setTimeout(() => {
-  quadtree.subscribe((newTree) => {
+  quadtree?.subscribe((newTree) => {
     const currentVisibleData = getPointsInRect(vp.minX, vp.minY, vp.maxX, vp.maxY, newTree);
     visibleData.set(currentVisibleData);
   });
