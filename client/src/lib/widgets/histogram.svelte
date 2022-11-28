@@ -10,15 +10,15 @@
   export let data: Record<string, unknown>[];
   export let dimension: string;
   export let domain: [number, number] = null;
-  export let selectedValues: [number, number] = null;
+  export let selectedInterval: [number, number] = null;
+  export let usePresetInterval = true;
   export let groupDimension: string = null;
   export let showTitle = false;
 
   const dispatch = createEventDispatcher();
-  let usePresetSelection = true;
 
   function onBrush(event) {
-    usePresetSelection = false;
+    usePresetInterval = false;
     dispatch("interval", event.detail.value);
   }
 
@@ -87,13 +87,13 @@
 
   $: if (!showTitle) {
     histogram.layer[0].encoding.x["title"] = false;
-  }
+  };
   $: if (domain !== null) {
     histogram.layer.forEach((l) => (l.encoding.x["scale"] = { domain }));
-  }
-  $: if (usePresetSelection && selectedValues !== null) {
-    histogram.layer[0].params[0]["value"] = { x: selectedValues };
-  }
+  };
+  $: if (usePresetInterval && selectedInterval !== null) {
+    histogram.layer[0].params[0]["value"] = { x: selectedInterval };
+  };
 </script>
 
 <VegaLitePlot {id} spec={histogram} on:brush={onBrush} on:end={onEnd} />
