@@ -48,7 +48,7 @@
   // turn decision tree in to d3 hierarchy format
   $: root = hierarchy(decisionTree, d => d?.type === "internal" ? [d.left, d.right] : null);
   $: root.sum(node => {
-    return node.type === "leaf" ? node.value[0] : 0;
+    return node?.type === "leaf" ? node.value[0] : 0;
   });
 
   // maps interest to the size of leaf nodes
