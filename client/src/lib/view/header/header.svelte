@@ -14,12 +14,15 @@
   const maxWidth = 700;
   let selectedDimensionWeights = new Map<DOIDimension, number>();
 
-  $: selectedDimensionWeights.forEach((value, key) => $doiDimensionWeights.set(key, value));
+  $: {
+    selectedDimensionWeights.forEach((value, key) => $doiDimensionWeights.set(key, value));
+    $doiDimensionWeights = $doiDimensionWeights;
+  }
   $: $selectedDoiDimensions = $dimensions.filter((d) => $isDimensionInteresting[d]);
 
-  selectedDoiDimensions.subscribe((newDimension) => {
+  selectedDoiDimensions.subscribe((newSelection) => {
     selectedDimensionWeights = new Map();
-    newDimension.forEach((dimension) => {
+    newSelection.forEach((dimension) => {
       selectedDimensionWeights.set(dimension, $doiDimensionWeights.get(dimension));
     });
   });
