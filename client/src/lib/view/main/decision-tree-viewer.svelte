@@ -24,6 +24,7 @@
   const INTERNAL_NODE_SIZE = 5;
   const MAX_LEAF_NODE_HEIGHT = 40;
   const LEAF_NODE_WIDTH = 6;
+  const MAX_PATH_WIDTH = 2;
   const FONT_SIZE = 12;
 
   const MARGIN = {
@@ -32,9 +33,6 @@
     bottom: MAX_LEAF_NODE_HEIGHT / 2 + FONT_SIZE,
     left: 10
   };
-
-  // maps interest to the size of leaf nodes
-  const scaleLeafSize = scaleLinear([0, 1], [0, MAX_LEAF_NODE_HEIGHT]);
 
   // path generator function
   const path = linkVertical<HierarchyPointLink<DecisionTree>, HierarchyPointLink<DecisionTree>>()
@@ -49,9 +47,19 @@
 
   // turn decision tree in to d3 hierarchy format
   $: root = hierarchy(decisionTree, d => d?.type === "internal" ? [d.left, d.right] : null);
+  $: root.sum(node => {
+    return node.type === "leaf" ? node.value[0] : 0;
+  });
+
+  // maps interest to the size of leaf nodes
+  const scaleLeafSize = scaleLinear([0, 1], [0, MAX_LEAF_NODE_HEIGHT]);
+
+  // maps interest to the width of links
+  const scaleLinkSize = scaleLinear([0, root?.value || 1], [1, MAX_PATH_WIDTH]);
 
   // compute the tree layout
   $: treeData = root ? tree(root) : null;
+
 
   $: links = treeData?.links();
 
@@ -119,6 +127,7 @@
                 {isNodeInteresting(link["target"]["data"]) ? "interesting" : ""}
                 {isLinkFocused(link) ? "focus" : ""}
               "
+              stroke-width={scaleLinkSize(link["target"].value)}
               d={path(link)}
             />
           {/each}
@@ -204,11 +213,9 @@
   .decision-tree-viewer .links path.link {
     fill: none;
     stroke: #aaa;
-    stroke-width: 1;
   }
   .decision-tree-viewer .links path.link.interesting {
     stroke: black;
-    stroke-width: 2;
   }
   .decision-tree-viewer .links path.link.focus {
     stroke: orange;
@@ -239,6 +246,9 @@
     fill: white;
     stroke: #aaa;
     stroke-width: 1;
+  }
+  .decision-tree-viewer .nodes .leaf-node.focus rect.background {
+    stroke: orange;
   }
   .decision-tree-viewer .nodes .leaf-node rect.value {
     fill: #aaa;

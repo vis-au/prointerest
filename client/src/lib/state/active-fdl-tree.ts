@@ -55,7 +55,7 @@ function createTreeFromDimensions(dimensions: DOIDimension[]) {
         currentNode.left.right = createEmptyInternalNode(accumulatedInterest);
         currentNode = currentNode.left.right;
       } else {
-        (currentNode.left.left as LeafNode).value = [0];
+        (currentNode.left.left as LeafNode).value = (currentNode.right as LeafNode).value;
       }
     });
 
