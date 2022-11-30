@@ -1,17 +1,15 @@
 <script lang="ts">
   import { isDimensionInteresting, interestingIntervals } from "$lib/state/interesting-dimensions";
   import { dimensions } from "$lib/state/processed-data";
-  import { randomlySampledItems } from "$lib/state/randomly-sampled-items";
-  import { dataItemToRecord } from "$lib/util/item-transform";
+  import { randomDataSubset } from "$lib/state/sampled-data";
   import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
   import { getDimensionExtent, sendInterestingDimensionRange } from "$lib/util/requests";
   import Column from "$lib/widgets/column.svelte";
-  import Histogram from "$lib/widgets/histogram.svelte";
+  import DoiItemHistogram from "$lib/view/main/doi-item-histogram.svelte";
   import Row from "$lib/widgets/row.svelte";
   import { afterUpdate } from "svelte";
   import { truncateFloat } from "$lib/util/number-transform";
 
-  let tabularData = $randomlySampledItems.map(dataItemToRecord);
   let selectedInterval: [number, number] = null;
 
   const extents = new Map<string, [number, number]>();
@@ -63,9 +61,9 @@
       </Row>
 
       {#if $isDimensionInteresting[dim]}
-        <Histogram
+        <DoiItemHistogram
           id="all-data-dim-{i}"
-          data={tabularData}
+          data={$randomDataSubset}
           dimension={dim}
           domain={extents[dim]}
           selectedInterval={$interestingIntervals[dim]}

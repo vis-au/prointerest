@@ -3,18 +3,15 @@
   import { interestingIntervals, selectedDoiDimensions } from "$lib/state/interesting-dimensions";
   import { randomDataSubset } from "$lib/state/sampled-data";
   import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
-  import { dataItemToRecord } from "$lib/util/item-transform";
-  import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
-  import Histogram from "$lib/widgets/histogram.svelte";
-  import Row from "$lib/widgets/row.svelte";
   import { truncateFloat } from "$lib/util/number-transform";
   import { getDimensionExtent, sendInterestingDimensionRange } from "$lib/util/requests";
   import type { DOIDimension } from "$lib/types/doi-dimension";
+  import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
+  import DoiItemHistogram from "$lib/view/main/doi-item-histogram.svelte";
+  import Row from "$lib/widgets/row.svelte";
 
   let selectedInterval: [number, number] = null;
   let usePresetInterval = false;
-
-  $: tabularData = $randomDataSubset.map(dataItemToRecord);
 
   const extents = new Map<string, [number, number]>();
 
@@ -63,9 +60,9 @@
     {/if}
   </Row>
 
-  <Histogram
+  <DoiItemHistogram
     id="all-data-dim-{$selectedDoiWeight}"
-    data={tabularData}
+    data={$randomDataSubset}
     dimension={$selectedDoiWeight}
     domain={extents[$selectedDoiWeight]}
     selectedInterval={$interestingIntervals[$selectedDoiWeight]}
