@@ -2,7 +2,7 @@ import type DataItem from "$lib/types/data-item";
 import type { Hexbin, HexbinBin } from "d3-hexbin";
 import { writable } from "svelte/store";
 import { hexbinning } from "./hexbinning";
-import { interestingData } from "./visible-data";
+import { visibleInterestingData } from "./visible-data";
 
 export const bins = writable([] as HexbinBin<DataItem>[]);
 
@@ -18,7 +18,7 @@ hexbinning.subscribe((h) => {
   updateBins();
 });
 
-interestingData.subscribe((data) => {
+visibleInterestingData.subscribe((data) => {
   currentlyVisibleData = data;
   updateBins();
 });

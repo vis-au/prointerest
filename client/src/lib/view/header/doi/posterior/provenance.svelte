@@ -10,7 +10,7 @@
   import Histogram from "$lib/widgets/histogram.svelte";
   import List from "$lib/widgets/list.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
-  import { randomDataSubset } from "$lib/state/sampled-data";
+  import { randomDataSample } from "$lib/state/sampled-data";
   import { interactionLog } from "$lib/provenance/interaction-log";
   import { sendProvenanceConfig, sendProvenanceWeights } from "$lib/util/requests";
   import { interactionWeights } from "$lib/state/active-doi-weights";
@@ -26,7 +26,7 @@
     .reverse();
 
   $: percentage =
-    Math.floor(($exploredItems.length / $randomDataSubset.length) * 10000) / 100;
+    Math.floor(($exploredItems.length / $randomDataSample.length) * 10000) / 100;
 
   function exploredItemsToRecord(items: Map<DataItem, number>): Record<"interest", number>[] {
     return Array.from(items.values()).map((value) => {

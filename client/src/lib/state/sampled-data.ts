@@ -5,7 +5,6 @@ import { sample } from "../util/sample";
 import { quadtree } from "./quadtree";
 
 const STEPS_BETWEEN_RESAMPLING = 10;
-const SAMPLE_SIZE = 50000;
 
 let iteration = 0;
 let sampleProbability = 1;
@@ -13,8 +12,12 @@ let sampleProbability = 1;
 let currentQuadtree: Quadtree<DataItem> = null;
 let currentProcessedItems: DataItem[] = [];
 
-let randomSample: DataItem[] = [];
-export const randomDataSubset = writable(randomSample);
+let currentSampleSize = 50000;
+export const sampleSize = writable(currentSampleSize);
+sampleSize.subscribe(newSize => currentSampleSize = newSize);
+
+let currentRandomSample: DataItem[] = [];
+export const randomDataSample = writable(currentRandomSample);
 
 
 quadtree?.subscribe((newTree) => {
@@ -23,10 +26,10 @@ quadtree?.subscribe((newTree) => {
   if (iteration % STEPS_BETWEEN_RESAMPLING === 0 || currentQuadtree !== newTree) {
     currentProcessedItems = newTree.data();
     currentQuadtree = newTree;
-    sampleProbability = SAMPLE_SIZE / currentProcessedItems.length;
+    sampleProbability = currentSampleSize / currentProcessedItems.length;
 
-    randomSample = currentProcessedItems.filter(() => sample(sampleProbability));
-    randomDataSubset.set(randomSample);
+    currentRandomSample = currentProcessedItems.filter(() => sample(sampleProbability));
+    randomDataSample.set(currentRandomSample);
   }
 
   // this function is called numerous times before any data has actually been loaded, so make sure

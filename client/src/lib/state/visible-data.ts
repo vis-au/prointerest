@@ -15,17 +15,13 @@ export const viewPort = writable(vp);
 
 export const visibleData = writable([] as DataItem[]);
 
-export const interestingData = derived([visibleData, doiValues, doiLimit], ([$visibleData, $doiValues, $doiLimit]) => {
-  return $visibleData.filter((item) => {
-    return $doiValues.get(item.id) > $doiLimit;
-  });
+quadtree?.subscribe((newTree) => {
+  const currentVisibleData = getPointsInRect(vp.minX, vp.minY, vp.maxX, vp.maxY, newTree);
+  visibleData.set(currentVisibleData);
 });
 
-// TODO: if this function is run synchronously, the application crashes on load, due to an error
-// with accessing "quadtree" before its declaration.
-setTimeout(() => {
-  quadtree?.subscribe((newTree) => {
-    const currentVisibleData = getPointsInRect(vp.minX, vp.minY, vp.maxX, vp.maxY, newTree);
-    visibleData.set(currentVisibleData);
+export const visibleInterestingData = derived([visibleData, doiValues, doiLimit], ([$visibleData, $doiValues, $doiLimit]) => {
+  return $visibleData.filter((item) => {
+    return $doiValues.get(item.id) >= $doiLimit;
   });
-}, 0);
+});

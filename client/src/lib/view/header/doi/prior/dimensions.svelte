@@ -1,7 +1,7 @@
 <script lang="ts">
   import { isDimensionInteresting, interestingIntervals } from "$lib/state/interesting-dimensions";
   import { dimensions } from "$lib/state/processed-data";
-  import { randomDataSubset } from "$lib/state/sampled-data";
+  import { randomDataSample } from "$lib/state/sampled-data";
   import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
   import { getDimensionExtent, sendInterestingDimensionRange } from "$lib/util/requests";
   import Column from "$lib/widgets/column.svelte";
@@ -63,7 +63,7 @@
       {#if $isDimensionInteresting[dim]}
         <DoiItemHistogram
           id="all-data-dim-{i}"
-          data={$randomDataSubset}
+          data={$randomDataSample}
           dimension={dim}
           domain={extents[dim]}
           selectedInterval={$interestingIntervals[dim]}

@@ -5,7 +5,6 @@
   import { selectedDoiDimensions } from "$lib/state/interesting-dimensions";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
-  import { randomDataSubset } from "$lib/state/sampled-data";
   import { quadtree } from "$lib/state/quadtree";
   import { secondaryBrushedItems } from "$lib/state/secondary-brushed-items";
   import { selectedItems } from "$lib/state/selected-items";
@@ -26,7 +25,7 @@
   let histogramMode: "selected" | "all" = "all";
   let showDoiValues = true;
 
-  $: items = histogramMode === "all" ? $randomDataSubset : $selectedItems;
+  $: items = histogramMode === "all" ? $quadtree.data() : $selectedItems;
   $: data = items.map(dataItemToRecord);
 
   function onBrush(event: CustomEvent) {

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { afterUpdate } from "svelte";
   import { interestingIntervals, selectedDoiDimensions } from "$lib/state/interesting-dimensions";
-  import { randomDataSubset } from "$lib/state/sampled-data";
-  import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
+  import { randomDataSample } from "$lib/state/sampled-data";
+  import {selectedDoiWeight } from "$lib/state/selected-doi-weight";
   import { truncateFloat } from "$lib/util/number-transform";
   import { getDimensionExtent, sendInterestingDimensionRange } from "$lib/util/requests";
   import type { DOIDimension } from "$lib/types/doi-dimension";
@@ -62,7 +62,7 @@
 
   <DoiItemHistogram
     id="all-data-dim-{$selectedDoiWeight}"
-    data={$randomDataSubset}
+    data={$randomDataSample}
     dimension={$selectedDoiWeight}
     domain={extents[$selectedDoiWeight]}
     selectedInterval={$interestingIntervals[$selectedDoiWeight]}
