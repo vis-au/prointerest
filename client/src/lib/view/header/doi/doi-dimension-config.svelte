@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterUpdate } from "svelte";
   import { interestingIntervals, selectedDoiDimensions } from "$lib/state/interesting-dimensions";
-  import { randomlySampledItems } from "$lib/state/randomly-sampled-items";
+  import { randomDataSubset } from "$lib/state/sampled-data";
   import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
   import { dataItemToRecord } from "$lib/util/item-transform";
   import DoiConfig from "$lib/view/header/doi/doi-panel.svelte";
@@ -14,10 +14,9 @@
   let selectedInterval: [number, number] = null;
   let usePresetInterval = false;
 
-  $: tabularData = $randomlySampledItems.map(dataItemToRecord);
+  $: tabularData = $randomDataSubset.map(dataItemToRecord);
 
   const extents = new Map<string, [number, number]>();
-
 
   function setInterestingInterval(dimension: string, interval: [number, number]) {
     if (interval === undefined) {
@@ -25,7 +24,6 @@
     } else {
       $interestingIntervals[dimension] = interval;
     }
-
     sendInterestingDimensionRange(dimension, interval);
   }
 
@@ -48,7 +46,8 @@
   });
 </script>
 
-<DoiConfig on:close
+<DoiConfig
+  on:close
   title="Select interesting range"
   message="Items with values in that range along this dimension get a higher degree of interest."
 >
@@ -73,7 +72,7 @@
     bins={100}
     width={750}
     height={100}
-    bind:usePresetInterval={usePresetInterval}
+    bind:usePresetInterval
     on:interval={(event) => (selectedInterval = event.detail[$selectedDoiWeight])}
     on:end={() => setInterestingInterval($selectedDoiWeight, selectedInterval)}
   />
