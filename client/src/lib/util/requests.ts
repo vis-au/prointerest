@@ -9,7 +9,7 @@ import { scagnostics, type Scagnostic } from "$lib/types/scagnostics";
 import type { SteeringFilter } from "$lib/types/steering-filters";
 import { dataItemToList } from "./item-transform";
 import { mapToRecord } from "./map-to-record";
-import { sample } from "./sample-list";
+import { sample } from "./sample";
 
 const BASE_URL = "http://127.0.0.1:5000";
 

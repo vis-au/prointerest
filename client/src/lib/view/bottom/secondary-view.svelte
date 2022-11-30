@@ -5,7 +5,7 @@
   import { selectedDoiDimensions } from "$lib/state/interesting-dimensions";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
-  import { randomlySampledBinItems } from "$lib/state/randomly-sampled-items";
+  import { randomlySampledBinItems } from "$lib/state/sampled-data";
   import { quadtree } from "$lib/state/quadtree";
   import { secondaryBrushedItems } from "$lib/state/secondary-brushed-items";
   import { selectedItems } from "$lib/state/selected-items";

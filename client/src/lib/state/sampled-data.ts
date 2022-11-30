@@ -1,16 +1,14 @@
 import type { Quadtree } from "d3-quadtree";
 import { derived, writable } from "svelte/store";
 import type DataItem from "$lib/types/data-item";
-import { sample } from "../util/sample-list";
+import { sample } from "../util/sample";
 import { quadtree } from "./quadtree";
 import { bins } from "./bins";
 
-const iterationsBetweenUpdates = 10;
+const STEPS_BETWEEN_RESAMPLING = 10;
 
-const currentSmallSampleSize = 1000;
-let currentLargeSampleSize = 50000;
-export const sampleSize = writable(currentLargeSampleSize);
-sampleSize.subscribe((s) => (currentLargeSampleSize = s));
+const SMALL_SAMPLE_SIZE = 1000;
+const LARGE_SAMPLE_SIZE = 50000;
 
 let iteration = 0;
 let smallSampleProbabilty = 1;
@@ -20,14 +18,14 @@ let currentQuadtree: Quadtree<DataItem> = null;
 let currentProcessedItems: DataItem[] = [];
 
 let largeRandomSample: DataItem[] = [];
-export const randomlySampledItems = writable(largeRandomSample);
+export const randomDataSubset = writable(largeRandomSample);
 
 let smallRandomSample: DataItem[] = [];
-export const lessRandomlySampledItems = writable(smallRandomSample);
+export const smallRandomDataSubset = writable(smallRandomSample);
 
 // additional set of items that ensure that every bin in the view is at least represented once.
-export const randomlySampledBinItems = derived(bins, (newBins) => {
-  return newBins
+export const randomlySampledBinItems = derived(bins, ($bins) => {
+  return $bins
     .map((bin) => {
       const probability = bin.length === 1 ? 2 : smallSampleProbabilty;
       return bin.filter(() => sample(probability));
@@ -35,25 +33,25 @@ export const randomlySampledBinItems = derived(bins, (newBins) => {
     .flat();
 });
 
-// put into timeout to prevent page from crashing when quadtree is still undefined
-// window?.setTimeout(() => {
 quadtree?.subscribe((newTree) => {
-  // check if quadtree has changed (for exaxmple when opening the secondary view panel)
-  if (iteration % iterationsBetweenUpdates === 0 || currentQuadtree !== newTree) {
+  // check if actual data in the quadtree has changed or whether items were just repositioned.
+  // (for exaxmple when opening the secondary view panel).
+  if (iteration % STEPS_BETWEEN_RESAMPLING === 0 || currentQuadtree !== newTree) {
     currentProcessedItems = newTree.data();
     currentQuadtree = newTree;
-    smallSampleProbabilty = currentSmallSampleSize / currentProcessedItems.length;
-    largeSampleProbability = currentLargeSampleSize / currentProcessedItems.length;
+    smallSampleProbabilty = SMALL_SAMPLE_SIZE / currentProcessedItems.length;
+    largeSampleProbability = LARGE_SAMPLE_SIZE / currentProcessedItems.length;
 
     smallRandomSample = currentProcessedItems.filter(() => sample(smallSampleProbabilty));
     largeRandomSample = currentProcessedItems.filter(() => sample(largeSampleProbability));
 
-    lessRandomlySampledItems.set(smallRandomSample);
-    randomlySampledItems.set(largeRandomSample);
+    smallRandomDataSubset.set(smallRandomSample);
+    randomDataSubset.set(largeRandomSample);
   }
 
+  // this function is called numerous times before any data has actually been loaded, so make sure
+  // to adjust the iteration counter only when necessary.
   if (currentProcessedItems.length > 0) {
     iteration += 1;
   }
 });
-// });

@@ -3,17 +3,14 @@ import type { Quadtree, QuadtreeLeaf } from "d3-quadtree";
 import { quadtree } from "$lib/state/quadtree";
 import type { ScaleLinear } from "d3-scale";
 import { scaleX, scaleY } from "$lib/state/scales";
-import { sampledQuadtree } from "$lib/state/sampled-quadtree";
 import { polygonContains } from "d3-polygon";
 
 let currentQuadtree: Quadtree<DataItem>;
-let currentSampledQuadtree: Quadtree<DataItem>;
 let x: ScaleLinear<number, number>;
 let y: ScaleLinear<number, number>;
 
 // this is async to avoid error when loading page caused by access to lexical declaration of quadtr.
 setTimeout(() => quadtree?.subscribe((newQuadtree) => (currentQuadtree = newQuadtree)), 0);
-sampledQuadtree?.subscribe((t) => (currentSampledQuadtree = t));
 scaleX.subscribe((s) => (x = s));
 scaleY.subscribe((s) => (y = s));
 
@@ -102,9 +99,4 @@ export function getUntransformedPointsInRect(
   tree = currentQuadtree
 ): DataItem[] {
   return getPointsInRect(x(x0), y(y0), x(x3), y(y3), tree);
-}
-
-// uses SCALED, BUT UNTRANSFORMED screen positions
-export function getSampledPointsInRect(x0: number, y0: number, x3: number, y3: number): DataItem[] {
-  return getPointsInRect(x0, y0, x3, y3, currentSampledQuadtree);
 }
