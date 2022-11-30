@@ -4,20 +4,19 @@
   import { hexbinning } from "$lib/state/hexbinning";
   import { hoveredBin } from "$lib/state/hovered-bin";
   import { selectedBins } from "$lib/state/selected-bins";
-  import { secondaryBrushedItems } from "$lib/state/secondary-brushed-items";
+  import { selectionInSecondaryView } from "$lib/state/secondary-brushed-items";
 
   export let id: string;
   export let width: number;
   export let height: number;
 
   const lineWidth = 4;
-  const primarySelectionColor = "rgba(255,69,0,.7)";
-  const secondarySelectionColor = "rgba(255,165,0,.7)";
+  const color = "rgba(255,165,0,.7)";
+  const hoverColor = "rgba(255,65,0,.7)";
 
   let primarySelectionCanvas: HTMLCanvasElement;
-  let secondarySelectionCanvas: HTMLCanvasElement;
 
-  $: secondarySelectionBins = $hexbinning($secondaryBrushedItems);
+  $: binsWithSelectedItems = $hexbinning($selectionInSecondaryView);
 
   function renderHoveredBin(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
     if (!$hoveredBin) {
@@ -29,7 +28,7 @@
 
     ctx.beginPath();
     ctx.translate(x, y);
-    ctx.strokeStyle = primarySelectionColor;
+    ctx.strokeStyle = hoverColor;
     ctx.fillStyle = "rgba(0, 0, 0, 0.0)";
     ctx.lineWidth = lineWidth * 0.5;
     ctx.setLineDash([2]);
@@ -40,9 +39,9 @@
     ctx.setLineDash([]);
   }
 
-  function renderPrimarySelectedBins(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
+  function renderClickSelection(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
     ctx.beginPath();
-    ctx.strokeStyle = primarySelectionColor;
+    ctx.strokeStyle = color;
     ctx.fillStyle = "rgba(0, 0, 0, 0.0)";
     ctx.lineWidth = lineWidth;
     $selectedBins.forEach((bin) => {
@@ -54,12 +53,12 @@
     ctx.closePath();
   }
 
-  function renderSecondarySelectedBins(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
+  function renderSecondaryViewSelection(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
     ctx.beginPath();
-    ctx.strokeStyle = secondarySelectionColor;
+    ctx.strokeStyle = color;
     ctx.fillStyle = "rgba(0, 0, 0, 0.0)";
     ctx.lineWidth = lineWidth;
-    secondarySelectionBins.forEach((bin) => {
+    binsWithSelectedItems.forEach((bin) => {
       ctx.translate(bin.x, bin.y);
       ctx.stroke(hexagonPath);
       ctx.fill(hexagonPath);
@@ -78,10 +77,9 @@
     ctx.clearRect(0, 0, width, height);
 
     // make sure clicked bin is always visible, so render secondary selection first
-    renderSecondarySelectedBins(ctx, hexagonPath);
-
+    renderSecondaryViewSelection(ctx, hexagonPath);
+    renderClickSelection(ctx, hexagonPath);
     renderHoveredBin(ctx, hexagonPath);
-    renderPrimarySelectedBins(ctx, hexagonPath);
   }
 
   afterUpdate(render);
@@ -94,12 +92,5 @@
     {width}
     {height}
     bind:this={primarySelectionCanvas}
-  />
-  <canvas
-    id="{id}-selection-canvas"
-    class="selection-secondary interaction-canvas"
-    {width}
-    {height}
-    bind:this={secondarySelectionCanvas}
   />
 </div>

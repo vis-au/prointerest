@@ -6,7 +6,7 @@
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
   import { quadtree } from "$lib/state/quadtree";
-  import { secondaryBrushedItems } from "$lib/state/secondary-brushed-items";
+  import { selectionInSecondaryView } from "$lib/state/secondary-brushed-items";
   import { selectedItems } from "$lib/state/selected-items";
   import type DataItem from "$lib/types/data-item";
   import { dataItemToRecord } from "$lib/util/item-transform";
@@ -16,6 +16,7 @@
   import ControlButton from "$lib/widgets/control-button.svelte";
   import Row from "$lib/widgets/row.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
+  import { visibleInterestingData } from "$lib/state/visible-data";
 
   export let width: number;
   export let height: number;
@@ -25,7 +26,7 @@
   let histogramMode: "selected" | "all" = "all";
   let showDoiValues = true;
 
-  $: items = histogramMode === "all" ? $quadtree.data() : $selectedItems;
+  $: items = histogramMode === "all" ? $visibleInterestingData : $selectedItems;
   $: data = items.map(dataItemToRecord);
 
   function onBrush(event: CustomEvent) {
@@ -36,7 +37,7 @@
     const dims = Object.keys(selections);
 
     if (dims.length === 0) {
-      $secondaryBrushedItems = [];
+      $selectionInSecondaryView = [];
       return;
     }
 
@@ -51,14 +52,10 @@
 
     const recent = $interactionLog.getNRecentSteps(1)[0] as HistogramBrushInteraction;
 
-    if (recent.dimension === "doi" || recent.dimension === "label") {
-      const dim = recent.dimension;
-      $secondaryBrushedItems = data
+    const dim = recent.dimension;
+      $selectionInSecondaryView = data
         .filter((item) => item[dim] >= recent.extent[0] && item[dim] <= recent.extent[1])
         .map((item) => item["__item__"] as DataItem);
-    } else {
-      $secondaryBrushedItems = recent.getAffectedItems();
-    }
   }
 </script>
 
