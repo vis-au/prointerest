@@ -11,12 +11,14 @@ import { selectedBins } from "./selected-bins";
 import { scaleX, scaleY } from "./scales";
 import type { BrushMode } from "$lib/types/brush-mode";
 import { scatterplotBrush } from "./active-scatterplot-brush";
+import { visibleItemsSelectedInDT } from "./selection-in-dt";
 
 let currentlySelected: DataItem[] = [];
 export const selectedItems = writable(currentlySelected);
 
 let currentScatterplotBrush: BrushMode = null;
 let currentSelectedBins: HexbinBin<DataItem>[] = [];
+let currentSelectedInDT: DataItem[] = [];
 let currentBrush: [[number, number], [number, number]] = null;
 let currentLasso: [number, number][] = null;
 let x: ScaleLinear<number, number> = null;
@@ -68,7 +70,7 @@ function getSelectedItems() {
   const brushedItems = getBrushedItems();
   const itemsInBins = getItemsInSelectedBins();
 
-  const selected = brushedItems.concat(itemsInBins);
+  const selected = brushedItems.concat(itemsInBins).concat(currentSelectedInDT);
   selected.forEach((d) => (d.selected = true));
   return selected;
 }
@@ -113,5 +115,10 @@ selectedBins.subscribe((newBins) => {
     return;
   }
   currentSelectedBins = newBins;
+  updateSelectedItems();
+});
+
+visibleItemsSelectedInDT.subscribe(newSelection => {
+  currentSelectedInDT = newSelection;
   updateSelectedItems();
 });
