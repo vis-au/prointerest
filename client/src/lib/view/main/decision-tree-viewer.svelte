@@ -4,7 +4,7 @@
   import { linkVertical } from "d3-shape";
 
   import type { DecisionTree, InternalNode, LeafNode } from "$lib/types/decision-tree";
-  import { truncateFloat } from "$lib/util/number-transform";
+  import { separateThousands, truncateFloat } from "$lib/util/number-transform";
   import { doiLimit } from "$lib/state/doi-limit";
   import { selectionInDT, visibleItemsSelectedInDT } from "$lib/state/selection-in-dt";
 
@@ -142,7 +142,7 @@
       height={canvasHeight}>
 
       <text x={MARGIN.left} y={MARGIN.top}>
-        {$visibleItemsSelectedInDT.length} selected
+        {separateThousands($visibleItemsSelectedInDT.length)} selected
       </text>
 
       <g class="decision-tree-container" transform="translate({MARGIN.left}, {MARGIN.top})">

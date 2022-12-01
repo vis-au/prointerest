@@ -7,13 +7,13 @@
   import { selectedBins } from "$lib/state/selected-bins";
   import { visibleItemsSelectedInSecondaryView } from "$lib/state/selection-in-secondary-view";
   import { visibleItemsSelectedInDT } from "$lib/state/selection-in-dt";
-  import { interpolateOranges, interpolateYlOrRd } from "d3";
+  import { interpolateOranges } from "d3";
 
   export let id: string;
   export let width: number;
   export let height: number;
 
-  const lineWidth = 4;
+  const lineWidth = 3;
   // const color = "rgba(255,165,0,.7)";
   const scheme = interpolateOranges;
   const color = scaleSequential(scheme);

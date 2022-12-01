@@ -9,7 +9,7 @@ import { interestingIntervals } from "./interesting-dimensions";
 import { activeDecisionTree } from "./active-decision-tree";
 import { randomDataSample } from "./sampled-data";
 
-export const CHUNK_SIZE = 1000;
+export const CHUNK_SIZE = 10000;
 
 const currentInterval = 1000;
 export const updateInterval = writable(currentInterval);
