@@ -1,4 +1,4 @@
-from typing import Literal, List, Tuple
+from typing import Literal, Tuple
 import pandas as pd
 import numpy as np
 
@@ -27,11 +27,16 @@ DIMENSION_INTERVALS = {}
 scagnostics_comp = ScagnosticsComponent([5, 17])  # FIXME: unused, but kept for compatibility
 provenance_comp = ProvenanceComponent()  # FIXME: unused, but kept for legacy compatibility
 
-feature_comp: DoiComponent = FeatureComponent(
-  weights=DIMENSION_WEIGHTS,
-  intervals=DIMENSION_INTERVALS,
-  get_dimensions_in_data=get_dimensions_in_data
-)
+
+def create_feature_component():
+  return FeatureComponent(
+    weights=DIMENSION_WEIGHTS,
+    intervals=DIMENSION_INTERVALS,
+    get_dimensions_in_data=get_dimensions_in_data
+  )
+
+
+feature_comp: DoiComponent = create_feature_component()
 doi_component: DoiComponent = feature_comp
 
 storage: StorageStrategy = WindowingStorage(STORAGE_SIZE)
@@ -40,9 +45,13 @@ update: OutdatedItemSelectionStrategy = None
 
 
 def reset_doi_component():
-  global storage, context
+  global storage, context, doi_component, feature_comp, DIMENSION_INTERVALS
   storage = WindowingStorage(STORAGE_SIZE)
   context = DoiBasedContext(n_dims=20, storage=storage, n_bins=25)
+
+  DIMENSION_INTERVALS = {}
+  feature_comp = create_feature_component()
+  doi_component = feature_comp
 
 
 def set_component_weights(weights: dict):

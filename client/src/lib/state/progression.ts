@@ -4,6 +4,10 @@ import { writable } from "svelte/store";
 import { processedData } from "./processed-data";
 import { sendReset } from "../util/requests";
 import { doiValues } from "./doi-values";
+import { selectionInSecondaryView } from "./selection-in-secondary-view";
+import { interestingIntervals } from "./interesting-dimensions";
+import { activeDecisionTree } from "./active-decision-tree";
+import { randomDataSample } from "./sampled-data";
 
 export const CHUNK_SIZE = 1000;
 
@@ -55,8 +59,14 @@ export function pauseProgression(): void {
 
 export function resetProgression(): void {
   pauseProgression();
-  processedData.update(() => {
-    return [];
-  });
+
+  processedData.set([]);
+  randomDataSample.set([]);
+  selectionInSecondaryView.set({});
+  interestingIntervals.set({});
+  currentDoiValues.clear();
+  doiValues.set(currentDoiValues);
+  activeDecisionTree.set(null);
+
   sendReset();
 }
