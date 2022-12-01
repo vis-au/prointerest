@@ -24,6 +24,8 @@
       res.view.addSignalListener("brush", (name: string, value: Record<string, unknown>) =>
         dispatch("brush", { value })
       );
+
+      dispatch("view", res.view);
     }, 10);
   });
 </script>

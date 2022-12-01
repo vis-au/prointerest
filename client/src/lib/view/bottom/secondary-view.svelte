@@ -53,10 +53,7 @@
 
     const dim = recent.dimension;
     $selectionInSecondaryView = {};
-    $selectionInSecondaryView[dim] = recent.extent
-    // $selectionInSecondaryView = data
-    //   .filter((item) => item[dim] >= recent.extent[0] && item[dim] <= recent.extent[1])
-    //   .map((item) => item["__item__"] as DataItem);
+    $selectionInSecondaryView[dim] = recent.extent;
   }
 </script>
 

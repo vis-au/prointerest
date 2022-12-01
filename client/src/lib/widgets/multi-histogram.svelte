@@ -16,14 +16,22 @@
 
   const dispatch = createEventDispatcher();
 
-  $: brushedDimension = brushedInterval && Object.keys(brushedInterval).length > 0
-    ? Object.keys(brushedInterval)[0]
-    : null;
+  $: brushedDimension =
+    brushedInterval && Object.keys(brushedInterval).length > 0
+      ? Object.keys(brushedInterval)[0]
+      : null;
 
+  let dataSize = data.length;
+  $: {
+    if (dataSize !== data.length) {
+      usePresetInterval = true;
+      dataSize = data.length;
+    }
+  }
 
   function onBrush(event: CustomEvent) {
-    usePresetInterval = false;
     brushedInterval = event.detail.value;
+    usePresetInterval = false;
     dispatch("interval", event.detail.value);
   }
 
@@ -55,13 +63,13 @@
       height: height,
       layer: [
         {
+          mark: { type: "bar", tooltip: true },
           params: [
             {
               name: "brush",
               select: { type: "interval", encodings: ["x"] }
             }
           ],
-          mark: { type: "bar", tooltip: true },
           encoding: {
             x: {
               bin: { maxbins: bins },
@@ -96,8 +104,12 @@
   $: if (showTitle) {
     histogram.spec.layer[1].encoding.x["title"] = false;
   }
-  $: if (usePresetInterval && brushedInterval !== null && data) {
-    histogram.spec.layer[0].params[0]["value"] = { x: brushedInterval[brushedDimension] };
+  $: if (usePresetInterval && brushedInterval && brushedDimension && data) {
+    // histogram.spec.layer[0].params[0]["value"] = { x: brushedInterval[brushedDimension] };
+
+    // FIXME: the code below does not work, as it seems to be a bug in vega-lite
+    // https://github.com/vega/vega-lite/issues/8348
+    // view?.signal("brush", {"trip_distance": [12.706451612903226,20.129032258064516]}).run();
   }
 </script>
 
