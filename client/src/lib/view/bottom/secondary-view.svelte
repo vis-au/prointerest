@@ -6,9 +6,8 @@
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
   import { quadtree } from "$lib/state/quadtree";
-  import { selectionInSecondaryView } from "$lib/state/secondary-brushed-items";
+  import { selectionInSecondaryView } from "$lib/state/selection-in-secondary-view";
   import { selectedItems } from "$lib/state/selected-items";
-  import type DataItem from "$lib/types/data-item";
   import { dataItemToRecord } from "$lib/util/item-transform";
   import MultiHistogram from "$lib/widgets/multi-histogram.svelte";
   import Alternatives from "$lib/widgets/alternatives.svelte";
@@ -37,7 +36,7 @@
     const dims = Object.keys(selections);
 
     if (dims.length === 0) {
-      $selectionInSecondaryView = [];
+      $selectionInSecondaryView = {};
       return;
     }
 
@@ -53,9 +52,11 @@
     const recent = $interactionLog.getNRecentSteps(1)[0] as HistogramBrushInteraction;
 
     const dim = recent.dimension;
-      $selectionInSecondaryView = data
-        .filter((item) => item[dim] >= recent.extent[0] && item[dim] <= recent.extent[1])
-        .map((item) => item["__item__"] as DataItem);
+    $selectionInSecondaryView = {};
+    $selectionInSecondaryView[dim] = recent.extent
+    // $selectionInSecondaryView = data
+    //   .filter((item) => item[dim] >= recent.extent[0] && item[dim] <= recent.extent[1])
+    //   .map((item) => item["__item__"] as DataItem);
   }
 </script>
 

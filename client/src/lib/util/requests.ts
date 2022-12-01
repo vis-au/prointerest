@@ -6,7 +6,7 @@ import type { DOIDimension } from "$lib/types/doi-dimension";
 import type { OutliernessMeasure } from "$lib/types/outlier-measures";
 import type { ProvenanceConfig } from "$lib/types/provenance-config";
 import { scagnostics, type Scagnostic } from "$lib/types/scagnostics";
-import type { SteeringFilter } from "$lib/types/steering-filters";
+import type { DimensionFilter } from "$lib/types/steering-filters";
 import { dataItemToList } from "./item-transform";
 import { mapToRecord } from "./map-to-record";
 import { sample } from "./sample";
@@ -162,7 +162,7 @@ export async function getDoiValues(items: DataItem[]): Promise<[number, number][
   return sendRequestToBaseURL("/doi", "POST", { items: values });
 }
 
-export async function sendSteeringFilters(filters: SteeringFilter) {
+export async function sendSteeringFilters(filters: DimensionFilter) {
   return sendRequestToBaseURL("/steer", "POST", { filters });
 }
 

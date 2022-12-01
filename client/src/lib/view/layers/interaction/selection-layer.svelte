@@ -4,7 +4,7 @@
   import { hexbinning } from "$lib/state/hexbinning";
   import { hoveredBin } from "$lib/state/hovered-bin";
   import { selectedBins } from "$lib/state/selected-bins";
-  import { selectionInSecondaryView } from "$lib/state/secondary-brushed-items";
+  import { visibleItemsSelectedInSecondaryView } from "$lib/state/selection-in-secondary-view";
 
   export let id: string;
   export let width: number;
@@ -14,9 +14,9 @@
   const color = "rgba(255,165,0,.7)";
   const hoverColor = "rgba(255,65,0,.7)";
 
-  let primarySelectionCanvas: HTMLCanvasElement;
+  let selectionCanvas: HTMLCanvasElement;
 
-  $: binsWithSelectedItems = $hexbinning($selectionInSecondaryView);
+  $: binsWithSelectedItems = $hexbinning($visibleItemsSelectedInSecondaryView);
 
   function renderHoveredBin(ctx: CanvasRenderingContext2D, hexagonPath: Path2D) {
     if (!$hoveredBin) {
@@ -68,12 +68,12 @@
   }
 
   function render() {
-    if (!primarySelectionCanvas) {
+    if (!selectionCanvas) {
       return;
     }
 
     const hexagonPath = new Path2D($hexbinning.hexagon());
-    const ctx = primarySelectionCanvas.getContext("2d");
+    const ctx = selectionCanvas.getContext("2d");
     ctx.clearRect(0, 0, width, height);
 
     // make sure clicked bin is always visible, so render secondary selection first
@@ -91,6 +91,6 @@
     class="selection-main interaction-canvas"
     {width}
     {height}
-    bind:this={primarySelectionCanvas}
+    bind:this={selectionCanvas}
   />
 </div>
