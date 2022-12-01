@@ -6,7 +6,7 @@
   import type { DecisionTree, InternalNode, LeafNode } from "$lib/types/decision-tree";
   import { truncateFloat } from "$lib/util/number-transform";
   import { doiLimit } from "$lib/state/doi-limit";
-  import { activeDecisionTreePath } from "$lib/state/selection-in-dt";
+  import { selectionInDT, visibleItemsSelectedInDT } from "$lib/state/selection-in-dt";
 
   export let id: string;
   export let decisionTree: DecisionTree;
@@ -83,26 +83,24 @@
   let hoveredPath: DecisionTree[] = [];
 
   $: {
-    let focusNode = hoveredNode;
-
     // focus all descendents
-    hoveredPath = focusNode?.descendants().map(d => d.data) || [];
+    hoveredPath = hoveredNode?.descendants().map(d => d.data) || [];
 
     // focus all predecessorss
-    hoveredPath = hoveredPath.concat(focusNode?.ancestors().map(d => d.data) || []);
+    hoveredPath = hoveredPath.concat(hoveredNode?.ancestors().map(d => d.data) || []);
   }
 
   function setActiveDTPath() {
-    if ($activeDecisionTreePath?.length === hoveredPath.length) {
+    if ($selectionInDT?.length === hoveredPath.length) {
       let isTheSame = true;
 
       hoveredPath.forEach(node => {
-        isTheSame = isTheSame && $activeDecisionTreePath.indexOf(node) > -1;
+        isTheSame = isTheSame && $selectionInDT.indexOf(node) > -1;
       });
 
-      $activeDecisionTreePath = isTheSame ? null : hoveredPath;
+      $selectionInDT = isTheSame ? null : hoveredPath;
     } else {
-      $activeDecisionTreePath = hoveredPath;
+      $selectionInDT = hoveredPath;
     }
   }
 
@@ -124,11 +122,11 @@
   };
 
   $: isNodeSelected = (node: HierarchyPointNode<DecisionTree>) => {
-    return $activeDecisionTreePath?.indexOf(node.data) > -1;
+    return $selectionInDT?.indexOf(node.data) > -1;
   };
   $: isLinkSelected = (link: HierarchyPointLink<DecisionTree>) => {
-    return $activeDecisionTreePath?.indexOf(link["source"].data) > -1
-           && $activeDecisionTreePath?.indexOf(link["target"].data) > -1;
+    return $selectionInDT?.indexOf(link["source"].data) > -1
+           && $selectionInDT?.indexOf(link["target"].data) > -1;
 
   };
 </script>
@@ -142,6 +140,10 @@
       viewBox="0 0 {width} {height}"
       width={canvasWidth}
       height={canvasHeight}>
+
+      <text x={MARGIN.left} y={MARGIN.top}>
+        {$visibleItemsSelectedInDT.length} selected
+      </text>
 
       <g class="decision-tree-container" transform="translate({MARGIN.left}, {MARGIN.top})">
         <g class="links">
