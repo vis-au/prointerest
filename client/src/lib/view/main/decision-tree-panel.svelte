@@ -11,7 +11,7 @@
   export let width = 1000;
   export let height = 500;
 
-  let isHidden = false;  // flag for whether the tree is visible or not
+  let isHidden = true;  // flag for whether the tree is visible or not
   let showRaw = false;  // flag for showing the JSON viewer of the tree
   let currentlyShownTree = "decision tree";
 
