@@ -83,6 +83,7 @@
     <MultiHistogram
       id="secondary-selected-dims"
       {data}
+      brushedInterval={$selectionInSecondaryView}
       dimensions={$selectedDoiDimensions.concat(showDoiValues ? ["doi"] : [])}
       showTitle={false}
       groupDimension="selected"

@@ -9,14 +9,20 @@
   export let bins = 50;
   export let data: Record<string, unknown>[];
   export let dimensions: string[];
+  export let brushedInterval: Record<string, [number, number]> = null;
+  export let usePresetInterval = true;
   export let groupDimension: string = null;
   export let showTitle = false;
 
   const dispatch = createEventDispatcher();
 
-  let brushedInterval: Record<string, [number, number]> = null;
+  $: brushedDimension = brushedInterval && Object.keys(brushedInterval).length > 0
+    ? Object.keys(brushedInterval)[0]
+    : null;
+
 
   function onBrush(event: CustomEvent) {
+    usePresetInterval = false;
     brushedInterval = event.detail.value;
     dispatch("interval", event.detail.value);
   }
@@ -89,6 +95,9 @@
 
   $: if (showTitle) {
     histogram.spec.layer[1].encoding.x["title"] = false;
+  }
+  $: if (usePresetInterval && brushedInterval !== null && data) {
+    histogram.spec.layer[0].params[0]["value"] = { x: brushedInterval[brushedDimension] };
   }
 </script>
 
