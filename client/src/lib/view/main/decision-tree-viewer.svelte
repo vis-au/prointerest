@@ -6,6 +6,7 @@
   import type { DecisionTree, InternalNode, LeafNode } from "$lib/types/decision-tree";
   import { truncateFloat } from "$lib/util/number-transform";
   import { doiLimit } from "$lib/state/doi-limit";
+  import { activeDecisionTreePath } from "$lib/state/selection-in-dt";
 
   export let id: string;
   export let decisionTree: DecisionTree;
@@ -90,6 +91,21 @@
     // focus all predecessorss
     hoveredPath = hoveredPath.concat(focusNode?.ancestors().map(d => d.data) || []);
   }
+
+  function setActiveDTPath() {
+    if ($activeDecisionTreePath?.length === hoveredPath.length) {
+      let isTheSame = true;
+
+      hoveredPath.forEach(node => {
+        isTheSame = isTheSame && $activeDecisionTreePath.indexOf(node) > -1;
+      });
+
+      $activeDecisionTreePath = isTheSame ? null : hoveredPath;
+    } else {
+      $activeDecisionTreePath = hoveredPath;
+    }
+  }
+
   function hoverNode(node: HierarchyPointNode<DecisionTree>) {
     hoveredNode = node
   }
@@ -98,15 +114,23 @@
     hoveredNode = null;
   }
 
-  $: isNodeFocused = (node: HierarchyPointNode<DecisionTree>) => {
+  $: isNodeHovered = (node: HierarchyPointNode<DecisionTree>) => {
     return hoveredPath.indexOf(node.data) > -1;
-  }
-
-  $: isLinkFocused = (link: HierarchyPointLink<DecisionTree>) => {
+  };
+  $: isLinkHovered = (link: HierarchyPointLink<DecisionTree>) => {
     return hoveredPath.indexOf(link["source"].data) > -1
            && hoveredPath.indexOf(link["target"].data) > -1;
 
-  }
+  };
+
+  $: isNodeSelected = (node: HierarchyPointNode<DecisionTree>) => {
+    return $activeDecisionTreePath?.indexOf(node.data) > -1;
+  };
+  $: isLinkSelected = (link: HierarchyPointLink<DecisionTree>) => {
+    return $activeDecisionTreePath?.indexOf(link["source"].data) > -1
+           && $activeDecisionTreePath?.indexOf(link["target"].data) > -1;
+
+  };
 </script>
 
 <div class="decision-tree-viewer" {style}>
@@ -125,7 +149,8 @@
             <path
               class="link
                 {isNodeInteresting(link["target"]["data"]) ? "interesting" : ""}
-                {isLinkFocused(link) ? "focus" : ""}
+                {isLinkHovered(link) ? "hover" : ""}
+                {isLinkSelected(link) ? "selected" : ""}
               "
               stroke-width={scaleLinkSize(link["target"].value)}
               d={path(link)}
@@ -139,13 +164,14 @@
               <g
                 class="internal-node
                   {isNodeInteresting(node.data) ? "interesting" : ""}
-                  {isNodeFocused(node) ? "focus" : ""}
+                  {isNodeHovered(node) ? "hover" : ""}
+                  {isNodeSelected(node) ? "selected" : ""}
                 "
                 transform="translate({node.x},{node.y})">
                 <circle
                   class="node {hoveredNode === node ? "hover" : ""}"
                   r={INTERNAL_NODE_SIZE}
-                  on:click={() => hoverNode(node)}
+                  on:click={() => setActiveDTPath()}
                   on:mouseover={() => hoverNode(node)}
                   on:focus={() => hoverNode(node)}
                   on:mouseout={() => unhoverNode()}
@@ -170,10 +196,11 @@
             {#each leafNodes as node}
               <g class="leaf-node
                   {isNodeInteresting(node.data) ? "interesting" : ""}
-                  {isNodeFocused(node) ? "focus" : ""}
+                  {isNodeHovered(node) ? "hover" : ""}
+                  {isNodeSelected(node) ? "selected" : ""}
                 "
                 transform="translate({node.x - LEAF_NODE_WIDTH/2},{node.y})"
-                on:click={() => hoverNode(node)}
+                on:click={() => setActiveDTPath()}
                 on:mouseover={() => hoverNode(node)}
                 on:focus={() => hoverNode(node)}
                 on:mouseout={() => unhoverNode()}
@@ -217,7 +244,10 @@
   .decision-tree-viewer .links path.link.interesting {
     stroke: black;
   }
-  .decision-tree-viewer .links path.link.focus {
+  .decision-tree-viewer .links path.link.hover {
+    stroke: rgba(255, 166, 0, 0.3);
+  }
+  .decision-tree-viewer .links path.link.selected {
     stroke: orange;
   }
 
@@ -231,7 +261,11 @@
     fill: black;
     cursor: pointer;
   }
-  .decision-tree-viewer .nodes .internal-node.focus circle.node {
+  .decision-tree-viewer .nodes .internal-node.hover circle.node {
+    fill: rgba(255, 166, 0, 0.3);
+    stroke: none;
+  }
+  .decision-tree-viewer .nodes .internal-node.selected circle.node {
     fill: orange;
     stroke: none;
   }
@@ -247,7 +281,10 @@
     stroke: #aaa;
     stroke-width: 1;
   }
-  .decision-tree-viewer .nodes .leaf-node.focus rect.background {
+  .decision-tree-viewer .nodes .leaf-node.hover rect.background {
+    stroke: rgba(255, 166, 0, 0.3);
+  }
+  .decision-tree-viewer .nodes .leaf-node.selected rect.background {
     stroke: orange;
   }
   .decision-tree-viewer .nodes .leaf-node rect.value {
@@ -256,7 +293,11 @@
   .decision-tree-viewer .nodes .leaf-node.interesting rect.value {
     fill: black;
   }
-  .decision-tree-viewer .nodes .leaf-node.focus rect.value {
+  .decision-tree-viewer .nodes .leaf-node.hover rect.value {
+    fill: rgba(255, 166, 0, 0.3);
+    stroke: none;
+  }
+  .decision-tree-viewer .nodes .leaf-node.selected rect.value {
     fill: orange;
     stroke: none;
   }
@@ -264,7 +305,8 @@
     display: none;
     text-anchor: middle;
   }
-  .decision-tree-viewer .nodes .leaf-node.focus text.value,
+  .decision-tree-viewer .nodes .leaf-node.hover text.value,
+  .decision-tree-viewer .nodes .leaf-node.selected text.value,
   .decision-tree-viewer .nodes .leaf-node:hover text.value {
     display: block;
   }
