@@ -1,9 +1,12 @@
 <script lang="ts">
-  import { activeViewMode } from "$lib/state/active-view-mode";
+  import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { hoveredItems } from "$lib/state/hovered-items";
   import { hoveredScreenPosition } from "$lib/state/hovered-position";
+  import { scaleX, scaleY } from "$lib/state/scales";
   import { separateThousands, truncateFloat } from "$lib/util/number-transform";
   import Row from "$lib/widgets/row.svelte";
+  import Column from "$lib/widgets/column.svelte";
+  import { currentTransform } from "$lib/state/zoom";
 
   let innerWidth: number;
   let innerHeight: number;
@@ -20,20 +23,34 @@
     tooltipHeight / 2 +
     Math.max(padding, Math.min($hoveredScreenPosition[1], innerHeight - tooltipHeight - padding));
 
-  $: selectedCount = $hoveredItems.filter(item => item.selected).length;
+  $: selectedCount = $hoveredItems.filter((item) => item.selected).length;
   $: selectedPercentage = truncateFloat((selectedCount / $hoveredItems.length) * 100);
 </script>
 
 <div
-  class="tooltip {$hoveredItems.length === 0 || $activeViewMode === 'scatter' ? 'hidden' : ''}"
+  class="tooltip"
   bind:clientHeight={tooltipHeight}
   bind:clientWidth={tooltipWidth}
-  style="left:{left}px;top:{top}px"
->
-  <Row>
-    <span>count: </span>
-    <strong>{separateThousands($hoveredItems.length)}</strong>
-  </Row>
+  style="left:{left}px;top:{top}px">
+  <Column>
+    <Row
+      >{$activeViewEncodings.x}: {truncateFloat(
+        $scaleX.invert($currentTransform.invertX($hoveredScreenPosition[0]))
+      )}</Row
+    >
+    <Row
+      >{$activeViewEncodings.y}: {truncateFloat(
+        $scaleY.invert($currentTransform.invertY($hoveredScreenPosition[1]))
+      )}</Row
+    >
+  </Column>
+  {#if $hoveredItems.length > 0}
+    <hr />
+    <Row>
+      <span>#items: </span>
+      <strong>{separateThousands($hoveredItems.length)}</strong>
+    </Row>
+  {/if}
   {#if selectedCount > 0}
     <Row>
       <span>selected: </span>
@@ -50,8 +67,10 @@
     background: white;
     border: 1px solid #ccc;
     padding: 10px 15px;
+    font-size: 12px;
   }
-  div.tooltip.hidden {
-    display: none;
+  div.tooltip hr {
+    height: 0.25px;
+    color: #aaa;
   }
 </style>
