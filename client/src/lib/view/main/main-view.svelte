@@ -34,7 +34,7 @@
   <InteractionLayer {width} {height} />
 
   <DecisionTreePanel
-    x={10}
+    x={40}
     y={80}
   />
 

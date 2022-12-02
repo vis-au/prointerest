@@ -2,17 +2,15 @@
   import {activeDecisionTree} from "$lib/state/active-decision-tree";
   import {activeFDLTree} from "$lib/state/active-fdl-tree";
   import Alternatives from "$lib/widgets/alternatives.svelte";
-  import JsObjectViewer from "$lib/widgets/js-object-viewer.svelte";
   import ControlButton from "../../widgets/control-button.svelte";
   import DecisionTreeViewer from "./decision-tree-viewer.svelte";
 
   export let x = 0;
   export let y = 0;
-  export let width = 1000;
+  export let width = 500;
   export let height = 500;
 
   let isHidden = true;  // flag for whether the tree is visible or not
-  let showRaw = false;  // flag for showing the JSON viewer of the tree
   let currentlyShownTree = "decision tree";
 
   function hide() {
@@ -53,17 +51,10 @@
 
       <DecisionTreeViewer
         id="tree-viewer"
+        {width}
+        {height}
         decisionTree={currentlyShownTree === "decision tree" ? $activeDecisionTree: $activeFDLTree}
       />
-
-      {#if showRaw}
-        <JsObjectViewer
-          {width}
-          {height}
-          input={$activeDecisionTree}
-          style="font-size:14px"
-          on:close={hide} />
-      {/if}
     </div>
   {/if}
 </div>

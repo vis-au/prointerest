@@ -9,7 +9,7 @@ import type { DimensionFilter } from "$lib/types/steering-filters";
  * @param dtPath list of internal and leaf nodes from a regression/fdl tree
  * @returns the record of filters
  */
-export function getFiltersForDTPath(dtPath: DecisionTree[]) {
+export function getFiltersForDTPath(dtPath: DecisionTree[]): DimensionFilter {
   const filters: DimensionFilter = {};
 
   // transform consecutive nodes into interval filters
@@ -55,7 +55,7 @@ export function doesItemFitFilter(
   item: DataItem,
   filter: DimensionFilter,
   dimensions: DOIDimension[]
-) {
+): boolean {
   let matchesFilters = true;
 
   // apply the filters defined by the brushes in the
@@ -71,4 +71,13 @@ export function doesItemFitFilter(
   });
 
   return matchesFilters;
+}
+
+
+export function getPathToDTNode(node: DecisionTree): DecisionTree[] {
+  if (!node.parent) {
+    return [node];
+  } else {
+    return getPathToDTNode(node.parent).concat(node);
+  }
 }
