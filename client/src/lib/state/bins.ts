@@ -1,24 +1,12 @@
-import type DataItem from "$lib/types/data-item";
-import type { Hexbin, HexbinBin } from "d3-hexbin";
-import { writable } from "svelte/store";
+import { derived } from "svelte/store";
 import { hexbinning } from "./hexbinning";
+import { randomDataSample } from "./sampled-data";
 import { visibleInterestingData } from "./visible-data";
+import { isZooming } from "./zoom";
 
-export const bins = writable([] as HexbinBin<DataItem>[]);
-
-let currentHexbinning = null as Hexbin<DataItem>;
-let currentlyVisibleData = [] as DataItem[];
-
-function updateBins() {
-  bins.set(currentHexbinning(currentlyVisibleData));
-}
-
-hexbinning.subscribe((h) => {
-  currentHexbinning = h;
-  updateBins();
-});
-
-visibleInterestingData.subscribe((data) => {
-  currentlyVisibleData = data;
-  updateBins();
-});
+export const bins = derived(
+  [visibleInterestingData, randomDataSample, hexbinning, isZooming],
+  ([$visibleInterestingData, $randomDataSample, $hexbinning, $isZooming]) => {
+    return $hexbinning($isZooming ? $randomDataSample : $visibleInterestingData);
+  }
+);

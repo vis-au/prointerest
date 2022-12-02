@@ -12,7 +12,7 @@ let sampleProbability = 1;
 let currentQuadtree: Quadtree<DataItem> = null;
 let currentProcessedItems: DataItem[] = [];
 
-let currentSampleSize = 50000;
+let currentSampleSize = 1000;
 export const sampleSize = writable(currentSampleSize);
 sampleSize.subscribe(newSize => currentSampleSize = newSize);
 

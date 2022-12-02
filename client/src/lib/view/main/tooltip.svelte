@@ -19,9 +19,10 @@
     padding,
     Math.min($hoveredScreenPosition[0] + 20, innerWidth - tooltipWidth - padding)
   );
-  $: top =
-    tooltipHeight / 2 +
-    Math.max(padding, Math.min($hoveredScreenPosition[1], innerHeight - tooltipHeight - padding));
+  $: top = Math.max(
+    padding,
+    Math.min($hoveredScreenPosition[1], innerHeight - tooltipHeight - padding)
+  );
 
   $: selectedCount = $hoveredItems.filter((item) => item.selected).length;
   $: selectedPercentage = truncateFloat((selectedCount / $hoveredItems.length) * 100);
@@ -31,7 +32,8 @@
   class="tooltip"
   bind:clientHeight={tooltipHeight}
   bind:clientWidth={tooltipWidth}
-  style="left:{left}px;top:{top}px">
+  style="left:{left}px;top:{top}px"
+>
   <Column>
     <Row
       >{$activeViewEncodings.x}: {truncateFloat(
@@ -63,6 +65,7 @@
 
 <style>
   div.tooltip {
+    user-select: none;
     position: absolute;
     background: white;
     border: 1px solid #ccc;
