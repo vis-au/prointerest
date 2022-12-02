@@ -7,7 +7,7 @@
   import { activeBrush, activeLasso } from "$lib/state/active-brush";
   import { scatterplotBrush } from "$lib/state/active-scatterplot-brush";
   import { scaleX, scaleY } from "$lib/state/scales";
-  import { selectedItems } from "$lib/state/selected-items";
+  import { brushedItems } from "$lib/state/selected-items";
   import { currentTransform } from "$lib/state/zoom";
   import { separateThousands } from "$lib/util/number-transform";
 
@@ -35,7 +35,7 @@
 
     // draw label
     ctx.font = "13px sans-serif";
-    ctx.fillText(`${separateThousands($selectedItems.length)} points`, x0, y1 + 15);
+    ctx.fillText(`${separateThousands($brushedItems.length)} points`, x0, y1 + 15);
   }
 
   function renderLasso(ctx: CanvasRenderingContext2D, t: ZoomTransform) {
@@ -56,7 +56,7 @@
     const first = coordinates[0];
     ctx.font = "13px sans-serif";
     ctx.fillStyle = "rgba(0, 0, 0, 1)";
-    ctx.fillText(`${separateThousands($selectedItems.length)} points`, first[0] + 15, first[1]);
+    ctx.fillText(`${separateThousands($brushedItems.length)} points`, first[0] + 15, first[1]);
     ctx.stroke();
   }
 

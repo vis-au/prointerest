@@ -16,6 +16,9 @@ import { visibleItemsSelectedInDT } from "./selection-in-dt";
 let currentlySelected: DataItem[] = [];
 export const selectedItems = writable(currentlySelected);
 
+let currentBrushedItems: DataItem[] = []
+export const brushedItems = writable(currentBrushedItems);
+
 let currentScatterplotBrush: BrushMode = null;
 let currentSelectedBins: HexbinBin<DataItem>[] = [];
 let currentSelectedInDT: DataItem[] = [];
@@ -67,10 +70,9 @@ function deselectItems() {
 
 function getSelectedItems() {
   deselectItems();
-  const brushedItems = getBrushedItems();
   const itemsInBins = getItemsInSelectedBins();
 
-  const selected = brushedItems.concat(itemsInBins).concat(currentSelectedInDT);
+  const selected = currentBrushedItems.concat(itemsInBins).concat(currentSelectedInDT);
   selected.forEach((d) => (d.selected = true));
   return selected;
 }
@@ -96,16 +98,22 @@ quadtree?.subscribe(() => {
 
 scatterplotBrush.subscribe((mode) => {
   currentScatterplotBrush = mode;
+  currentBrushedItems = getBrushedItems();
+  brushedItems.set(currentBrushedItems);
   updateSelectedItems();
 });
 
 activeBrush.subscribe((newBrush) => {
   currentBrush = newBrush;
+  currentBrushedItems = getBrushedItems();
+  brushedItems.set(currentBrushedItems);
   updateSelectedItems();
 });
 
 activeLasso.subscribe((lasso) => {
   currentLasso = lasso;
+  currentBrushedItems = getBrushedItems();
+  brushedItems.set(currentBrushedItems);
   updateSelectedItems();
 });
 
