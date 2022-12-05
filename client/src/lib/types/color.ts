@@ -1,5 +1,6 @@
 import {
   interpolateBuPu,
+  interpolateSpectral,
   interpolateBrBG,
   interpolateCividis,
   interpolateCool,
@@ -21,6 +22,7 @@ import {
 
 export const sequentialSchemes = [
   interpolateBuPu,
+  interpolateSpectral,
   interpolateYlGnBu,
   interpolateInferno,
   interpolateMagma,
