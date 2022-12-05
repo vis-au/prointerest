@@ -56,7 +56,7 @@
   {#if selectedCount > 0}
     <Row>
       <span>selected: </span>
-      <strong>{selectedCount} ({selectedPercentage}%)</strong>
+      <strong>{separateThousands(selectedCount)} ({selectedPercentage}%)</strong>
     </Row>
   {/if}
 </div>
