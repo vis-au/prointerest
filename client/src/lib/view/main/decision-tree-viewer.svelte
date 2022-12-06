@@ -121,7 +121,7 @@
   $: isNodeInteresting = (node: DecisionTree) => {
     return node.type === "internal"
       ? isNodeInteresting(node.left) || isNodeInteresting(node.right)
-      : node.value[0] > $doiLimit;
+      : node.value[0] >= $doiLimit;
   };
 
   let hoveredNode: HierarchyPointNode<DecisionTree> = null;

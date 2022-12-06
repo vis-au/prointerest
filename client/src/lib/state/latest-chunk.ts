@@ -35,7 +35,7 @@ scaleY?.subscribe(updateLatestItems);
 
 export const latestInterestingItems = derived([doiLimit, latestItems, doiValues], ([$doiLimit, $latestItems, $doiValues]) => {
   return $latestItems.filter((item) => {
-    return $doiValues.get(item.id) > $doiLimit;
+    return $doiValues.get(item.id) >= $doiLimit;
   });
 });
 
