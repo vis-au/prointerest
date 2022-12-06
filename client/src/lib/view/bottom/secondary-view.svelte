@@ -15,7 +15,7 @@
   import ControlButton from "$lib/widgets/control-button.svelte";
   import Row from "$lib/widgets/row.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
-  import { visibleInterestingData } from "$lib/state/visible-data";
+  import { interestingItems } from "$lib/state/items";
 
   export let width: number;
   export let height: number;
@@ -25,7 +25,7 @@
   let histogramMode: "selected" | "all" = "all";
   let showDoiValues = true;
 
-  $: items = histogramMode === "all" ? $visibleInterestingData : $selectedItems;
+  $: items = histogramMode === "all" ? $interestingItems : $selectedItems;
   $: data = items.map(dataItemToRecord);
 
   function onBrush(event: CustomEvent) {

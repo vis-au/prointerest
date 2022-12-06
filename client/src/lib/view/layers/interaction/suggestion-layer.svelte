@@ -1,6 +1,6 @@
 <script lang="ts">
   import { hexbinning } from "$lib/state/hexbinning";
-  import { viewPort as vp } from "$lib/state/visible-data";
+  import { viewPort as vp } from "$lib/state/viewport";
   import { afterUpdate } from "svelte";
 
   export let width: number;

@@ -12,7 +12,7 @@
   import ResizingOverlay from "$lib/view/header/resizing-overlay.svelte";
   import { getDimensionNames, getTotalDatasize } from "$lib/util/requests";
   import { activeViewEncodings } from "$lib/state/active-view-encodings";
-  import { viewPort } from "$lib/state/visible-data";
+  import { viewPort } from "$lib/state/viewport";
   import SplitView from "$lib/view/main/split-view.svelte";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import SecondaryView from "$lib/view/bottom/secondary-view.svelte";

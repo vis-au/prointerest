@@ -12,7 +12,7 @@
   import { selectedDTNode } from "$lib/state/selection-in-dt";
   import type { DecisionTree, InternalNode, LeafNode } from "$lib/types/decision-tree";
   import { dimensions } from "$lib/state/processed-data";
-  import { visibleData } from "$lib/state/visible-data";
+  import { items } from "$lib/state/items";
   import { doesItemFitFilter, getFiltersForDTPath, getPathToDTNode } from "$lib/util/dt-functions";
   import { separateThousands, truncateFloat } from "$lib/util/number-transform";
 
@@ -79,7 +79,7 @@
         const path = getPathToDTNode(node.data);
         const filter = getFiltersForDTPath(path);
 
-        node.data.items = $visibleData.filter((item) => {
+        node.data.items = $items.filter((item) => {
           return doesItemFitFilter(item, filter, $dimensions);
         });
       } else if (node.data?.type === "internal") {

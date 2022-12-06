@@ -2,14 +2,14 @@ import type { DimensionFilter } from "$lib/types/steering-filters";
 import { derived, writable } from "svelte/store";
 import { doiValues } from "./doi-values";
 import { dimensions } from "./processed-data";
-import { visibleInterestingData } from "./visible-data";
+import { interestingItems } from "./items";
 
 export const selectionInSecondaryView = writable({} as DimensionFilter);
 
 export const visibleItemsSelectedInSecondaryView = derived(
-  [selectionInSecondaryView, visibleInterestingData, dimensions, doiValues],
-  ([$selectionInSecondaryView, $visibleInterestingData, $dimensions, $doiValues]) => {
-    return $visibleInterestingData.filter((item) => {
+  [selectionInSecondaryView, interestingItems, dimensions, doiValues],
+  ([$selectionInSecondaryView, $interestingItems, $dimensions, $doiValues]) => {
+    return $interestingItems.filter((item) => {
       // if no filter is active, no items are selected (even though technically everything matches)
       let matchesFilter = Object.keys($selectionInSecondaryView).length > 0;
 

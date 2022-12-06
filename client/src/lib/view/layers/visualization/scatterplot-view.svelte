@@ -4,7 +4,7 @@
   import { ScatterplotLayer } from "@deck.gl/layers";
   import { selectAll } from "d3-selection";
 
-  import { visibleInterestingData } from "$lib/state/visible-data";
+  import { interestingItems } from "$lib/state/items";
   import { randomDataSample } from "$lib/state/sampled-data";
   import { currentTransform, isZooming } from "$lib/state/zoom";
   import type DataItem from "$lib/types/data-item";
@@ -15,7 +15,7 @@
   export let radius = 5; // size of points
   export let orientation = "right"; // left or right side of the screen?
 
-  $: data = $isZooming ? $randomDataSample : $visibleInterestingData;
+  $: data = $isZooming ? $randomDataSample : $interestingItems;
 
   const INITIAL_VIEW_STATE = {
     zoom: 0,

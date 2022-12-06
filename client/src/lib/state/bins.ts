@@ -1,12 +1,12 @@
 import { derived } from "svelte/store";
 import { hexbinning } from "./hexbinning";
 import { randomDataSample } from "./sampled-data";
-import { visibleInterestingData } from "./visible-data";
+import { interestingItems } from "./items";
 import { isZooming } from "./zoom";
 
 export const bins = derived(
-  [visibleInterestingData, randomDataSample, hexbinning, isZooming],
-  ([$visibleInterestingData, $randomDataSample, $hexbinning, $isZooming]) => {
-    return $hexbinning($isZooming ? $randomDataSample : $visibleInterestingData);
+  [interestingItems, randomDataSample, hexbinning, isZooming],
+  ([$interestingItems, $randomDataSample, $hexbinning, $isZooming]) => {
+    return $hexbinning($isZooming ? $randomDataSample : $interestingItems);
   }
 );
