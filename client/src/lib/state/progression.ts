@@ -1,14 +1,14 @@
+import { mean } from "d3";
+import { writable } from "svelte/store";
+
 import type { ProgressionState } from "$lib/types/progression-state";
 import { getNextChunk } from "$lib/util/requests";
-import { writable } from "svelte/store";
 import { processedData } from "./processed-data";
 import { sendReset } from "../util/requests";
 import { averageDoiPerChunk, doiValues } from "./doi-values";
 import { selectionInSecondaryView } from "./selection-in-secondary-view";
 import { interestingIntervals } from "./interesting-dimensions";
 import { activeDecisionTree } from "./active-decision-tree";
-import { randomDataSample } from "./sampled-data";
-import { mean } from "d3";
 
 export const CHUNK_SIZE = 10000;
 
@@ -66,7 +66,6 @@ export function resetProgression(): void {
   pauseProgression();
 
   processedData.set([]);
-  randomDataSample.set([]);
   selectionInSecondaryView.set({});
   interestingIntervals.set({});
   currentDoiValues.clear();
