@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { separateThousands } from "$lib/util/number-transform";
+
   export let id: string;
   export let progress: number;
   export let current: number;
@@ -11,7 +13,7 @@
   id="{id}-progress-bar"
   class="progress-bar"
   style="width:{width}px;min-height:{height}px"
-  title="{current}/{total}"
+  title="{separateThousands(current)}/{separateThousands(total)}"
 >
   <div class="progress" style="width:{progress * 100}%;height:{height}px" />
 </div>

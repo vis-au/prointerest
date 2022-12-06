@@ -11,6 +11,7 @@
   import Column from "$lib/widgets/column.svelte";
   import ProgressBar from "$lib/widgets/progress-bar.svelte";
   import Row from "$lib/widgets/row.svelte";
+  import { currentChunkNo } from "$lib/state/progression";
   import ControlButton from "../../widgets/control-button.svelte";
 
   export let x = 0;
@@ -29,6 +30,9 @@
 
 <div class="progression-controls {useDarkMode ? 'dark' : ''}" style="{style};{position}">
   <Row>
+    <Row style="margin:0 10px">
+      <span>Iteration: <BigNumber>{$currentChunkNo}</BigNumber></span>
+    </Row>
     <Column>
       <div class="progression-text">
         <span>Processed:</span>

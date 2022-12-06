@@ -19,6 +19,8 @@ export const progressionState = writable("paused" as ProgressionState);
 let currentlyWaiting = false;
 export const waitingForChunk = writable(currentlyWaiting);
 
+export const currentChunkNo = writable(0);
+
 const currentDoiValues: Map<number, number> = new Map();
 
 const progressionCallback = () => {
@@ -37,6 +39,7 @@ const progressionCallback = () => {
         currentDoiValues.set(id, doi);
       });
 
+      currentChunkNo.update(chunkNo => chunkNo + 1);
       doiValues.update(() => currentDoiValues);
 
       currentlyWaiting = false;
