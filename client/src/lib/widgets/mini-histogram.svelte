@@ -16,6 +16,7 @@
       class="bin"
       style:width="{width / values.length}px"
       style:height="{scaleX(value)}px"
+      title={value.toString()}
     />
   {/each}
 </div>

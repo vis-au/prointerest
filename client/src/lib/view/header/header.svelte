@@ -1,6 +1,10 @@
 <script lang="ts">
   import { dimensions } from "$lib/state/processed-data";
-  import { doiDimensionWeights, isDimensionInteresting, selectedDoiDimensions } from "$lib/state/interesting-dimensions";
+  import {
+    doiDimensionWeights,
+    isDimensionInteresting,
+    selectedDoiDimensions
+  } from "$lib/state/interesting-dimensions";
   import type { DOIDimension } from "$lib/types/doi-dimension";
   import { sendDimenionWeights } from "$lib/util/requests";
   import Row from "$lib/widgets/row.svelte";
@@ -80,7 +84,7 @@
     margin-right: 25px;
     padding: 0;
     font-size: 18px;
-    font-weight: bold;;
+    font-weight: bold;
   }
 
   header div.title {

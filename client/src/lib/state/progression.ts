@@ -3,11 +3,12 @@ import { getNextChunk } from "$lib/util/requests";
 import { writable } from "svelte/store";
 import { processedData } from "./processed-data";
 import { sendReset } from "../util/requests";
-import { doiValues } from "./doi-values";
+import { averageDoiPerChunk, doiValues } from "./doi-values";
 import { selectionInSecondaryView } from "./selection-in-secondary-view";
 import { interestingIntervals } from "./interesting-dimensions";
 import { activeDecisionTree } from "./active-decision-tree";
 import { randomDataSample } from "./sampled-data";
+import { mean } from "d3";
 
 export const CHUNK_SIZE = 10000;
 
@@ -40,6 +41,7 @@ const progressionCallback = () => {
       });
 
       currentChunkNo.update(chunkNo => chunkNo + 1);
+      averageDoiPerChunk.update(averageDois => averageDois.concat(mean(chunk.dois)));
       doiValues.update(() => currentDoiValues);
 
       currentlyWaiting = false;

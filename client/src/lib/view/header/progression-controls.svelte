@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { averageDoiPerChunk } from "$lib/state/doi-values";
   import { processedData, totalSize } from "$lib/state/processed-data";
   import {
     pauseProgression,
@@ -13,6 +14,7 @@
   import Row from "$lib/widgets/row.svelte";
   import { currentChunkNo } from "$lib/state/progression";
   import ControlButton from "../../widgets/control-button.svelte";
+  import MiniHistogram from "$lib/widgets/mini-histogram.svelte";
 
   export let x = 0;
   export let y = 0;
@@ -30,8 +32,15 @@
 
 <div class="progression-controls {useDarkMode ? 'dark' : ''}" style="{style};{position}">
   <Row>
-    <Row style="margin:0 10px">
+    <Row>
       <span>Iteration: <BigNumber>{$currentChunkNo}</BigNumber></span>
+      <MiniHistogram
+        id="mean-doi-per-chunk"
+        width={150}
+        height={25}
+        values={$averageDoiPerChunk}
+        style="padding:0 5px;"
+      />
     </Row>
     <Column>
       <div class="progression-text">
