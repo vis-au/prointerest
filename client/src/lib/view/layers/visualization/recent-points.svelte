@@ -39,11 +39,11 @@
 
     const t = $currentTransform;
 
-    // ... and then copy-paste it for every recent point in the dataset
     const positions = $latestInterestingItems.map((item) => {
       return t.apply([item.position.x, item.position.y]);
     });
 
+    // ... and then copy-paste it for every recent point in the dataset
     positions.forEach((position) => {
       ctx.drawImage(offCanvas, position[0] - radius, position[1] - radius, pointSize, pointSize);
     });
