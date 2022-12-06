@@ -17,7 +17,7 @@
   export let height: number;
 </script>
 
-<main style="height:{height}px">
+<main style:height="{height}px">
   {#if $activeViewMode === "scatter"}
     <ScatterplotView {width} {height} />
   {:else if $activeViewMode === "binned"}

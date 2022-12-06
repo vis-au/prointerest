@@ -22,7 +22,7 @@
   let sliderValue = value;
 </script>
 
-<div class="slider" style="width:{width}px;{style}">
+<div class="slider" style:width="{width}px" {style}>
   <label class="before" for="{id}-slider">{label}</label>
   {#if showValue}
     {#if updateLive}

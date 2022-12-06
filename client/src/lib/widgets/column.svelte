@@ -5,11 +5,11 @@
   export let height = -1;
   export let style = "";
 
-  const maxWidth = width === -1 ? "" : `max-width:${width}px;`;
-  const maxHeight = height === -1 ? "" : `max-height:${width}px;`;
+  const maxWidth = width === -1 ? "0" : `${width}px;`;
+  const maxHeight = height === -1 ? "0" : `${width}px;`;
 </script>
 
-<div {id} class="column {className}" style="{maxWidth}{maxHeight}{style}">
+<div {id} class="column {className}" style:maxWidth style:maxHeight {style}>
   <slot />
 </div>
 

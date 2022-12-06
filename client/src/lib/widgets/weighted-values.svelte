@@ -93,14 +93,13 @@
   }
 </script>
 
-<div {id} class="weighted-values {useDarkmode ? 'dark' : ''}" style="height:{height}px">
+<div {id} class="weighted-values" class:dark={useDarkmode} style:height="{height}px">
   {#each weights as entry, i}
-    <div
-      class="entry {activeWeight === entry[0] ? 'active' : ''}"
-      style="width:{entry[1] * totalSize}px;{backgroundColor.length > 0
-        ? `background:${backgroundColor}`
-        : ''}"
-    >
+    <div class="entry"
+      class:active={activeWeight === entry[0]}
+      style:width="{entry[1] * totalSize}px"
+      style:background="{backgroundColor.length > 0 ? backgroundColor : null}">
+
       <label for={getId(entry[0])} title={`${entry[0]}: ${entry[1] * 100}%`}>
         <span class="key">{entry[0]}</span>
         {#if showValue}

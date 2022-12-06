@@ -57,7 +57,7 @@
   }
 </script>
 
-<Column id="secondary-view" style="max-width:{width}px;height:{height}px">
+<Column id="secondary-view" {width} {height}>
   <Row id="secondary-header" style="margin-bottom: 25px">
     <Row>
       <Row style="margin-right:20px;padding-bottom:3px">
@@ -72,7 +72,6 @@
       <Toggle id="doi-values" style="margin-right:10px" bind:active={showDoiValues}>
         show DOI histogram
       </Toggle>
-      <!-- <Toggle id="doi-labels" bind:active={showDoiLabels}>doi labels</Toggle> -->
     </Row>
     <ControlButton on:click={() => ($isSecondaryViewCollapsed = true)}>close</ControlButton>
   </Row>

@@ -155,7 +155,7 @@
   }
 </script>
 
-<div class="interaction-canvas-container {$isZooming ? 'zooming' : ''}">
+<div class="interaction-canvas-container" class:zooming={$isZooming}>
   <SelectionLayer id="selection-layer" {width} {height} />
   <ZoomLayer
     id="zoom-layer"

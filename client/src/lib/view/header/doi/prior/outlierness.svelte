@@ -22,7 +22,7 @@
     bind:activeWeight={$selectedOutlierMeasure}
     on:end={() => sendWeights("outlierness", $outliernessWeights)}
   />
-  <p class="explanation" style="max-width:{width}px">
+  <p class="explanation" style:maxWidth="{width}px">
     Info:
     {#if $selectedOutlierMeasure === "elliptic"}
       Apply sklearn's EllipticEnvelope metric. Check the <Link

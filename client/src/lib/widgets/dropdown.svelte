@@ -6,7 +6,7 @@
   export let useDarkMode = false;
 </script>
 
-<label for={id} class="dropdown {useDarkMode ? 'dark' : ''} {className}" {style}>
+<label for={id} class="dropdown {className}" class:dark={useDarkMode} {style}>
   <select name={id} {id} bind:value={selectedValue}>
     <slot />
   </select>

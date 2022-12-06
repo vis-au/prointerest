@@ -26,7 +26,8 @@
 </script>
 
 <div
-  class="divider {isResizing ? 'active' : ''}"
+  class="divider"
+  class:active={isResizing}
   on:mousedown={(e) => resizeStart(e.clientX, e.clientY)}
 />
 

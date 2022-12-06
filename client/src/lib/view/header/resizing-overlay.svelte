@@ -16,14 +16,17 @@
   $: rightValue = Math.round($isResizing?.rightValue * 10000) / 100;
 
   $: left = $isResizing
-    ? `left:${Math.min(Math.max(x - width / 2, 0), innerWidth - width - margin)}px`
-    : "left: 0";
-  $: top = $isResizing ? `top:${y + margin}px` : "top: 0";
+    ? `${Math.min(Math.max(x - width / 2, 0), innerWidth - width - margin)}px`
+    : "0";
+  $: top = $isResizing ? `${y + margin}px` : "0";
 </script>
 
 <div
-  class="resizing-overlay {$isResizing === null ? 'hidden' : ''}"
-  style="{left};{top};min-width:{width}px;"
+  class="resizing-overlay"
+  class:hidden={$isResizing === null}
+  style:minWidth="{width}px"
+  style:left
+  style:top
   bind:clientWidth={width}
 >
   <Column>

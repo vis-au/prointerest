@@ -38,7 +38,7 @@
   );
 </script>
 
-<svg id="{id}-legend-canvas" class="legend" {width} {height} style="left:{x}px;top:{y}px">
+<svg id="{id}-legend-canvas" class="legend" {width} {height} style:left="{x}px" style:top="{y}px">
   {#if title !== null}
     <text class="legend-title" x={margin} y={margin}>{title}</text>
   {/if}

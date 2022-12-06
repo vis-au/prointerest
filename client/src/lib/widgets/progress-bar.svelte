@@ -12,10 +12,11 @@
 <div
   id="{id}-progress-bar"
   class="progress-bar"
-  style="width:{width}px;min-height:{height}px"
-  title="{separateThousands(current)}/{separateThousands(total)}"
->
-  <div class="progress" style="width:{progress * 100}%;height:{height}px" />
+  style:width="{width}px"
+  style:minHeight="{height}px"
+  title="{separateThousands(current)}/{separateThousands(total)}">
+
+  <div class="progress" style:width="{progress * 100}%" style:height="{height}px" />
 </div>
 
 <style>

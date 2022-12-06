@@ -44,7 +44,7 @@
   message="Configure how much weight each interaction should be assigned to, when computing the data of interest."
 >
   <Column>
-    <h3 style="width:{histogramSize - 20}px">
+    <h3 style:width="{histogramSize - 20}px">
       Assign weights to interactions
       <Toggle id="auto-update" style="font-weight:normal" bind:active={autoUpdateAfterWeights}>
         auto update

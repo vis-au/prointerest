@@ -5,11 +5,9 @@
   export let title: string;
   export let width: number = null;
   export let message = "";
-
-  $: widthStyle = width === null ? "" : `width:${width}px`;
 </script>
 
-<div class="doi-config" style={widthStyle}>
+<div class="doi-config" style:width="{width}px">
   <h2>
     <span>{title}</span>
     <ControlButton on:click={() => ($selectedDoiWeight = null)}>close</ControlButton>

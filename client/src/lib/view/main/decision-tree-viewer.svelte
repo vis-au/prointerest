@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { hierarchy, tree as d3tree, type HierarchyPointLink, type HierarchyPointNode } from "d3-hierarchy";
+  import {
+    hierarchy,
+    tree as d3tree,
+    type HierarchyPointLink,
+    type HierarchyPointNode
+  } from "d3-hierarchy";
   import { scaleLinear } from "d3-scale";
   import { linkVertical } from "d3-shape";
 
@@ -10,7 +15,6 @@
   import { visibleData } from "$lib/state/visible-data";
   import { doesItemFitFilter, getFiltersForDTPath, getPathToDTNode } from "$lib/util/dt-functions";
   import { separateThousands, truncateFloat } from "$lib/util/number-transform";
-
 
   export let id: string;
   export let decisionTree: DecisionTree;
@@ -23,7 +27,7 @@
   // from https://observablehq.com/@jwilber/visualize-decision-trees-from-sklearn
 
   // make the actual canvas a bit smaller to avoid overflow
-  const CANVAS_PADDING = 25
+  const CANVAS_PADDING = 25;
   $: canvasWidth = width - CANVAS_PADDING;
   $: canvasHeight = height - CANVAS_PADDING;
 
@@ -44,20 +48,20 @@
 
   // path generator function
   const path = linkVertical<HierarchyPointLink<DecisionTree>, HierarchyPointLink<DecisionTree>>()
-    .x(d => d["x"])
-    .y(d => d["y"]);
+    .x((d) => d["x"])
+    .y((d) => d["y"]);
 
   // tree layout generator function
-  $: tree = d3tree<DecisionTree>()
-    .size(
-      [canvasWidth - MARGIN.left - MARGIN.right, canvasHeight - MARGIN.top - MARGIN.bottom]
-    );
+  $: tree = d3tree<DecisionTree>().size([
+    canvasWidth - MARGIN.left - MARGIN.right,
+    canvasHeight - MARGIN.top - MARGIN.bottom
+  ]);
 
   // turn decision tree in to d3 hierarchy format
-  $: root = hierarchy(decisionTree, d => d?.type === "internal" ? [d.left, d.right] : null);
+  $: root = hierarchy(decisionTree, (d) => (d?.type === "internal" ? [d.left, d.right] : null));
   $: root
     // set the parent nodes
-    .eachBefore(node => {
+    .eachBefore((node) => {
       if (!node.data) {
         return;
       }
@@ -70,30 +74,32 @@
       }
     })
     // set the items per node
-    .eachAfter(node => {
+    .eachAfter((node) => {
       if (node.data?.type === "leaf") {
         const path = getPathToDTNode(node.data);
         const filter = getFiltersForDTPath(path);
 
-        node.data.items = $visibleData.filter(item => {
+        node.data.items = $visibleData.filter((item) => {
           return doesItemFitFilter(item, filter, $dimensions);
         });
       } else if (node.data?.type === "internal") {
-        node.data.items = node.children?.map(d => d.data.items).flat();
+        node.data.items = node.children?.map((d) => d.data.items).flat();
       }
     })
     // compute the node values
-    .sum(node => {
+    .sum((node) => {
       return sizeEncoding === "doi"
-        ? node?.type === "leaf" ? node.value[0] : 0  // <-- basically count()
-        : node?.items?.length;  // <-- number of items per node
+        ? node?.type === "leaf"
+          ? node.value[0]
+          : 0 // <-- basically count()
+        : node?.items?.length; // <-- number of items per node
     });
 
   // maps interest to the size of leaf nodes
   $: scaleLeafSize = scaleLinear(
-      [0, sizeEncoding === "doi" ? 1 : root?.value],
-      [0, MAX_LEAF_NODE_HEIGHT]
-    );
+    [0, sizeEncoding === "doi" ? 1 : root?.value],
+    [0, MAX_LEAF_NODE_HEIGHT]
+  );
 
   // maps interest to the width of links
   $: scaleLinkSize = scaleLinear([0, root?.value || 1], [1, MAX_PATH_WIDTH]);
@@ -104,12 +110,13 @@
   $: links = treeData?.links();
 
   // derive partitions of internal and leaf nodes
-  $: internalNodes = treeData?.descendants()
-    .filter(d => d.data?.type === "internal") as HierarchyPointNode<InternalNode>[];
+  $: internalNodes = treeData
+    ?.descendants()
+    .filter((d) => d.data?.type === "internal") as HierarchyPointNode<InternalNode>[];
 
-  $: leafNodes = treeData?.descendants()
-    .filter(d => d.data?.type === "leaf") as HierarchyPointNode<LeafNode>[];
-
+  $: leafNodes = treeData
+    ?.descendants()
+    .filter((d) => d.data?.type === "leaf") as HierarchyPointNode<LeafNode>[];
 
   $: isNodeInteresting = (node: DecisionTree) => {
     return node.type === "internal"
@@ -117,16 +124,15 @@
       : node.value[0] > $doiLimit;
   };
 
-
   let hoveredNode: HierarchyPointNode<DecisionTree> = null;
   let hoveredPath: DecisionTree[] = [];
 
   $: {
     // focus all descendents
-    hoveredPath = hoveredNode?.descendants().map(d => d.data) || [];
+    hoveredPath = hoveredNode?.descendants().map((d) => d.data) || [];
 
     // focus all predecessorss
-    hoveredPath = hoveredPath.concat(hoveredNode?.ancestors().map(d => d.data) || []);
+    hoveredPath = hoveredPath.concat(hoveredNode?.ancestors().map((d) => d.data) || []);
   }
 
   function selectDTNode() {
@@ -140,7 +146,7 @@
   }
 
   function hoverNode(node: HierarchyPointNode<DecisionTree>) {
-    hoveredNode = node
+    hoveredNode = node;
   }
 
   function unhoverNode() {
@@ -151,44 +157,44 @@
     return hoveredPath.indexOf(node.data) > -1;
   };
   $: isLinkHovered = (link: HierarchyPointLink<DecisionTree>) => {
-    return hoveredPath.indexOf(link["source"].data) > -1
-           && hoveredPath.indexOf(link["target"].data) > -1;
-
+    return (
+      hoveredPath.indexOf(link["source"].data) > -1 && hoveredPath.indexOf(link["target"].data) > -1
+    );
   };
 
   $: isNodeSelected = (node: HierarchyPointNode<DecisionTree>) => {
     return activeDTPath?.indexOf(node.data) > -1;
   };
   $: isLinkSelected = (link: HierarchyPointLink<DecisionTree>) => {
-    return activeDTPath?.indexOf(link["source"].data) > -1
-           && activeDTPath?.indexOf(link["target"].data) > -1;
-
+    return (
+      activeDTPath?.indexOf(link["source"].data) > -1 &&
+      activeDTPath?.indexOf(link["target"].data) > -1
+    );
   };
 </script>
 
 <div class="decision-tree-viewer" {style}>
   {#if !decisionTree}
-    <div style="width:{canvasWidth}px">no dt, yet</div>
+    <div style:width="{canvasWidth}px">no dt, yet</div>
   {:else}
-    <svg id="{id}-canvas"
+    <svg
+      id="{id}-canvas"
       class="canvas"
       viewBox="0 0 {width} {height}"
       width={canvasWidth}
       height={canvasHeight}>
-
       <text x={MARGIN.left} y={MARGIN.top}>
         {separateThousands($selectedDTNode?.items.length || 0)} items selected
       </text>
 
       <g class="decision-tree-container" transform="translate({MARGIN.left}, {MARGIN.top})">
         <g class="links">
-          { #each links as link }
+          {#each links as link}
             <path
-              class="link
-                {isNodeInteresting(link["target"]["data"]) ? "interesting" : ""}
-                {isLinkHovered(link) ? "hover" : ""}
-                {isLinkSelected(link) ? "selected" : ""}
-              "
+              class="link"
+              class:interesting={isNodeInteresting(link['target']['data'])}
+              class:hover={isLinkHovered(link)}
+              class:selected={isLinkSelected(link)}
               stroke-width={scaleLinkSize(link["target"].value)}
               d={path(link)}
             />
@@ -199,14 +205,13 @@
           <g class="internal-nodes">
             {#each internalNodes as node}
               <g
-                class="internal-node
-                  {isNodeInteresting(node.data) ? "interesting" : ""}
-                  {isNodeHovered(node) ? "hover" : ""}
-                  {isNodeSelected(node) ? "selected" : ""}
-                "
+                class="internal-node"
+                class:interesting={isNodeInteresting(node.data)}
+                class:hover={isNodeHovered(node)}
+                class:selected={isNodeSelected(node)}
                 transform="translate({node.x},{node.y})">
                 <circle
-                  class="node {hoveredNode === node ? "hover" : ""}"
+                  class="node"
                   r={INTERNAL_NODE_SIZE}
                   on:click={() => selectDTNode()}
                   on:mouseover={() => hoverNode(node)}
@@ -216,14 +221,14 @@
                 />
 
                 {#if isNodeInteresting(node.data)}
-                  <text class="label"
+                  <text
+                    class="label"
                     font-size={FONT_SIZE}
                     alignment-baseline="middle"
                     dx={10}
                     dy={-INTERNAL_NODE_SIZE - 5}>
-
                     {`${node.data.feature} <= ${truncateFloat(node.data.threshold)}`}
-                </text>
+                  </text>
                 {/if}
               </g>
             {/each}
@@ -231,34 +236,41 @@
 
           <g class="leaf-nodes">
             {#each leafNodes as node}
-              <g class="leaf-node
-                  {isNodeInteresting(node.data) ? "interesting" : ""}
-                  {isNodeHovered(node) ? "hover" : ""}
-                  {isNodeSelected(node) ? "selected" : ""}
-                "
-                transform="translate({node.x - LEAF_NODE_WIDTH/2},{node.y})"
+              <g
+                class="leaf-node"
+                class:interesting={isNodeInteresting(node.data)}
+                class:hover={isNodeHovered(node)}
+                class:selected={isNodeSelected(node)}
+                transform="translate({node.x - LEAF_NODE_WIDTH / 2},{node.y})"
                 on:click={() => selectDTNode()}
                 on:mouseover={() => hoverNode(node)}
                 on:focus={() => hoverNode(node)}
                 on:mouseout={() => unhoverNode()}
-                on:blur={() => unhoverNode()}>
-
-                <rect class="background"
+                on:blur={() => unhoverNode()}
+              >
+                <rect
+                  class="background"
                   width={LEAF_NODE_WIDTH}
-                  height={scaleLeafSize.range()[1]} />
-                <rect class="value"
+                  height={scaleLeafSize.range()[1]}
+                />
+                <rect
+                  class="value"
                   width={LEAF_NODE_WIDTH}
-                  height={scaleLeafSize(sizeEncoding === "doi" ? node.data.value[0] : node.data.items.length)} />
+                  height={scaleLeafSize(
+                    sizeEncoding === "doi" ? node.data.value[0] : node.data.items.length
+                  )}
+                />
 
                 <text
                   class="value"
-                  dx={LEAF_NODE_WIDTH/2}
-                  dy={scaleLeafSize.range()[1] + FONT_SIZE}>
-                  {
-                    separateThousands(truncateFloat(sizeEncoding === "doi"
-                      ? node.data.value[0] : node.data.items.length
-                    ))
-                  }
+                  dx={LEAF_NODE_WIDTH / 2}
+                  dy={scaleLeafSize.range()[1] + FONT_SIZE}
+                >
+                  {separateThousands(
+                    truncateFloat(
+                      sizeEncoding === "doi" ? node.data.value[0] : node.data.items.length
+                    )
+                  )}
                 </text>
               </g>
             {/each}

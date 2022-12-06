@@ -6,7 +6,7 @@
 </script>
 
 <div class="js-object-viewer" {style}>
-  <pre style="max-width:{width}px;max-height:{height}px">{ JSON.stringify(input, null, 4) }</pre>
+  <pre style:maxWidth="{width}px" style:maxHeight="{height}px">{ JSON.stringify(input, null, 4) }</pre>
 </div>
 
 <style>

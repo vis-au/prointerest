@@ -32,7 +32,8 @@
   class="tooltip"
   bind:clientHeight={tooltipHeight}
   bind:clientWidth={tooltipWidth}
-  style="left:{left}px;top:{top}px"
+  style:left="{left}px"
+  style:top="{top}px"
 >
   <Column>
     <Row

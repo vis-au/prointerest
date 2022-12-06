@@ -8,10 +8,11 @@
   {#each alternatives as alternative}
     <label
       for="{alternative.split(' ').join('_')}-{name}-alternative"
-      class="alternative {alternative === activeAlternative ? 'active' : ''}"
+      class="alternative"
+      class:active={alternative === activeAlternative}
       title={alternative}
     >
-      <div class="alternative-text {alternative === activeAlternative ? 'active' : ''}">
+      <div class="alternative-text" class:active={alternative === activeAlternative}>
         {alternative}
       </div>
       <input

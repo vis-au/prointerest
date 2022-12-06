@@ -32,7 +32,13 @@
   );
 </script>
 
-<svg id="{id}-legend-canvas" class="legend" {width} {height} style="left: {left}px; top: {top}px">
+<svg
+  id="{id}-legend-canvas"
+  class="legend"
+  {width}
+  {height}
+  style:left="{left}px"
+  style:top="{top}px">
   <g class="color">
     <text class="legend-title" x={margin} y={margin}>{title}</text>
     <g class="values" transform="translate(0,{22})">

@@ -8,7 +8,7 @@
   const maxHeight = height === -1 ? "" : `max-height:${width}px;`;
 </script>
 
-<div {id} class="row" style="{maxWidth}{maxHeight}{style}">
+<div {id} class="row" style:maxWidth="{maxWidth}px" style:maxHeight="{maxHeight}px" {style}>
   <slot />
 </div>
 

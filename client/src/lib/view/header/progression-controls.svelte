@@ -25,12 +25,14 @@
   const width = 120;
 
   $: progress = $processedData.length / $totalSize;
-  $: position = useAbsolutePositioning
-    ? `position:absolute;left:${x}px;top:${y}px`
-    : "position:relative";
 </script>
 
-<div class="progression-controls {useDarkMode ? 'dark' : ''}" style="{style};{position}">
+<div class="progression-controls"
+  class:dark={useDarkMode}
+  style:position={useAbsolutePositioning ? "absolute" : "relative"}
+  style:left="{x}px"
+  style:top="{y}px"
+  {style}>
   <Row>
     <Row>
       <span>Iteration: <BigNumber>{$currentChunkNo}</BigNumber></span>

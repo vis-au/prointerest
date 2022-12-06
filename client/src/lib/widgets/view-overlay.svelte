@@ -9,18 +9,26 @@
 
   const dispatch = createEventDispatcher();
 
-  $: display = `display:${visible ? "flex" : "none"}`;
-  $: left = `left:${x}px`;
-  $: top = `top:${y}px`;
-  $: w = `width:${width}px`;
-  $: h = `height:${height}px`;
+  $: display = `${visible ? "flex" : "none"}`;
+  $: left = `${x}px`;
+  $: top = `${y}px`;
+  $: w = `${width}px`;
+  $: h = `${height}px`;
 
   function close() {
     dispatch("close");
   }
 </script>
 
-<div class="main-view-overlay-container" style="{display};{left};{top};{w};{h}" on:click={close}>
+<div
+  class="main-view-overlay-container"
+  style:display
+  style:left
+  style:top
+  style:width={w}
+  style:height={h}
+  on:click={close}>
+
   <div class="main-view-overlay" on:click={(event) => event.stopPropagation()}>
     <slot />
   </div>
