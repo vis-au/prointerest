@@ -12,6 +12,8 @@
   import Slider from "$lib/widgets/slider.svelte";
   import { doiLimit } from "$lib/state/doi-limit";
   import Toggle from "$lib/widgets/toggle.svelte";
+  import ControlButton from "$lib/widgets/control-button.svelte";
+  import { resetViewTransform } from "$lib/state/zoom";
 </script>
 
 <Row id="view-controls">
@@ -22,6 +24,7 @@
       alternatives={viewModes}
       bind:activeAlternative={$activeViewMode}
     />
+    <ControlButton on:click={resetViewTransform} style="margin-left:25px;padding:2px 10px">reset zoom</ControlButton>
   </div>
   <div class="configuration">
     <Toggle id="show-recent-chunk" bind:active={$isRecentChunkVisible}>Show recent chunk</Toggle>
@@ -48,14 +51,7 @@
     />
   </div>
   <div class="configuration">
-    <Slider
-      id="doi-limit"
-      label="DOI limit"
-      width={300}
-      min={0}
-      max={1}
-      bind:value={$doiLimit}
-    />
+    <Slider id="doi-limit" label="DOI limit" width={300} min={0} max={1} bind:value={$doiLimit} />
   </div>
 </Row>
 

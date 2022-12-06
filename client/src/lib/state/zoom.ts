@@ -5,3 +5,8 @@ import { zoomIdentity } from "d3-zoom";
 export const currentTransform = writable<ZoomTransform>(zoomIdentity);
 
 export const isZooming = writable(false);
+
+
+export function resetViewTransform() {
+  currentTransform.set(zoomIdentity);
+}
