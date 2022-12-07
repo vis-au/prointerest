@@ -24,7 +24,9 @@
       alternatives={viewModes}
       bind:activeAlternative={$activeViewMode}
     />
-    <ControlButton on:click={resetViewTransform} style="margin-left:25px;padding:2px 10px">reset zoom</ControlButton>
+    <ControlButton on:click={resetViewTransform} style="margin-left:25px;padding:2px 10px">
+      reset zoom
+    </ControlButton>
   </div>
   <div class="configuration">
     <Toggle id="show-recent-chunk" bind:active={$isRecentChunkVisible}>Show recent chunk</Toggle>

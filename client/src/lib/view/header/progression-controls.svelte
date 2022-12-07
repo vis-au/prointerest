@@ -38,6 +38,7 @@
       <span>Iteration: <BigNumber>{$currentChunkNo}</BigNumber></span>
       <MiniHistogram
         id="mean-doi-per-chunk"
+        domain={[0, 1]}
         width={150}
         height={25}
         values={$averageDoiPerChunk}

@@ -17,18 +17,24 @@
   import Toggle from "$lib/widgets/toggle.svelte";
   import { doiLimit } from "$lib/state/doi-limit";
   import { items } from "$lib/state/items";
-  import { INTERESTING_COLOR, UNINTERESTING_COLOR } from "$lib/state/active-view-encodings";
+  import { getRGB, INTERESTING_COLOR, UNINTERESTING_COLOR } from "$lib/state/active-view-encodings";
 
   export let width: number;
   export let height: number;
 
   const interactionFactory = new InteractionFactory(width, height, $quadtree);
 
-  let histogramMode: "selected" | "all" = "all";
+  let histogramMode: "stack interest in selection" | "stack selected" | "stack interesting" =
+    "stack interesting";
   let showDoiValues = true;
 
-  $: _items = histogramMode === "all" ? $items : $selectedItems;
+  $: _items =
+    ["stack interesting", "stack selected"].indexOf(histogramMode) > -1 ? $items : $selectedItems;
   $: data = _items.map(dataItemToRecord);
+
+  $: transform = ["stack interesting", "stack interest in selection"].indexOf(histogramMode)
+    ? [{ calculate: `datum.doi >= ${$doiLimit}`, as: "interesting" }]
+    : null;
 
   function onBrush(event: CustomEvent) {
     const selections: Record<string, [number, number]> = event.detail;
@@ -60,13 +66,13 @@
 </script>
 
 <Column id="secondary-view" {width} {height}>
-  <Row id="secondary-header" style="margin-bottom: 25px">
+  <Row id="secondary-header" style="margin-bottom: 5px">
     <Row>
       <Row style="margin-right:20px;padding-bottom:3px">
         <h2>Mode:</h2>
         <Alternatives
           name="active-histogram-mode"
-          alternatives={["selected", "all"]}
+          alternatives={["stack interesting", "stack selected", "stack interest in selection"]}
           bind:activeAlternative={histogramMode}
         />
       </Row>
@@ -78,22 +84,35 @@
     <ControlButton on:click={() => ($isSecondaryViewCollapsed = true)}>close</ControlButton>
   </Row>
   <Row id="selected-data-histograms" style="width:{width}px">
-    <MultiHistogram
-      id="secondary-selected-dims"
-      {data}
-      transform={[{ calculate: `datum.doi >= ${$doiLimit}`, as: "interesting" }]}
-      brushedInterval={$selectionInSecondaryView}
-      dimensions={$selectedDoiDimensions.concat(showDoiValues ? ["doi"] : [])}
-      showTitle={false}
-      groupDimension="interesting"
-      colors={[
-        `rgb(${UNINTERESTING_COLOR[0]}, ${UNINTERESTING_COLOR[1]}, ${UNINTERESTING_COLOR[2]})`,
-        `rgb(${INTERESTING_COLOR[0]}, ${INTERESTING_COLOR[1]}, ${INTERESTING_COLOR[2]})`,
-      ]}
-      width={310}
-      height={height * 0.4}
-      on:end={onBrush}
-    />
+    <Column>
+      <div class="colors">
+        <div class="interesting color">
+          <div class="legend" style:background={getRGB(INTERESTING_COLOR)} />
+          <span class="label">
+            {histogramMode === "stack selected" ? "selected" : "interesting"}
+          </span>
+        </div>
+        <div class="uninteresting color">
+          <div class="legend" style:background={getRGB(UNINTERESTING_COLOR)} />
+          <span class="label">
+            {histogramMode === "stack selected" ? "not selected": "uninteresting"}
+          </span>
+        </div>
+      </div>
+      <MultiHistogram
+        id="secondary-selected-dims"
+        {data}
+        {transform}
+        brushedInterval={$selectionInSecondaryView}
+        dimensions={$selectedDoiDimensions.concat(showDoiValues ? ["doi"] : [])}
+        showTitle={false}
+        groupDimension={["stack interesting", "stack interest in selection"].indexOf(histogramMode) ? "interesting" : "selected"}
+        colors={[getRGB(UNINTERESTING_COLOR), getRGB(INTERESTING_COLOR)]}
+        width={310}
+        height={height * 0.4}
+        on:end={onBrush}
+      />
+    </Column>
   </Row>
 </Column>
 
@@ -120,5 +139,26 @@
   h2 {
     font-size: 12pt;
     margin: 0;
+  }
+
+  div.colors {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 12px;
+    margin: 10px 0;
+  }
+  div.colors div.color {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0 5px;
+  }
+  div.colors div.color .legend {
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
   }
 </style>

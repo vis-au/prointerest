@@ -4,13 +4,16 @@
   export let id: string;
   export let width = 100;
   export let height = 20;
+  export let domain: [number, number] = null;
   export let values: number[];
   export let style = "";
 
-  $: scaleX = scaleLinear([0, max(values)], [0, height]);
+  $: scaleX = scaleLinear()
+    .domain(domain ? domain : [0, max(values)])
+    .range([0, height]);
 </script>
 
-<div {id} class="mini-histogram" {style}>
+<div {id} class="mini-histogram" style:height="{height}px" {style}>
   {#each values as value}
     <div
       class="bin"
@@ -33,5 +36,8 @@
     box-sizing: border-box;
     border: 1px solid #333;
     background: white;
+  }
+  div.mini-histogram .bin:hover {
+    background: #efefef;
   }
 </style>
