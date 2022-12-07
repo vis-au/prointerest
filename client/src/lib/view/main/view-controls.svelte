@@ -3,6 +3,7 @@
   import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { activeViewMode } from "$lib/state/active-view-mode";
   import { doiLimit } from "$lib/state/doi-limit";
+  import { doiValues } from "$lib/state/doi-values";
   import { isRecentChunkVisible } from "$lib/state/is-recent-chunk-visible";
   import { dimensions } from "$lib/state/processed-data";
   import { resetViewTransform } from "$lib/state/zoom";
@@ -14,7 +15,10 @@
   import HistogramSlider from "$lib/widgets/histogram-slider.svelte";
   import Row from "$lib/widgets/row.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
-  import { range } from "d3";
+  import { bin } from "d3";
+
+  let binsGenerator = bin().thresholds(25);
+  $: doiBins = binsGenerator(Array.from($doiValues.values())).map((d) => d.length);
 </script>
 
 <Row id="view-controls">
@@ -61,7 +65,7 @@
       min={0}
       max={1}
       updateLive={false}
-      values={range(25).map(Math.random)}
+      values={doiBins}
       bind:value={$doiLimit}
     />
   </div>

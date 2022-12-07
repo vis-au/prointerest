@@ -38,7 +38,7 @@
     bind:style
     on:end={(event) => dispatch("end", event.detail)}
   >
-    <MiniHistogram id="{id}-with-slider" width={sliderWidth} height={15} {values} />
+    <MiniHistogram id="{id}-with-slider" width={sliderWidth} height={15} bind:values />
   </Slider>
 </div>
 
