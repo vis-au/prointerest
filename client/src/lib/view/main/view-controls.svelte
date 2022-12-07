@@ -2,18 +2,19 @@
   import { scatterplotBrush } from "$lib/state/active-scatterplot-brush";
   import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { activeViewMode } from "$lib/state/active-view-mode";
+  import { doiLimit } from "$lib/state/doi-limit";
   import { isRecentChunkVisible } from "$lib/state/is-recent-chunk-visible";
   import { dimensions } from "$lib/state/processed-data";
+  import { resetViewTransform } from "$lib/state/zoom";
   import { brushModes } from "$lib/types/brush-mode";
   import { viewModes } from "$lib/types/view-modes";
   import Alternatives from "$lib/widgets/alternatives.svelte";
-  import Dropdown from "$lib/widgets/dropdown.svelte";
-  import Row from "$lib/widgets/row.svelte";
-  import Slider from "$lib/widgets/slider.svelte";
-  import { doiLimit } from "$lib/state/doi-limit";
-  import Toggle from "$lib/widgets/toggle.svelte";
   import ControlButton from "$lib/widgets/control-button.svelte";
-  import { resetViewTransform } from "$lib/state/zoom";
+  import Dropdown from "$lib/widgets/dropdown.svelte";
+  import HistogramSlider from "$lib/widgets/histogram-slider.svelte";
+  import Row from "$lib/widgets/row.svelte";
+  import Toggle from "$lib/widgets/toggle.svelte";
+  import { range } from "d3";
 </script>
 
 <Row id="view-controls">
@@ -53,7 +54,16 @@
     />
   </div>
   <div class="configuration">
-    <Slider id="doi-limit" label="DOI limit" width={300} min={0} max={1} bind:value={$doiLimit} />
+    <HistogramSlider
+      id="doi-limit"
+      label="DOI limit"
+      width={300}
+      min={0}
+      max={1}
+      updateLive={false}
+      values={range(25).map(Math.random)}
+      bind:value={$doiLimit}
+    />
   </div>
 </Row>
 

@@ -44,7 +44,7 @@
         width={150}
         height={25}
         values={$averageDoiPerChunk}
-        style="padding:0 5px;"
+        histogramStyle="padding:0 5px;"
       />
     </Row>
     <Column>

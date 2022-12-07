@@ -6,17 +6,25 @@
   export let height = 20;
   export let domain: [number, number] = null;
   export let values: number[];
-  export let style = "";
+  export let binStyle = "";
+  export let histogramStyle = "";
 
   $: scaleX = scaleLinear()
     .domain(domain ? domain : [0, max(values)])
     .range([0, height]);
 </script>
 
-<div {id} class="mini-histogram" style:height="{height}px" {style}>
+<div
+  {id}
+  class="mini-histogram"
+  style:width="{width}px"
+  style:height="{height}px"
+  style={histogramStyle}
+>
   {#each values as value}
     <div
       class="bin"
+      style={binStyle}
       style:width="{width / values.length}px"
       style:height="{scaleX(value)}px"
       title={value.toString()}
@@ -35,9 +43,8 @@
   div.mini-histogram .bin {
     box-sizing: border-box;
     border: 1px solid #333;
-    background: white;
   }
   div.mini-histogram .bin:hover {
-    background: #efefef;
+    opacity: 0.73;
   }
 </style>
