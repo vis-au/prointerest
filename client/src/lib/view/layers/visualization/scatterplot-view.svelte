@@ -4,18 +4,20 @@
   import { ScatterplotLayer } from "@deck.gl/layers";
   import { selectAll } from "d3-selection";
 
-  import { interestingItems } from "$lib/state/items";
+  import { items } from "$lib/state/items";
   import { randomDataSample } from "$lib/state/sampled-data";
   import { currentTransform, isZooming } from "$lib/state/zoom";
   import type DataItem from "$lib/types/data-item";
+  import { doiValues } from "$lib/state/doi-values";
+  import { doiLimit } from "$lib/state/doi-limit";
 
   export let id = "deck-gl-scatterplot";
   export let width = 100;
   export let height = 50;
-  export let radius = 5; // size of points
+  export let radius = 2; // size of points
   export let orientation = "right"; // left or right side of the screen?
 
-  $: data = $isZooming ? $randomDataSample : $interestingItems;
+  $: interestingData = $isZooming ? $randomDataSample : $items;
 
   const INITIAL_VIEW_STATE = {
     zoom: 0,
@@ -48,10 +50,14 @@
         getPosition: (d: DataItem) => [t.applyX(d.position.x), t.applyY(d.position.y)],
         getRadius: radius,
         getLineWidth: 0,
+        getLineColor: (d: DataItem) =>
+          $doiValues.get(d.id) >= $doiLimit ? [0, 0, 0] : [0, 0, 0],
+        getFillColor: (d: DataItem) =>
+          $doiValues.get(d.id) >= $doiLimit ? [0, 128, 128] : [255, 165, 0],
         opacity: 0.01,
         lineWidthUnits: "pixels",
         stroked: false,
-        data: data
+        data: interestingData
       })
     ];
 
