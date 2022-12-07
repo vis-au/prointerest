@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { dimensions } from "$lib/state/processed-data";
   import {
     doiDimensionWeights,
     isDimensionInteresting,
     selectedDoiDimensions
   } from "$lib/state/interesting-dimensions";
+  import { dimensions } from "$lib/state/processed-data";
+  import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
   import type { DOIDimension } from "$lib/types/doi-dimension";
   import { sendDimenionWeights } from "$lib/util/requests";
+  import Options from "$lib/widgets/options.svelte";
   import Row from "$lib/widgets/row.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
-  import Options from "$lib/widgets/options.svelte";
   import ProgressionControls from "./progression-controls.svelte";
-  import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
 
   export let height: number;
 

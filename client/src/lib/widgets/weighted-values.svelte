@@ -95,11 +95,12 @@
 
 <div {id} class="weighted-values" class:dark={useDarkmode} style:height="{height}px">
   {#each weights as entry, i}
-    <div class="entry"
+    <div
+      class="entry"
       class:active={activeWeight === entry[0]}
       style:width="{entry[1] * totalSize}px"
-      style:background="{backgroundColor.length > 0 ? backgroundColor : null}">
-
+      style:background={backgroundColor.length > 0 ? backgroundColor : null}
+    >
       <label for={getId(entry[0])} title={`${entry[0]}: ${entry[1] * 100}%`}>
         <span class="key">{entry[0]}</span>
         {#if showValue}
@@ -115,7 +116,7 @@
         value={entry[0]}
         bind:group={activeWeight}
         disabled={!isSelectable}
-        on:click={() => isSelectable ? selectWeight(entry[0]): null}
+        on:click={() => (isSelectable ? selectWeight(entry[0]) : null)}
       />
       {#if weightsRemovable}
         <button class="remove" on:click={() => onWeightRemoved(entry[0])}>

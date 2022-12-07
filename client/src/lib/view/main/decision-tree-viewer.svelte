@@ -182,7 +182,8 @@
       class="canvas"
       viewBox="0 0 {width} {height}"
       width={canvasWidth}
-      height={canvasHeight}>
+      height={canvasHeight}
+    >
       <text x={MARGIN.left} y={MARGIN.top}>
         {separateThousands($selectedDTNode?.items.length || 0)} items selected
       </text>
@@ -192,7 +193,7 @@
           {#each links as link}
             <path
               class="link"
-              class:interesting={isNodeInteresting(link['target']['data'])}
+              class:interesting={isNodeInteresting(link["target"]["data"])}
               class:hover={isLinkHovered(link)}
               class:selected={isLinkSelected(link)}
               stroke-width={scaleLinkSize(link["target"].value)}
@@ -209,7 +210,8 @@
                 class:interesting={isNodeInteresting(node.data)}
                 class:hover={isNodeHovered(node)}
                 class:selected={isNodeSelected(node)}
-                transform="translate({node.x},{node.y})">
+                transform="translate({node.x},{node.y})"
+              >
                 <circle
                   class="node"
                   r={INTERNAL_NODE_SIZE}
@@ -226,7 +228,8 @@
                     font-size={FONT_SIZE}
                     alignment-baseline="middle"
                     dx={10}
-                    dy={-INTERNAL_NODE_SIZE - 5}>
+                    dy={-INTERNAL_NODE_SIZE - 5}
+                  >
                     {`${node.data.feature} <= ${truncateFloat(node.data.threshold)}`}
                   </text>
                 {/if}

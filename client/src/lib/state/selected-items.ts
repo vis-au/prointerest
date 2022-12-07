@@ -16,7 +16,7 @@ import { visibleItemsSelectedInDT } from "./selection-in-dt";
 let currentlySelected: DataItem[] = [];
 export const selectedItems = writable(currentlySelected);
 
-let currentBrushedItems: DataItem[] = []
+let currentBrushedItems: DataItem[] = [];
 export const brushedItems = writable(currentBrushedItems);
 
 let currentScatterplotBrush: BrushMode = null;
@@ -29,7 +29,7 @@ let y: ScaleLinear<number, number> = null;
 
 let currentQuadtree: Quadtree<DataItem> = null;
 
-quadtree?.subscribe(newTree => {
+quadtree?.subscribe((newTree) => {
   currentQuadtree = newTree;
 });
 
@@ -126,7 +126,7 @@ selectedBins.subscribe((newBins) => {
   updateSelectedItems();
 });
 
-visibleItemsSelectedInDT.subscribe(newSelection => {
+visibleItemsSelectedInDT.subscribe((newSelection) => {
   currentSelectedInDT = newSelection;
   updateSelectedItems();
 });

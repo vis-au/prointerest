@@ -32,15 +32,17 @@ latestChunk?.subscribe((newChunk) => {
 scaleX?.subscribe(updateLatestItems);
 scaleY?.subscribe(updateLatestItems);
 
-
-export const latestInterestingItems = derived([doiLimit, latestItems, doiValues], ([$doiLimit, $latestItems, $doiValues]) => {
-  return $latestItems.filter((item) => {
-    return $doiValues.get(item.id) >= $doiLimit;
-  });
-});
+export const latestInterestingItems = derived(
+  [doiLimit, latestItems, doiValues],
+  ([$doiLimit, $latestItems, $doiValues]) => {
+    return $latestItems.filter((item) => {
+      return $doiValues.get(item.id) >= $doiLimit;
+    });
+  }
+);
 
 // if the data is cleared/reset, so should be the latest chunk
-processedData?.subscribe(newData => {
+processedData?.subscribe((newData) => {
   if (newData.length === 0) {
     latestChunk.set([]);
   }

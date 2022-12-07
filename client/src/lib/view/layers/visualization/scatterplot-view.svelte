@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { afterUpdate, onMount } from "svelte";
   import { Deck, OrthographicView } from "@deck.gl/core";
   import { ScatterplotLayer } from "@deck.gl/layers";
   import { selectAll } from "d3-selection";
+  import { afterUpdate, onMount } from "svelte";
 
+  import { HIGHLIGHT_COLOR, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
+  import { doiLimit } from "$lib/state/doi-limit";
+  import { doiValues } from "$lib/state/doi-values";
   import { items } from "$lib/state/items";
   import { randomDataSample } from "$lib/state/sampled-data";
   import { currentTransform, isZooming } from "$lib/state/zoom";
   import type DataItem from "$lib/types/data-item";
-  import { doiValues } from "$lib/state/doi-values";
-  import { doiLimit } from "$lib/state/doi-limit";
-  import { PRIMARY_COLOR, HIGHLIGHT_COLOR } from "$lib/state/active-view-encodings";
 
   export let id = "deck-gl-scatterplot";
   export let width = 100;

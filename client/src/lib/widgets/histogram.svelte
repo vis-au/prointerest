@@ -87,13 +87,13 @@
 
   $: if (!showTitle) {
     histogram.layer[0].encoding.x["title"] = false;
-  };
+  }
   $: if (domain !== null) {
     histogram.layer.forEach((l) => (l.encoding.x["scale"] = { domain }));
-  };
+  }
   $: if (usePresetInterval && selectedInterval !== null && data) {
     histogram.layer[0].params[0]["value"] = { x: selectedInterval };
-  };
+  }
 </script>
 
 <VegaLitePlot {id} spec={histogram} on:brush={onBrush} on:end={onEnd} />

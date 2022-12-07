@@ -19,7 +19,7 @@
   }
 </script>
 
-<div {id} class="options {className} {useDarkMode ? "dark" : ""}" {style}>
+<div {id} class="options {className} {useDarkMode ? 'dark' : ''}" {style}>
   {#if showInactive}
     {#each options as option}
       <div class="option">
@@ -33,7 +33,7 @@
       </div>
     {/each}
   {:else}
-    <Dropdown useDarkMode={useDarkMode} id="inactive-options" selectedValue="null" style="margin-right:20px">
+    <Dropdown {useDarkMode} id="inactive-options" selectedValue="null" style="margin-right:20px">
       <option disabled value="null">add ...</option>
       {#each inactiveOptions as option}
         <option value={option} on:click={() => select(option)}>{option}</option>

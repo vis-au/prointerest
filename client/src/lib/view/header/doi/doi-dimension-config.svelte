@@ -2,7 +2,7 @@
   import { afterUpdate } from "svelte";
   import { interestingIntervals, selectedDoiDimensions } from "$lib/state/interesting-dimensions";
   import { randomDataSample } from "$lib/state/sampled-data";
-  import {selectedDoiWeight } from "$lib/state/selected-doi-weight";
+  import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
   import { truncateFloat } from "$lib/util/number-transform";
   import { getDimensionExtent, sendInterestingDimensionRange } from "$lib/util/requests";
   import type { DOIDimension } from "$lib/types/doi-dimension";

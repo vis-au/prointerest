@@ -25,8 +25,7 @@
     .map((d) => d.mode)
     .reverse();
 
-  $: percentage =
-    Math.floor(($exploredItems.length / $randomDataSample.length) * 10000) / 100;
+  $: percentage = Math.floor(($exploredItems.length / $randomDataSample.length) * 10000) / 100;
 
   function exploredItemsToRecord(items: Map<DataItem, number>): Record<"interest", number>[] {
     return Array.from(items.values()).map((value) => {

@@ -67,13 +67,15 @@
 </script>
 
 <div id="{id}-binned-scatterplot-view" class="binned-scatterplot-view">
-  <canvas id="{id}-uninteresting-bins-canvas"
+  <canvas
+    id="{id}-uninteresting-bins-canvas"
     class="bins-canvas uninteresting"
     {width}
     {height}
     bind:this={uninterestingCanvasElement}
   />
-  <canvas id="{id}-interesting-bins-canvas"
+  <canvas
+    id="{id}-interesting-bins-canvas"
     class="bins-canvas"
     {width}
     {height}

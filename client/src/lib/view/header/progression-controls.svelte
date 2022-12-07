@@ -2,6 +2,7 @@
   import { averageDoiPerChunk } from "$lib/state/doi-values";
   import { processedData, totalSize } from "$lib/state/processed-data";
   import {
+    currentChunkNo,
     pauseProgression,
     progressionState,
     resetProgression,
@@ -10,11 +11,10 @@
   import { abbreviate } from "$lib/util/number-transform";
   import BigNumber from "$lib/widgets/big-number.svelte";
   import Column from "$lib/widgets/column.svelte";
+  import MiniHistogram from "$lib/widgets/mini-histogram.svelte";
   import ProgressBar from "$lib/widgets/progress-bar.svelte";
   import Row from "$lib/widgets/row.svelte";
-  import { currentChunkNo } from "$lib/state/progression";
   import ControlButton from "../../widgets/control-button.svelte";
-  import MiniHistogram from "$lib/widgets/mini-histogram.svelte";
 
   export let x = 0;
   export let y = 0;
@@ -27,12 +27,14 @@
   $: progress = $processedData.length / $totalSize;
 </script>
 
-<div class="progression-controls"
+<div
+  class="progression-controls"
   class:dark={useDarkMode}
   style:position={useAbsolutePositioning ? "absolute" : "relative"}
   style:left="{x}px"
   style:top="{y}px"
-  {style}>
+  {style}
+>
   <Row>
     <Row>
       <span>Iteration: <BigNumber>{$currentChunkNo}</BigNumber></span>

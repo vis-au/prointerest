@@ -40,8 +40,8 @@ const progressionCallback = () => {
         currentDoiValues.set(id, doi);
       });
 
-      currentChunkNo.update(chunkNo => chunkNo + 1);
-      averageDoiPerChunk.update(averageDois => averageDois.concat(mean(chunk.dois)));
+      currentChunkNo.update((chunkNo) => chunkNo + 1);
+      averageDoiPerChunk.update((averageDois) => averageDois.concat(mean(chunk.dois)));
       doiValues.update(() => currentDoiValues);
 
       currentlyWaiting = false;

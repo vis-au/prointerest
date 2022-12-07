@@ -1,14 +1,17 @@
 import type { DecisionTree, InternalNode, LeafNode } from "$lib/types/decision-tree";
 import type { DOIDimension } from "$lib/types/doi-dimension";
 import { writable } from "svelte/store";
-import { doiDimensionWeights, interestingIntervals, selectedDoiDimensions } from "./interesting-dimensions";
+import {
+  doiDimensionWeights,
+  interestingIntervals,
+  selectedDoiDimensions
+} from "./interesting-dimensions";
 
 export const activeFDLTree = writable(null as DecisionTree);
 
-let currentIntervals: Record<DOIDimension, [number, number]> = null
+let currentIntervals: Record<DOIDimension, [number, number]> = null;
 let currentSelectedDoiDimension: DOIDimension[] = [];
 let currentDoiWeights: Map<DOIDimension, number> = null;
-
 
 function createEmptyInternalNode(accumulatedInterest: number): InternalNode {
   return {
@@ -32,7 +35,7 @@ function createTreeFromDimensions(dimensions: DOIDimension[]) {
   let currentNode = newTree;
 
   dimensions
-    .filter(dimension => currentIntervals[dimension])
+    .filter((dimension) => currentIntervals[dimension])
     .forEach((dimension, i) => {
       const interval = currentIntervals[dimension]
         ? currentIntervals[dimension]
@@ -48,7 +51,6 @@ function createTreeFromDimensions(dimensions: DOIDimension[]) {
       currentNode.left = createEmptyInternalNode(accumulatedInterest) as InternalNode;
       currentNode.left.feature = dimension;
       currentNode.left.threshold = interval[0];
-
 
       if (i < dimensions.length - 1) {
         (currentNode.left.left as LeafNode).value = [accumulatedInterest];
@@ -69,8 +71,8 @@ function updateFDLTree() {
   }
 
   const rangedWeightedDimensions = currentSelectedDoiDimension
-    .filter(dimension => currentIntervals[dimension])
-    .filter(dimension => currentDoiWeights?.has(dimension));
+    .filter((dimension) => currentIntervals[dimension])
+    .filter((dimension) => currentDoiWeights?.has(dimension));
 
   if (rangedWeightedDimensions.length === 0) {
     activeFDLTree.set(null);
@@ -81,17 +83,17 @@ function updateFDLTree() {
   activeFDLTree.set(newTree);
 }
 
-interestingIntervals.subscribe(newIntervals => {
+interestingIntervals.subscribe((newIntervals) => {
   currentIntervals = newIntervals;
   updateFDLTree();
 });
 
-selectedDoiDimensions.subscribe(newDimension => {
+selectedDoiDimensions.subscribe((newDimension) => {
   currentSelectedDoiDimension = newDimension;
   updateFDLTree();
 });
 
-doiDimensionWeights.subscribe(newWeights => {
+doiDimensionWeights.subscribe((newWeights) => {
   currentDoiWeights = newWeights;
   updateFDLTree();
 });

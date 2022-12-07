@@ -59,7 +59,7 @@ export async function getDimensionExtent(dimension: string): Promise<{ min: numb
 
 export async function getNextChunk(
   chunkSize: number
-): Promise<{ chunk: number[][]; dois: number[], updated_ids: string[], updated_dois: number[] }> {
+): Promise<{ chunk: number[][]; dois: number[]; updated_ids: string[]; updated_dois: number[] }> {
   return sendRequestToBaseURL(`/next_chunk?size=${chunkSize}`);
 }
 
@@ -166,12 +166,14 @@ export async function sendSteeringFilters(filters: DimensionFilter) {
   return sendRequestToBaseURL("/steer", "POST", { filters });
 }
 
-export async function _sendSteeringByExampleItems(interestings: DataItem[], uninterestings: DataItem[], dimensions: string[]) {
+export async function _sendSteeringByExampleItems(
+  interestings: DataItem[],
+  uninterestings: DataItem[],
+  dimensions: string[]
+) {
   // NOTE: to train the steering-by-example classifier, we need interesting AND uninteresting items!
 
-  const items = interestings
-    .concat(uninterestings)
-    .map(d => d.values);
+  const items = interestings.concat(uninterestings).map((d) => d.values);
 
   // simple vector indicating whether item in the request is marked as interesting or not
   const isInteresting = range(items.length).map((i) => {
@@ -185,12 +187,14 @@ export async function _sendSteeringByExampleItems(interestings: DataItem[], unin
   });
 }
 
-export async function getDecisionTree(interestings: DataItem[], uninterestings: DataItem[], dimensions: string[]): Promise<DecisionTree> {
+export async function getDecisionTree(
+  interestings: DataItem[],
+  uninterestings: DataItem[],
+  dimensions: string[]
+): Promise<DecisionTree> {
   // NOTE: to train the steering-by-example classifier, we need interesting AND uninteresting items!
 
-  const items = interestings
-    .concat(uninterestings)
-    .map(d => d.values);
+  const items = interestings.concat(uninterestings).map((d) => d.values);
 
   // simple vector indicating whether item in the request is marked as interesting or not
   const isInteresting = range(items.length).map((i) => {
@@ -205,10 +209,13 @@ export async function getDecisionTree(interestings: DataItem[], uninterestings: 
   });
 }
 
-export async function getRegressionTree(items: DataItem[], interest: number[], dimensions: string[]): Promise<DecisionTree> {
-
+export async function getRegressionTree(
+  items: DataItem[],
+  interest: number[],
+  dimensions: string[]
+): Promise<DecisionTree> {
   return sendRequestToBaseURL("/train_tree", "POST", {
-    items: items.map(d => d.values),
+    items: items.map((d) => d.values),
     dimensions,
     label: interest,
     use_regression: true

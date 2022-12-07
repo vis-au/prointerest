@@ -1,6 +1,6 @@
 <script lang="ts">
-  import {activeDecisionTree} from "$lib/state/active-decision-tree";
-  import {activeFDLTree} from "$lib/state/active-fdl-tree";
+  import { activeDecisionTree } from "$lib/state/active-decision-tree";
+  import { activeFDLTree } from "$lib/state/active-fdl-tree";
   import Alternatives from "$lib/widgets/alternatives.svelte";
   import ControlButton from "../../widgets/control-button.svelte";
   import DecisionTreeViewer from "./decision-tree-viewer.svelte";
@@ -10,7 +10,7 @@
   export let width = 500;
   export let height = 500;
 
-  let isHidden = true;  // flag for whether the tree is visible or not
+  let isHidden = true; // flag for whether the tree is visible or not
   let currentlyShownTree = "decision tree";
 
   function hide() {
@@ -22,12 +22,10 @@
   }
 </script>
 
-
 <div class="decision-tree-panel" style="left:{x}px;top:{y}px;">
   {#if isHidden}
     <ControlButton style="width:2rem;height:2rem" on:click={show}>DT</ControlButton>
   {:else}
-
     <div class="container">
       <h2>
         <div class="left">
@@ -35,15 +33,12 @@
           <Alternatives
             name="currently-shown-tree"
             alternatives={["decision tree", "FDL tree"]}
-
             bind:activeAlternative={currentlyShownTree}
           />
         </div>
 
         <div class="right">
-          <ControlButton
-            on:click={hide}
-            style="width:20px;height:20px;line-height:20px;padding:0">
+          <ControlButton on:click={hide} style="width:20px;height:20px;line-height:20px;padding:0">
             <div style="transform:rotate(45deg)">+</div>
           </ControlButton>
         </div>
@@ -53,7 +48,7 @@
         id="tree-viewer"
         {width}
         {height}
-        decisionTree={currentlyShownTree === "decision tree" ? $activeDecisionTree: $activeFDLTree}
+        decisionTree={currentlyShownTree === "decision tree" ? $activeDecisionTree : $activeFDLTree}
       />
     </div>
   {/if}

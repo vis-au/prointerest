@@ -6,7 +6,6 @@ export const currentTransform = writable<ZoomTransform>(zoomIdentity);
 
 export const isZooming = writable(false);
 
-
 export function resetViewTransform() {
   currentTransform.set(zoomIdentity);
 }

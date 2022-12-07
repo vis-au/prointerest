@@ -27,8 +27,8 @@
   style:top
   style:width={w}
   style:height={h}
-  on:click={close}>
-
+  on:click={close}
+>
   <div class="main-view-overlay" on:click={(event) => event.stopPropagation()}>
     <slot />
   </div>

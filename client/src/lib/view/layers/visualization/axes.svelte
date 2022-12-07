@@ -23,10 +23,7 @@
   afterUpdate(() => {
     const canvas = select(container);
     canvas.selectAll("g.axis").remove();
-    canvas.append("g")
-      .attr("class", "axis x")
-      .call(xAxis)
-      .call(styleAxes);
+    canvas.append("g").attr("class", "axis x").call(xAxis).call(styleAxes);
     canvas
       .append("g")
       .attr("class", "axis y")
@@ -37,7 +34,7 @@
 </script>
 
 <svg id="axes" {width} {height}>
-  <g bind:this={container} id="axes-container"/>
+  <g bind:this={container} id="axes-container" />
   <rect
     class="background x"
     x={width / 2}

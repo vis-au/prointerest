@@ -2,22 +2,22 @@
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import type HistogramBrushInteraction from "$lib/provenance/histogram-brush-interaction";
   import { interactionLog } from "$lib/provenance/interaction-log";
+  import { getRGB, HIGHLIGHT_COLOR, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
+  import { doiLimit } from "$lib/state/doi-limit";
   import { selectedDoiDimensions } from "$lib/state/interesting-dimensions";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
+  import { items } from "$lib/state/items";
   import { dimensions } from "$lib/state/processed-data";
   import { quadtree } from "$lib/state/quadtree";
-  import { selectionInSecondaryView } from "$lib/state/selection-in-secondary-view";
   import { selectedItems } from "$lib/state/selected-items";
+  import { selectionInSecondaryView } from "$lib/state/selection-in-secondary-view";
   import { dataItemToRecord } from "$lib/util/item-transform";
-  import MultiHistogram from "$lib/widgets/multi-histogram.svelte";
   import Alternatives from "$lib/widgets/alternatives.svelte";
   import Column from "$lib/widgets/column.svelte";
   import ControlButton from "$lib/widgets/control-button.svelte";
+  import MultiHistogram from "$lib/widgets/multi-histogram.svelte";
   import Row from "$lib/widgets/row.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
-  import { doiLimit } from "$lib/state/doi-limit";
-  import { items } from "$lib/state/items";
-  import { getRGB, HIGHLIGHT_COLOR, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
 
   export let width: number;
   export let height: number;
@@ -95,7 +95,7 @@
         <div class="uninteresting color">
           <div class="legend" style:background={getRGB(HIGHLIGHT_COLOR)} />
           <span class="label">
-            {histogramMode === "stack selected" ? "not selected": "uninteresting"}
+            {histogramMode === "stack selected" ? "not selected" : "uninteresting"}
           </span>
         </div>
       </div>
@@ -106,7 +106,9 @@
         brushedInterval={$selectionInSecondaryView}
         dimensions={$selectedDoiDimensions.concat(showDoiValues ? ["doi"] : [])}
         showTitle={false}
-        groupDimension={["stack interesting", "stack interest in selection"].indexOf(histogramMode) ? "interesting" : "selected"}
+        groupDimension={["stack interesting", "stack interest in selection"].indexOf(histogramMode)
+          ? "interesting"
+          : "selected"}
         colors={[getRGB(HIGHLIGHT_COLOR), getRGB(PRIMARY_COLOR)]}
         width={310}
         height={height * 0.4}

@@ -24,7 +24,7 @@
     <BinnedScatterplotView {width} {height} />
   {/if}
 
-  {#if $isRecentChunkVisible }
+  {#if $isRecentChunkVisible}
     <RecentPoints {width} {height} />
   {/if}
 
@@ -33,10 +33,7 @@
   <BrushLayer {width} {height} />
   <InteractionLayer {width} {height} />
 
-  <DecisionTreePanel
-    x={40}
-    y={80}
-  />
+  <DecisionTreePanel x={40} y={80} />
 
   <Tooltip />
 

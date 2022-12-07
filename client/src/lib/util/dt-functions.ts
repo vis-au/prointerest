@@ -73,7 +73,6 @@ export function doesItemFitFilter(
   return matchesFilters;
 }
 
-
 export function getPathToDTNode(node: DecisionTree): DecisionTree[] {
   if (!node.parent) {
     return [node];
