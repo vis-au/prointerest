@@ -10,6 +10,9 @@ export const activeViewEncodings: Writable<Encodings> = writable({
   color: null
 });
 
+export const INTERESTING_COLOR = [255, 165, 0];
+export const UNINTERESTING_COLOR = [0, 128, 128];
+
 activeViewEncodings.subscribe((newEncodings) => {
   if (newEncodings.x !== null) {
     sendAxisDimension("x", newEncodings.x);

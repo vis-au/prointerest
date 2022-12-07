@@ -15,7 +15,9 @@
   import ControlButton from "$lib/widgets/control-button.svelte";
   import Row from "$lib/widgets/row.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
-  import { interestingItems } from "$lib/state/items";
+  import { doiLimit } from "$lib/state/doi-limit";
+  import { items } from "$lib/state/items";
+  import { INTERESTING_COLOR, UNINTERESTING_COLOR } from "$lib/state/active-view-encodings";
 
   export let width: number;
   export let height: number;
@@ -25,8 +27,8 @@
   let histogramMode: "selected" | "all" = "all";
   let showDoiValues = true;
 
-  $: items = histogramMode === "all" ? $interestingItems : $selectedItems;
-  $: data = items.map(dataItemToRecord);
+  $: _items = histogramMode === "all" ? $items : $selectedItems;
+  $: data = _items.map(dataItemToRecord);
 
   function onBrush(event: CustomEvent) {
     const selections: Record<string, [number, number]> = event.detail;
@@ -79,10 +81,15 @@
     <MultiHistogram
       id="secondary-selected-dims"
       {data}
+      transform={[{ calculate: `datum.doi >= ${$doiLimit}`, as: "interesting" }]}
       brushedInterval={$selectionInSecondaryView}
       dimensions={$selectedDoiDimensions.concat(showDoiValues ? ["doi"] : [])}
       showTitle={false}
-      groupDimension="selected"
+      groupDimension="interesting"
+      colors={[
+        `rgb(${UNINTERESTING_COLOR[0]}, ${UNINTERESTING_COLOR[1]}, ${UNINTERESTING_COLOR[2]})`,
+        `rgb(${INTERESTING_COLOR[0]}, ${INTERESTING_COLOR[1]}, ${INTERESTING_COLOR[2]})`,
+      ]}
       width={310}
       height={height * 0.4}
       on:end={onBrush}

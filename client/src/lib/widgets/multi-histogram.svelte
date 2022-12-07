@@ -3,11 +3,12 @@
   import VegaLitePlot from "./vega-lite-plot.svelte";
 
   export let id: string;
-  export let colors: string[] = [];
+  export let colors: string[] = null;
   export let width: number;
   export let height: number;
   export let bins = 50;
   export let data: Record<string, unknown>[];
+  export let transform: Record<string, unknown>[] = [];
   export let dimensions: string[];
   export let brushedInterval: Record<string, [number, number]> = null;
   export let usePresetInterval = true;
@@ -42,13 +43,13 @@
   $: colorEncoding =
     groupDimension === null
       ? {
-          value: colors.length ? colors[0] : "#555"
+          value: colors ? colors[0] : "#555"
         }
       : {
           field: groupDimension,
           legend: null,
           scale: {
-            range: colors.length ? colors : ["teal", "orange"]
+            range: colors ? colors : ["teal", "orange"]
           }
         };
 
@@ -57,6 +58,7 @@
     data: {
       values: data
     },
+    transform: transform,
     repeat: dimensions,
     spec: {
       width: width,
