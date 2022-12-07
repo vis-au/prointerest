@@ -28,13 +28,13 @@
     "stack interesting";
   let showDoiValues = true;
 
-  $: _items =
-    ["stack interesting", "stack selected"].indexOf(histogramMode) > -1 ? $items : $selectedItems;
+  $: _items = histogramMode === "stack interest in selection" ? $selectedItems : $items;
   $: data = _items.map(dataItemToRecord);
 
-  $: transform = ["stack interesting", "stack interest in selection"].indexOf(histogramMode)
-    ? [{ calculate: `datum.doi >= ${$doiLimit}`, as: "interesting" }]
-    : null;
+  $: transform =
+    ["stack interesting", "stack interest in selection"].indexOf(histogramMode) > -1
+      ? [{ calculate: `datum.doi >= ${$doiLimit}`, as: "interesting" }]
+      : null;
 
   function onBrush(event: CustomEvent) {
     const selections: Record<string, [number, number]> = event.detail;
@@ -106,9 +106,7 @@
         brushedInterval={$selectionInSecondaryView}
         dimensions={$selectedDoiDimensions.concat(showDoiValues ? ["doi"] : [])}
         showTitle={false}
-        groupDimension={["stack interesting", "stack interest in selection"].indexOf(histogramMode)
-          ? "interesting"
-          : "selected"}
+        groupDimension={histogramMode === "stack selected" ? "selected" : "interesting"}
         colors={[getRGB(HIGHLIGHT_COLOR), getRGB(PRIMARY_COLOR)]}
         width={310}
         height={height * 0.4}
