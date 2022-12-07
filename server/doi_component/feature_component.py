@@ -36,7 +36,9 @@ class FeatureComponent(DoiComponent):
         X_mask = np.zeros_like(X_)
 
         for i, dimension in enumerate(self.weights):
-            dim_index = dimensions.index(dimension)  # get the column name in the dataframe ...
+            dim_index = dimensions.index(
+                dimension
+            )  # get the column name in the dataframe ...
 
             # assume everything to be interesting if no interval is provided
             interval = (

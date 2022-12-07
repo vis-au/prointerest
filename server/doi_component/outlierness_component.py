@@ -11,7 +11,9 @@ from .doi_component import DoiComponent
 
 # adapted from https://scikit-learn.org/stable/modules/outlier_detection.html
 class OutliernessComponent(DoiComponent):
-    def __init__(self, subspace: list = None, outlierness_fraction: float = 0.15) -> None:
+    def __init__(
+        self, subspace: list = None, outlierness_fraction: float = 0.15
+    ) -> None:
         super().__init__()
         self.subspace = subspace
         self.outliers_fraction = outlierness_fraction
@@ -25,12 +27,12 @@ class OutliernessComponent(DoiComponent):
             EllipticEnvelope(contamination=self.outliers_fraction),
             OneClassSVM(nu=self.outliers_fraction, gamma=0.1),
             IsolationForest(contamination=self.outliers_fraction, random_state=0),
-            LocalOutlierFactor(n_neighbors=10, contamination=self.outliers_fraction)
+            LocalOutlierFactor(n_neighbors=10, contamination=self.outliers_fraction),
         ]
 
     def compute_doi(self, X: pd.DataFrame):
         if len(X) == 0:
-            return np.empty((0, ))
+            return np.empty((0,))
 
         if self.subspace is not None:
             X_ = X[self.subspace].to_numpy()
@@ -55,7 +57,7 @@ class OutliernessComponent(DoiComponent):
                 self.weights["elliptic"],
                 self.weights["oneclass"],
                 self.weights["forest"],
-                self.weights["lof"]
+                self.weights["lof"],
             ]
         ).reshape(len(predictions), 1)
 

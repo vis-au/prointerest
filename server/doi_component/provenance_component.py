@@ -52,7 +52,7 @@ class ProvenanceComponent(DoiComponent):
         if len(self.log) == 0:
             return pd.Series(np.zeros((len(X))))
         elif len(X) == 0:
-            return np.empty((0, ))
+            return np.empty((0,))
 
         # "flatten" the list of ids into separate rows
         s = self.log.set_index(["timestamp", "mode"])["ids"]
@@ -85,7 +85,8 @@ class ProvenanceComponent(DoiComponent):
             as_df.set_index("id"), on="id", lsuffix="left_", rsuffix="right_"
         )["doi"]
 
-        # input might contain items that have not been interacted with, which evaluate to NaN, so set them 0
+        # input might contain items that have not been interacted with, which evaluate to NaN, so
+        # set them 0
         doi.loc[doi.isna()] = 0
         doi = doi.astype(np.float64)
 

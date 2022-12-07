@@ -38,13 +38,13 @@ class ScagnosticsComponent(DoiComponent):
 
     def get_doi(self, ids: np.ndarray):
         if len(ids) == 0:
-            return np.empty((0, ))
+            return np.empty((0,))
 
         # this is a sanity check, in case this function is called "on-demand", finding only those
         # ids that we actually have scores for
         available_scores = self.scores.loc[self.scores[ID].isin(ids)]
 
-        doi = np.zeros((len(available_scores), ))
+        doi = np.zeros((len(available_scores),))
 
         for measure in self.weights:
             doi += self.weights[measure] * available_scores[measure]
@@ -53,12 +53,16 @@ class ScagnosticsComponent(DoiComponent):
 
     def compute_doi(self, X: pd.DataFrame):
         if len(X) == 0:
-            return np.empty((0, ))
+            return np.empty((0,))
 
-        X_ = X.select_dtypes(["number"]) if len(self.subspace) == 0 else X[self.subspace]
+        X_ = (
+            X.select_dtypes(["number"]) if len(self.subspace) == 0 else X[self.subspace]
+        )
 
         # get scagnostics scores for the input along the current axes in the plot
-        scores, _ = scagnostics(X[self.subspace[0]].to_numpy(), X[self.subspace[1]].to_numpy())
+        scores, _ = scagnostics(
+            X[self.subspace[0]].to_numpy(), X[self.subspace[1]].to_numpy()
+        )
 
         # score names produced by the library have upper case first letter key, so we need to fit
         # those to the labels used in self.weights

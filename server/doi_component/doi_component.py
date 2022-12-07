@@ -29,8 +29,8 @@ class DoiComponent:
 
     def update(self, data):
         """
-        Send more information to the doi function based on the progression. This could for instance be
-        a set of adjusted function parameters.
+        Send more information to the doi function based on the progression. This could for instance
+        be a set of adjusted function parameters.
         """
         pass
 
@@ -44,9 +44,9 @@ class DoiComponent:
 
     def predict_doi(self, X: DataFrame):
         """
-        Given the state of the doi predictor, predicts the degree of interest for the given a matrix X
-        with shape (n, m) without evaluating the full function. Returns a vector y of shape (n, 1),
-        containing the predicted doi for each item.
+        Given the state of the doi predictor, predicts the degree of interest for the given a matrix
+        X with shape (n, m) without evaluating the full function. Returns a vector y of shape
+        (n, 1), containing the predicted doi for each item.
         """
         if not self.is_trained:
             return Series(np.zeros((len(X))))
@@ -55,10 +55,10 @@ class DoiComponent:
 
     def get_prediction_error(self, X: DataFrame):
         """
-        A benchmarking function for the predictor: How accurate are the predictions based on the current
-        model? Takes a matrix X with shape (n, m) as input, then computes both the prediction and the
-        actual doi for this matrix, therefore has high runtime. Outputs the place-wise error as a vector
-        of shape (n, 1).
+        A benchmarking function for the predictor: How accurate are the predictions based on the
+        current model? Takes a matrix X with shape (n, m) as input, then computes both the
+        prediction and the actual doi for this matrix, therefore has high runtime. Outputs the
+        place-wise error as a vector of shape (n, 1).
         """
         prediction = self.predict_doi(X.drop(columns=["id"]))
         actual_doi = self.compute_doi(X)
@@ -68,8 +68,8 @@ class DoiComponent:
     def train(self, X: DataFrame):
         """
         Train the predictor model using the data in X. Evaluates the doi for all items in the input
-        marix X of shape (n, m) and then uses the output as training data for the predictor. Returns the
-        computed label vector of shape (n, 1).
+        marix X of shape (n, m) and then uses the output as training data for the predictor. Returns
+        the computed label vector of shape (n, 1).
         """
         training_data = X.drop(columns=["id"]).to_numpy()
         training_labels = self.compute_doi(X)
