@@ -16,6 +16,7 @@
   export let showTitle = false;
 
   const dispatch = createEventDispatcher();
+  const POINT_COLOR = "#555";
 
   $: brushedDimension =
     brushedInterval && Object.keys(brushedInterval).length > 0
@@ -40,18 +41,23 @@
     dispatch("end", brushedInterval);
   }
 
-  $: colorEncoding =
-    groupDimension === null
-      ? {
-          value: colors ? colors[0] : "#555"
-        }
-      : {
-          field: groupDimension,
-          legend: null,
-          scale: {
-            range: colors ? colors : ["teal", "orange"]
-          }
-        };
+  let colorEncoding: Record<string, unknown> = {};
+
+  $: if (colors && groupDimension) {
+    colorEncoding = {
+      field: groupDimension,
+      legend: null,
+      scale: { range: colors }
+    };
+  } else if (groupDimension === null && colors) {
+    colorEncoding = {
+      value: colors[0]
+    };
+  } else if (groupDimension) {
+    colorEncoding = {
+      value: POINT_COLOR
+    };
+  }
 
   $: histogram = {
     $schema: "https://vega.github.io/schema/vega-lite/v5.1.1.json",
@@ -108,7 +114,6 @@
   }
   $: if (usePresetInterval && brushedInterval && brushedDimension && data) {
     // histogram.spec.layer[0].params[0]["value"] = { x: brushedInterval[brushedDimension] };
-
     // FIXME: the code below does not work, as it seems to be a bug in vega-lite
     // https://github.com/vega/vega-lite/issues/8348
     // view?.signal("brush", {"trip_distance": [12.706451612903226,20.129032258064516]}).run();
