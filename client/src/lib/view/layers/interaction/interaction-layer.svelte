@@ -65,7 +65,7 @@
     $interactionLog.add(interaction);
   }
 
-  async function _steer(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
+  async function trainDecisionTree(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
     const interesting = brushInteraction.getAffectedItems();
 
     // find data to train against, by finding (at most twice as many) uninteresting items
@@ -77,7 +77,7 @@
     $activeDecisionTree = await getDecisionTree(interesting, uninteresting, $dimensions);
   }
 
-  async function steer(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
+  async function trainRegressionTree(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
     const interesting = brushInteraction.getAffectedItems();
 
     const scores = Array.from({ length: interesting.length }).map(Math.random);
@@ -95,14 +95,12 @@
       const y1_ = $scaleY(y1);
       const interaction = interactionFactory.createScatterplotBrushInteraction(x0_, y0_, x1_, y1_);
       onInteraction(interaction);
-      steer(interaction); // FIXME: steers every time user brushes
     } else if ($activeLasso !== null) {
       const polygon = $activeLasso.map(
         (pos) => [$scaleX(pos[0]), $scaleY(pos[1])] as [number, number]
       );
       const interaction = interactionFactory.createLassoBrushInteraction(polygon);
       onInteraction(interaction);
-      steer(interaction); // FIXME: steers every time user brushes
     }
   }
 
