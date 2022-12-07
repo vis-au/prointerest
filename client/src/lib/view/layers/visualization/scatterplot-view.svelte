@@ -10,7 +10,7 @@
   import type DataItem from "$lib/types/data-item";
   import { doiValues } from "$lib/state/doi-values";
   import { doiLimit } from "$lib/state/doi-limit";
-  import { INTERESTING_COLOR, UNINTERESTING_COLOR } from "$lib/state/active-view-encodings";
+  import { PRIMARY_COLOR, HIGHLIGHT_COLOR } from "$lib/state/active-view-encodings";
 
   export let id = "deck-gl-scatterplot";
   export let width = 100;
@@ -52,8 +52,7 @@
         getRadius: radius,
         getLineWidth: 0,
         getFillColor: (d: DataItem) =>
-          $doiValues.get(d.id) >= $doiLimit ? INTERESTING_COLOR : UNINTERESTING_COLOR,
-        opacity: 0.01,
+          $doiValues.get(d.id) >= $doiLimit ? PRIMARY_COLOR : HIGHLIGHT_COLOR,
         lineWidthUnits: "pixels",
         stroked: false,
         data: interestingData

@@ -30,7 +30,7 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    align-items: baseline;
+    align-items: flex-end;
   }
   div.mini-histogram .bin {
     box-sizing: border-box;

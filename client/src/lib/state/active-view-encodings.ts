@@ -10,8 +10,8 @@ export const activeViewEncodings: Writable<Encodings> = writable({
   color: null
 });
 
-export const INTERESTING_COLOR: [number, number, number] = [255, 165, 0];
-export const UNINTERESTING_COLOR: [number, number, number] = [0, 128, 128];
+export const PRIMARY_COLOR: [number, number, number] = [255, 165, 0];
+export const HIGHLIGHT_COLOR: [number, number, number] = [0, 128, 128];
 
 export function getRGB(rgbColor: [number, number, number]) {
   return `rgb(${rgbColor[0]}, ${rgbColor[1]}, ${rgbColor[2]})`;

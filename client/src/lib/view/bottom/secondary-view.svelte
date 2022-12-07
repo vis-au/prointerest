@@ -17,7 +17,7 @@
   import Toggle from "$lib/widgets/toggle.svelte";
   import { doiLimit } from "$lib/state/doi-limit";
   import { items } from "$lib/state/items";
-  import { getRGB, INTERESTING_COLOR, UNINTERESTING_COLOR } from "$lib/state/active-view-encodings";
+  import { getRGB, HIGHLIGHT_COLOR, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
 
   export let width: number;
   export let height: number;
@@ -87,13 +87,13 @@
     <Column>
       <div class="colors">
         <div class="interesting color">
-          <div class="legend" style:background={getRGB(INTERESTING_COLOR)} />
+          <div class="legend" style:background={getRGB(PRIMARY_COLOR)} />
           <span class="label">
             {histogramMode === "stack selected" ? "selected" : "interesting"}
           </span>
         </div>
         <div class="uninteresting color">
-          <div class="legend" style:background={getRGB(UNINTERESTING_COLOR)} />
+          <div class="legend" style:background={getRGB(HIGHLIGHT_COLOR)} />
           <span class="label">
             {histogramMode === "stack selected" ? "not selected": "uninteresting"}
           </span>
@@ -107,7 +107,7 @@
         dimensions={$selectedDoiDimensions.concat(showDoiValues ? ["doi"] : [])}
         showTitle={false}
         groupDimension={["stack interesting", "stack interest in selection"].indexOf(histogramMode) ? "interesting" : "selected"}
-        colors={[getRGB(UNINTERESTING_COLOR), getRGB(INTERESTING_COLOR)]}
+        colors={[getRGB(HIGHLIGHT_COLOR), getRGB(PRIMARY_COLOR)]}
         width={310}
         height={height * 0.4}
         on:end={onBrush}
