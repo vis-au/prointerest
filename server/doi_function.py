@@ -1,26 +1,28 @@
-from typing import Literal, Tuple, List
-import pandas as pd
-import numpy as np
+from typing import List, Literal, Tuple
 
-from database import get_dimensions_in_data, ID, ID_INDEX
-from doi_component.doi_component import DoiComponent
-from doi_component.scagnostics_component import ScagnosticsComponent
-from doi_component.feature_component import FeatureComponent
-from doi_component.interaction_component import InteractionComponent
+import numpy as np
+import pandas as pd
 from context_item_selection_strategy.context_item_selection_strategy import (
     ContextItemSelectionStrategy,
 )
+from context_item_selection_strategy.doi_based_context import DoiBasedContext
+from database import ID, ID_INDEX, get_dimensions_in_data
+from doi_component.doi_component import DoiComponent
+from doi_component.feature_component import FeatureComponent
+from doi_component.interaction_component import InteractionComponent
+from doi_component.provenance_component import ProvenanceComponent
+from doi_component.scagnostics_component import ScagnosticsComponent
 from outdated_item_selection_strategy.outdated_item_selection_strategy import (
     OutdatedItemSelectionStrategy,
 )
-from doi_component.provenance_component import ProvenanceComponent
-from context_item_selection_strategy.doi_based_context import DoiBasedContext
-from storage_strategy.windowing_storage import WindowingStorage
 from storage_strategy.storage_strategy import StorageStrategy
-
+from storage_strategy.windowing_storage import WindowingStorage
 
 # INTEREST COMPUTATION
+CONTEXT_SIZE = 1000
+UPDATE_INTERVAL = 10
 STORAGE_SIZE = 100000
+
 current_chunk = 0
 current_interactions = 0
 
@@ -176,10 +178,6 @@ def log_interaction(
         interaction_comp.undo_outdated_interactions()
 
     current_interactions += 1
-
-
-CONTEXT_SIZE: int = 1000
-UPDATE_INTERVAL: int = 10
 
 
 def doi_f(chunk_with_context: np.ndarray):
