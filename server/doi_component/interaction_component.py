@@ -81,10 +81,13 @@ class InteractionComponent(DoiComponent):
         """
         M = self.get_interaction_count_matrix()  # get interaction counts as matrix
 
-        X.set_index(0, inplace=True)
+        X_ = X.copy()
+        X_.set_index(0, inplace=True)
 
-        Y = X.join(M, how="left")  # for all rows not in M the "count" column is NaN
+        Y = X_.join(M, how="left")  # for all rows not in M the "count" column is NaN
         Y.loc[Y["count"].isna(), "count"] = 0  # set NaN to 0
 
         Y_doi = Y["count"] / self.window_size
-        return Y_doi
+        return Y_doi.to_numpy().reshape(
+            -1,
+        )

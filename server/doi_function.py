@@ -1,12 +1,18 @@
-from typing import Literal, Tuple
+from typing import Literal, Tuple, List
 import pandas as pd
 import numpy as np
 
-from database import *
-from doi_component.scagnostics_component import *
-from doi_component.feature_component import *
-from context_item_selection_strategy.context_item_selection_strategy import *
-from outdated_item_selection_strategy.outdated_item_selection_strategy import *
+from database import get_dimensions_in_data, ID, ID_INDEX
+from doi_component.doi_component import DoiComponent
+from doi_component.scagnostics_component import ScagnosticsComponent
+from doi_component.feature_component import FeatureComponent
+from doi_component.interaction_component import InteractionComponent
+from context_item_selection_strategy.context_item_selection_strategy import (
+    ContextItemSelectionStrategy,
+)
+from outdated_item_selection_strategy.outdated_item_selection_strategy import (
+    OutdatedItemSelectionStrategy,
+)
 from doi_component.provenance_component import ProvenanceComponent
 from context_item_selection_strategy.doi_based_context import DoiBasedContext
 from storage_strategy.windowing_storage import WindowingStorage
@@ -41,7 +47,10 @@ def create_feature_component():
 
 
 feature_comp: DoiComponent = create_feature_component()
-doi_component: DoiComponent = feature_comp
+interaction_comp = InteractionComponent()
+
+doi_component: DoiComponent = interaction_comp
+# doi_component: DoiComponent = feature_comp
 
 storage: StorageStrategy = WindowingStorage(STORAGE_SIZE)
 context: ContextItemSelectionStrategy = DoiBasedContext(
@@ -57,6 +66,7 @@ def reset_doi_component():
 
     DIMENSION_INTERVALS = {}
     feature_comp = create_feature_component()
+    interaction_comp.clear()
     doi_component = feature_comp
 
 
@@ -124,7 +134,8 @@ def set_dimension_range_of_interest(dimension: str, min_value: float, max_value:
     if min_value is None or max_value is None:
         # if the frontend sets the interesting range to INFINITY, this corresponds to None here
         # for simplicity, we treat INFINITY the same as having no interest at all.
-        del DIMENSION_INTERVALS[dimension]
+        if dimension in DIMENSION_INTERVALS:
+            del DIMENSION_INTERVALS[dimension]
         return
 
     DIMENSION_INTERVALS[dimension] = [min_value, max_value]
@@ -136,7 +147,7 @@ def set_doi_classes(classes: int):
     DOI_CLASSES = classes
 
 
-def set_dimensions_of_interest(dimensions: list):
+def set_dimensions_of_interest(dimensions: List[str]):
     global dimensions_of_interest
     dimensions_of_interest = dimensions
 
@@ -150,13 +161,19 @@ def set_scagnostic_weights(weights: dict):
     scagnostics_comp.weights = weights
 
 
-def log_interaction(mode: Literal["brush", "zoom", "select", "inspect"], items: list):
+def log_interaction(
+    mode: Literal["scat-brush", "zoom", "select", "inspect"], items: List[str]
+):
     global current_interactions
     provenance_comp.add_interaction([current_interactions, mode, np.array(items)[:, 0]])
     df = pd.DataFrame(items)
     df = df.drop(columns=[2, 3, 7, 18, 19])  # non-numerical columns
     df = df.astype(np.float64)
     df["id"] = df.index
+
+    if mode in ["scat-brush", "select"]:
+        interaction_comp.log_interaction(list(np.array(items)[:, ID_INDEX]))
+        interaction_comp.undo_outdated_interactions()
 
     current_interactions += 1
 
