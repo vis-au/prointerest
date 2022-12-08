@@ -23,18 +23,15 @@ class OldestChunksUpdate(OutdatedItemSelectionStrategy):
         # get all available ids from storage
         all_ids = self.storage.get_available_ids()
         if len(all_ids) == 0:
-          return empty((0, self.n_dims))
+            return empty((0, self.n_dims))
 
         all_ids = all_ids.to_list()
         if len(all_ids) == 1:
-          all_ids += all_ids
+            all_ids += all_ids
 
         # get all timestaps available in the database
         response = get_from_latest_update(
-            [
-              f"{ID} IN {tuple(all_ids)} ORDER BY {TIMESTAMP}"
-            ],
-            as_df=True
+            [f"{ID} IN {tuple(all_ids)} ORDER BY {TIMESTAMP}"], as_df=True
         )
 
         # find all chunks that belong to those timestamps (MIGHT BE MORE THAN n!)
@@ -42,6 +39,6 @@ class OldestChunksUpdate(OutdatedItemSelectionStrategy):
         outdated_ids = response[ID.lower()].iloc[-n:]
 
         if len(outdated_ids) == 0:
-          return empty((0, self.n_dims))
+            return empty((0, self.n_dims))
 
         return outdated_ids

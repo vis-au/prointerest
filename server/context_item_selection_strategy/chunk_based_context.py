@@ -10,16 +10,17 @@ from .context_item_selection_strategy import ContextItemSelectionStrategy
 class MostRecentChunkBasedContext(ContextItemSelectionStrategy):
     def __init__(self, n_dims: int, storage: StorageStrategy, n_chunks: int) -> None:
         super().__init__(n_dims, storage)
-        self.n_chunks = n_chunks  # how many most recent chunks should be returned as context?
+        self.n_chunks = (
+            n_chunks  # how many most recent chunks should be returned as context?
+        )
 
     def get_context_ids(self, n: int, current_chunk: int):
         # get the n most recent chunks from the database that are available in storage
         stored_chunks = self.storage.get_available_chunks()
-        most_recent_chunks = stored_chunks[-self.n_chunks:]
+        most_recent_chunks = stored_chunks[-self.n_chunks :]
 
         most_recent_items = self.storage.get_items_for_chunks(
-            most_recent_chunks.tolist(),
-            as_df=True
+            most_recent_chunks.tolist(), as_df=True
         )
 
         if len(most_recent_items) == 0:
@@ -32,7 +33,9 @@ class MostRecentChunkBasedContext(ContextItemSelectionStrategy):
 class RandomChunkBasedContext(ContextItemSelectionStrategy):
     def __init__(self, n_dims: int, storage: StorageStrategy, n_chunks: int):
         super().__init__(n_dims, storage)
-        self.n_chunks = n_chunks  # how many most recent chunks should be returned as context?
+        self.n_chunks = (
+            n_chunks  # how many most recent chunks should be returned as context?
+        )
 
     def get_context_ids(self, n: int, current_chunk=None):
         # if the number of processed chunks is lower than the number of chunks that should be

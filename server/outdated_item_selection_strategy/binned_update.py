@@ -23,10 +23,14 @@ class BinnedUpdate(OutdatedItemSelectionStrategy):
         if len(outdated_ids_dois) == 0:
             return pd.DataFrame()
 
-        binning = KBinsDiscretizer(n_bins=self.n_bins, strategy="uniform", encode="ordinal")
+        binning = KBinsDiscretizer(
+            n_bins=self.n_bins, strategy="uniform", encode="ordinal"
+        )
         bins: np.ndarray = binning.fit_transform(outdated_ids_dois[:, 1].reshape(-1, 1))
 
-        bins = bins.reshape(-1, ).astype(np.int64)
+        bins = bins.reshape(
+            -1,
+        ).astype(np.int64)
         outdated_ids = outdated_ids_dois[:, 0][bins == self.outdated_bin]
 
         if len(outdated_ids) > n:

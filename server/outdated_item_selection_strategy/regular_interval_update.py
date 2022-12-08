@@ -20,7 +20,9 @@ class RegularIntervalUpdate(OutdatedItemSelectionStrategy):
         The maximum age of considered chunks, thus the lower `max_age`, the faster the retrieval.
     """
 
-    def __init__(self, n_dims: int, storage: StorageStrategy, n_chunks: int, max_age: int):
+    def __init__(
+        self, n_dims: int, storage: StorageStrategy, n_chunks: int, max_age: int
+    ):
         super().__init__(n_dims, storage)
         self.max_age = max_age
         self.n_chunks = n_chunks
@@ -28,7 +30,7 @@ class RegularIntervalUpdate(OutdatedItemSelectionStrategy):
     def get_outdated_ids(self, n: int, current_chunk: int):
         available_chunks = self.storage.get_available_chunks()
         if len(available_chunks) == 0:
-          return empty((0, self.n_dims))
+            return empty((0, self.n_dims))
 
         interval = len(available_chunks) // self.n_chunks
 
@@ -37,15 +39,17 @@ class RegularIntervalUpdate(OutdatedItemSelectionStrategy):
         # so we update every item that falls into either of these positions
         # the interval we chose is set so that there are at most n_chunks in there
         if interval > 0:
-          outdated_chunks = available_chunks[available_chunks % interval == 0]
+            outdated_chunks = available_chunks[available_chunks % interval == 0]
         else:
-          outdated_chunks = available_chunks
+            outdated_chunks = available_chunks
 
-        outdated_chunks = outdated_chunks[-self.n_chunks:]
-        outdated_items = self.storage.get_items_for_chunks(outdated_chunks.tolist(), as_df=True)
+        outdated_chunks = outdated_chunks[-self.n_chunks :]
+        outdated_items = self.storage.get_items_for_chunks(
+            outdated_chunks.tolist(), as_df=True
+        )
 
         if len(outdated_items) == 0:
-          return empty((0, self.n_dims))
+            return empty((0, self.n_dims))
 
         outdated_ids = outdated_items[ID].iloc[:n].to_numpy()
         return outdated_ids

@@ -13,7 +13,9 @@ class ClusteringBasedContext(ContextItemSelectionStrategy):
 
     def __train_clustering(self, current_chunk: int):
         # get the latest chunk (must use db because not in storage yet!)
-        most_recent_items = self.storage.get_items_for_chunks([current_chunk - 1], as_df=True)
+        most_recent_items = self.storage.get_items_for_chunks(
+            [current_chunk - 1], as_df=True
+        )
         most_recent_items = most_recent_items.select_dtypes(["number"]).to_numpy()
         # clustering = KMeans(n_clusters=self.n_clusters).fit(numeric)
 
