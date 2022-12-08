@@ -3,12 +3,14 @@ import { writable } from "svelte/store";
 
 import type { ProgressionState } from "$lib/types/progression-state";
 import { getNextChunk } from "$lib/util/requests";
-import { processedData } from "./processed-data";
 import { sendReset } from "../util/requests";
-import { averageDoiPerChunk, doiValues } from "./doi-values";
-import { selectionInSecondaryView } from "./selection-in-secondary-view";
-import { interestingIntervals } from "./interesting-dimensions";
+import { activeBrush, activeLasso } from "./active-brush";
 import { activeDecisionTree } from "./active-decision-tree";
+import { averageDoiPerChunk, doiValues } from "./doi-values";
+import { interestingIntervals } from "./interesting-dimensions";
+import { processedData } from "./processed-data";
+import { selectedDTNode } from "./selection-in-dt";
+import { selectionInSecondaryView } from "./selection-in-secondary-view";
 
 export const CHUNK_SIZE = 10000;
 
@@ -68,6 +70,11 @@ export function resetProgression(): void {
   processedData.set([]);
   selectionInSecondaryView.set({});
   interestingIntervals.set({});
+  currentChunkNo.set(0);
+  activeBrush.set(null);
+  activeLasso.set(null);
+  selectedDTNode.set(null);
+  selectionInSecondaryView.set({});
   currentDoiValues.clear();
   doiValues.set(currentDoiValues);
   activeDecisionTree.set(null);
