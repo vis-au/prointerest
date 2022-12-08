@@ -50,12 +50,12 @@ class InteractionComponent(DoiComponent):
         for interaction in interactions:
             self._undo_interaction(interaction)
 
-    def _undo_outdated_interactions(self):
+    def undo_outdated_interactions(self):
         """
         Make sure that only the last <window_size> interactions are in self.id_log, undo the rest.
         """
 
-        outdated_interactions = self.interaction_log[-self.window_size :]
+        outdated_interactions = self.interaction_log[: -self.window_size]
         self._undo_interactions(outdated_interactions)
 
     def get_interaction_count_matrix(self):
