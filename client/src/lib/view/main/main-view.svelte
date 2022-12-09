@@ -33,9 +33,9 @@
   <BrushLayer {width} {height} />
   <InteractionLayer {width} {height} />
 
-  <DecisionTreePanel x={40} y={80} />
-
   <Tooltip />
+
+  <DecisionTreePanel x={40} y={100} />
 
   {#if $activeViewMode === "binned"}
     <ColorLegend
