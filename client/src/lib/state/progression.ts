@@ -11,6 +11,7 @@ import { interestingIntervals } from "./interesting-dimensions";
 import { processedData } from "./processed-data";
 import { selectedDTNode } from "./selection-in-dt";
 import { selectionInSecondaryView } from "./selection-in-secondary-view";
+import { resetViewTransform } from "./zoom";
 
 export const CHUNK_SIZE = 10000;
 
@@ -78,6 +79,7 @@ export function resetProgression(): void {
   currentDoiValues.clear();
   doiValues.set(currentDoiValues);
   activeDecisionTree.set(null);
+  resetViewTransform();
 
   sendReset();
 }
