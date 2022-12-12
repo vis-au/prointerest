@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { selectionInSecondaryView } from "$lib/state/selection-in-secondary-view";
   import Column from "$lib/widgets/column.svelte";
   import ControlButton from "../../widgets/control-button.svelte";
 
@@ -8,7 +9,15 @@
 <Column id="split-view">
   <div class="top">
     {#if isCollapsed}
-      <ControlButton id="open-button" on:click={() => (isCollapsed = false)}>open</ControlButton>
+      <ControlButton
+        id="open-button"
+        on:click={() => (isCollapsed = false)}
+        style="border:1px solid {Object.keys($selectionInSecondaryView).length > 0
+          ? 'orange'
+          : 'black'}"
+      >
+        open
+      </ControlButton>
     {/if}
     <slot name="top" />
   </div>
