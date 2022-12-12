@@ -1,6 +1,7 @@
 <script lang="ts">
   import { activeDecisionTree } from "$lib/state/active-decision-tree";
   import { activeFDLTree } from "$lib/state/active-fdl-tree";
+  import { selectedDTNode } from "$lib/state/selection-in-dt";
   import Alternatives from "$lib/widgets/alternatives.svelte";
   import ControlButton from "../../widgets/control-button.svelte";
   import DecisionTreeViewer from "./decision-tree-viewer.svelte";
@@ -22,9 +23,15 @@
   }
 </script>
 
-<div class="decision-tree-panel" style="left:{x}px;top:{y}px;">
+<div
+  class="decision-tree-panel"
+  class:active={$selectedDTNode !== null}
+  style="left:{x}px;top:{y}px;"
+>
   {#if isHidden}
-    <ControlButton style="width:2rem;height:2rem" on:click={show}>DT</ControlButton>
+    <ControlButton id="toggle-dt-panel" style="width:2rem;height:2rem" on:click={show}
+      >DT</ControlButton
+    >
   {:else}
     <div class="container">
       <h2>
@@ -58,6 +65,9 @@
   .decision-tree-panel {
     position: absolute;
     font-size: 12px;
+  }
+  .decision-tree-panel.active {
+    border: 1px solid orange;
   }
   .decision-tree-panel h2 {
     display: flex;

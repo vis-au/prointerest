@@ -9,7 +9,7 @@
   import { linkVertical } from "d3-shape";
 
   import { doiLimit } from "$lib/state/doi-limit";
-  import { selectedDTNode } from "$lib/state/selection-in-dt";
+  import { selectedDTNode, activeDTPath } from "$lib/state/selection-in-dt";
   import type { DecisionTree, InternalNode, LeafNode } from "$lib/types/decision-tree";
   import { dimensions } from "$lib/state/processed-data";
   import { items } from "$lib/state/items";
@@ -43,8 +43,6 @@
     bottom: MAX_LEAF_NODE_HEIGHT / 2 + FONT_SIZE,
     left: 10
   };
-
-  let activeDTPath: DecisionTree[] = [];
 
   // path generator function
   const path = linkVertical<HierarchyPointLink<DecisionTree>, HierarchyPointLink<DecisionTree>>()
@@ -137,10 +135,10 @@
 
   function selectDTNode() {
     if ($selectedDTNode === hoveredNode.data) {
-      activeDTPath = [];
+      $activeDTPath = [];
       $selectedDTNode = null;
     } else {
-      activeDTPath = hoveredPath.slice(0);
+      $activeDTPath = hoveredPath.slice(0);
       $selectedDTNode = hoveredNode.data;
     }
   }
@@ -163,12 +161,12 @@
   };
 
   $: isNodeSelected = (node: HierarchyPointNode<DecisionTree>) => {
-    return activeDTPath?.indexOf(node.data) > -1;
+    return $activeDTPath?.indexOf(node.data) > -1;
   };
   $: isLinkSelected = (link: HierarchyPointLink<DecisionTree>) => {
     return (
-      activeDTPath?.indexOf(link["source"].data) > -1 &&
-      activeDTPath?.indexOf(link["target"].data) > -1
+      $activeDTPath?.indexOf(link["source"].data) > -1 &&
+      $activeDTPath?.indexOf(link["target"].data) > -1
     );
   };
 </script>

@@ -17,7 +17,7 @@
   export let height: number;
 </script>
 
-<main style:height="{height}px">
+<main style:height="{height}px" style="position:relative">
   {#if $activeViewMode === "scatter"}
     <ScatterplotView {width} {height} />
   {:else if $activeViewMode === "binned"}
@@ -35,13 +35,13 @@
 
   <Tooltip />
 
-  <DecisionTreePanel x={40} y={100} />
+  <DecisionTreePanel x={10} y={60} />
 
   {#if $activeViewMode === "binned"}
     <ColorLegend
       id="color"
       x={width - 240}
-      y={height - 80}
+      y={height - 100}
       title="Bin color"
       blockSize={10}
       steps={10}

@@ -13,7 +13,7 @@
   let tooltipHeight: number;
   let tooltipWidth: number;
 
-  const padding = 25;
+  const padding = 50;
 
   $: left = Math.max(
     padding,

@@ -74,9 +74,9 @@
 <style>
   :global(div#view-controls) {
     position: absolute;
+    top: 0;
     box-sizing: border-box;
     justify-content: space-around;
-    padding-top: 20px;
     width: 100%;
     background: rgba(255, 255, 255, 0.73);
     padding: 5px 30px;
