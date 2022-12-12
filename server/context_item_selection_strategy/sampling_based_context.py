@@ -9,7 +9,9 @@ class RandomSamplingBasedContext(ContextItemSelectionStrategy):
 
         processed = len(stored_ids)
         sample_size = processed if processed < n else n
-        sample = sample_without_replacement(processed, sample_size, random_state=0)
+        sample = sample_without_replacement(
+            processed, sample_size, random_state=current_chunk
+        )
         sampled_ids = stored_ids[sample]
         return sampled_ids
 

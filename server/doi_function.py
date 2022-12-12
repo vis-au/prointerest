@@ -5,6 +5,9 @@ import pandas as pd
 from context_item_selection_strategy.context_item_selection_strategy import (
     ContextItemSelectionStrategy,
 )
+from context_item_selection_strategy.sampling_based_context import (
+    RandomSamplingBasedContext,
+)
 from context_item_selection_strategy.doi_based_context import DoiBasedContext
 from database import ID, ID_INDEX, get_dimensions_in_data
 from doi_component.doi_component import DoiComponent
@@ -15,6 +18,7 @@ from doi_component.scagnostics_component import ScagnosticsComponent
 from outdated_item_selection_strategy.outdated_item_selection_strategy import (
     OutdatedItemSelectionStrategy,
 )
+from sklearn.tree import DecisionTreeRegressor
 from storage_strategy.storage_strategy import StorageStrategy
 from storage_strategy.windowing_storage import WindowingStorage
 
@@ -22,15 +26,19 @@ from storage_strategy.windowing_storage import WindowingStorage
 CONTEXT_SIZE = 1000
 UPDATE_INTERVAL = 10
 STORAGE_SIZE = 100000
+TREE_TRAINING_SIZE = 50000
 
-current_chunk = 0
-current_interactions = 0
+current_chunk_no = 0  # keeps track of how "old" the latest data is
+current_interactions_count = 0  # keeps track of how many interactions took place
 
 # contains the weights for the dimensions used in the DOI function
 DIMENSION_WEIGHTS = {}
 
 # contains the interesting value ranges within each dimension
 DIMENSION_INTERVALS = {}
+
+# model for predicting the degree of interest function
+regtree = DecisionTreeRegressor(random_state=0)
 
 scagnostics_comp = ScagnosticsComponent(
     [5, 17]
@@ -51,25 +59,21 @@ def create_feature_component():
 feature_comp: DoiComponent = create_feature_component()
 interaction_comp = InteractionComponent()
 
-doi_component: DoiComponent = interaction_comp
-# doi_component: DoiComponent = feature_comp
-
 storage: StorageStrategy = WindowingStorage(STORAGE_SIZE)
-context: ContextItemSelectionStrategy = DoiBasedContext(
-    n_dims=20, storage=storage, n_bins=25
+context: ContextItemSelectionStrategy = RandomSamplingBasedContext(
+    n_dims=20, storage=storage
 )
 update: OutdatedItemSelectionStrategy = None
 
 
 def reset_doi_component():
-    global storage, context, doi_component, feature_comp, DIMENSION_INTERVALS
+    global storage, context, feature_comp, DIMENSION_INTERVALS
     storage = WindowingStorage(STORAGE_SIZE)
     context = DoiBasedContext(n_dims=20, storage=storage, n_bins=25)
 
     DIMENSION_INTERVALS = {}
     feature_comp = create_feature_component()
     interaction_comp.clear()
-    doi_component = feature_comp
 
 
 def set_component_weights(weights: dict):
@@ -166,8 +170,11 @@ def set_scagnostic_weights(weights: dict):
 def log_interaction(
     mode: Literal["scat-brush", "zoom", "select", "inspect"], items: List[str]
 ):
-    global current_interactions
-    provenance_comp.add_interaction([current_interactions, mode, np.array(items)[:, 0]])
+    global current_interactions_count
+
+    provenance_comp.add_interaction(
+        [current_interactions_count, mode, np.array(items)[:, 0]]
+    )
     df = pd.DataFrame(items)
     df = df.drop(columns=[2, 3, 7, 18, 19])  # non-numerical columns
     df = df.astype(np.float64)
@@ -177,37 +184,79 @@ def log_interaction(
         interaction_comp.log_interaction(list(np.array(items)[:, ID_INDEX]))
         interaction_comp.undo_outdated_interactions()
 
-    current_interactions += 1
+    current_interactions_count += 1
 
 
-def doi_f(chunk_with_context: np.ndarray):
-    df = pd.DataFrame(chunk_with_context)
+def doi_f(X: np.ndarray):
+    df = pd.DataFrame(X)
     df = df.drop(columns=[2, 3, 7, 18, 19])  # non-numerical columns
     df = df.astype(np.float64)
 
     df["id"] = df.index
 
-    doi = doi_component.compute_doi(df)
+    doi = feature_comp.compute_doi(df) * 0.5 + interaction_comp.compute_doi(df) * 0.5
 
     return doi
 
 
-def compute_dois(items: list) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    global current_chunk
+def doi_prediction(X: np.ndarray):
+    df = pd.DataFrame(X)
+    df = df.drop(columns=[2, 3, 7, 18, 19])  # non-numerical columns
+    df = df.astype(np.float64)
+
+    df["id"] = df.index
+
+    doi = regtree.predict(X)
+
+    return doi
+
+
+def compute_dois(
+    items: list, use_doi_f: bool = True
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    global current_chunk_no
 
     X = np.array(items)
 
-    context_items = context.get_context_items(CONTEXT_SIZE, current_chunk)
-    updated_ids = context_items[ID].tolist() if len(context_items) > 0 else []
+    context_items = context.get_context_items(CONTEXT_SIZE, current_chunk_no)
+    context_ids = context_items[ID].tolist() if len(context_items) > 0 else []
 
     X_ = np.concatenate((X, context_items), axis=0)
-    dois_with_context = doi_f(X_)
+
+    dois_with_context = doi_f(X_) if use_doi_f else doi_prediction(X_)
+
     new_dois = dois_with_context[: len(X)]
     updated_dois = dois_with_context[len(X) :]
 
     df = pd.DataFrame(items)
     df.rename(columns={0: ID}, inplace=True)
-    storage.insert_chunk(df, current_chunk)
+    storage.insert_chunk(df, current_chunk_no)
 
-    current_chunk += 1
-    return new_dois, updated_ids, updated_dois
+    current_chunk_no += 1
+    return new_dois, context_ids, updated_dois
+
+
+def full_doi_update(use_doi_f: bool = False) -> np.ndarray:
+    """Update the DOI for all items in storage"""
+
+    df = storage.get_available_items()
+    ids = df[ID]
+    X = df.to_numpy()
+
+    doi = doi_f(X) if use_doi_f else doi_prediction(X)
+
+    return ids, doi
+
+
+def retrain_dt() -> None:
+    """Retrain the regression tree model."""
+    global regtree
+
+    X_items = context.get_context_items(TREE_TRAINING_SIZE, current_chunk_no)
+    y_doi = None
+
+    max_depth = 3
+    regtree = DecisionTreeRegressor(random_state=0, max_depth=max_depth)
+    regtree.fit(X_items, y_doi)
+
+    return None
