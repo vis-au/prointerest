@@ -13,7 +13,7 @@
   import { hoveredPosition } from "$lib/state/hovered-position";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
-  import { sampledQuadtree } from "$lib/state/sampled-quadtree";
+  import { quadtree } from "$lib/state/quadtree";
   import { scaleX, scaleY } from "$lib/state/scales";
   import { selectedBins } from "$lib/state/selected-bins";
   import {
@@ -35,8 +35,8 @@
   export let width: number;
   export let height: number;
 
-  const interactionFactory = new InteractionFactory(width, height, $sampledQuadtree);
-  $: interactionFactory.quadtree = $sampledQuadtree;
+  const interactionFactory = new InteractionFactory(width, height, $quadtree);
+  $: interactionFactory.quadtree = $quadtree;
   interactionFactory.getItemsInRegion = getPointsInRect;
   interactionFactory.getItemsInPolygon = getPointsInPolygon;
   interactionFactory.getTimestamp = $interactionLog.getLatestTimestamp;
@@ -69,7 +69,7 @@
     const interesting = brushInteraction.getAffectedItems();
 
     // find data to train against, by finding (at most twice as many) uninteresting items
-    const uninteresting = $sampledQuadtree
+    const uninteresting = $quadtree
       .data()
       .filter((item) => interesting.indexOf(item) === -1)
       .filter((_, i) => i < interesting.length * 2);
