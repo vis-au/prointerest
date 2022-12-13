@@ -3,7 +3,12 @@
 import json
 import numpy as np
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, _tree, BaseDecisionTree
+from sklearn.tree import (
+    DecisionTreeClassifier,
+    DecisionTreeRegressor,
+    _tree,
+    BaseDecisionTree,
+)
 
 # global variables used for generating the steering condition
 feature = None
@@ -136,8 +141,8 @@ def get_steering_condition(features: pd.DataFrame, labels: pd.DataFrame, mode="p
 # adapted from
 # https://mljar.com/blog/extract-rules-decision-tree/
 def _tree_to_json(tree: BaseDecisionTree, feature_names: list):
-    ''' Transforms a trained tree model from the internal tree format into a simplified, reusable
-    python dict. '''
+    """Transforms a trained tree model from the internal tree format into a simplified, reusable
+    python dict."""
 
     tree_ = tree.tree_
     feature_name = [
@@ -156,15 +161,17 @@ def _tree_to_json(tree: BaseDecisionTree, feature_names: list):
             name = feature_name[node]
             threshold = tree_.threshold[node]
 
-            __node = f"\"type\": \"internal\", \"feature\": \"{name}\", \"threshold\": {threshold}"
+            __node = (
+                f'"type": "internal", "feature": "{name}", "threshold": {threshold}'
+            )
 
             __left = traverse(tree_.children_left[node], depth + 1)
-            __node = f"{__node}, \"left\": {__left}"
+            __node = f'{__node}, "left": {__left}'
 
             __right = traverse(tree_.children_right[node], depth + 1)
-            __node = f"{__node}, \"right\": {__right}"
+            __node = f'{__node}, "right": {__right}'
         else:
-            __node = f"\"type\": \"leaf\", \"value\": {tree_.value[node].tolist()}"
+            __node = f'"type": "leaf", "value": {tree_.value[node].tolist()}'
 
         __node = f"{OPEN_BRACE}{__node}{CLOSE_BRACE}"
         return __node
@@ -174,12 +181,17 @@ def _tree_to_json(tree: BaseDecisionTree, feature_names: list):
     return __tree
 
 
-def get_decision_tree(features: pd.DataFrame, labels: pd.DataFrame, use_regression: bool = False):
-    ''' Helper function for cases where not the steering query, but the model is needed. '''
+def get_decision_tree(
+    features: pd.DataFrame, labels: pd.DataFrame, use_regression: bool = False
+):
+    """Helper function for cases where not the steering query, but the model is needed."""
     global feature, threshold
 
-    model = DecisionTreeRegressor(max_depth=5, random_state=0) if use_regression \
-      else DecisionTreeClassifier(criterion="entropy", max_depth=5, random_state=0)
+    model = (
+        DecisionTreeRegressor(max_depth=5, random_state=0)
+        if use_regression
+        else DecisionTreeClassifier(criterion="entropy", max_depth=5, random_state=0)
+    )
 
     print("training tree")
     model = model.fit(features, y=labels)
