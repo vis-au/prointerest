@@ -3,7 +3,7 @@ import json
 from dataclasses import dataclass, field
 from typing import List
 
-from database import initialize_db, drop_tables
+from database import create_tables, drop_tables
 from doi_components import get_doi_component
 from progressive_doi_pipeline import ProgressiveDoiPipeline
 from context_strategies import *
@@ -115,7 +115,7 @@ class TestCase:
   # wipe the databases that track doi, processed, update chunks, etc.
   def initialize_database(self) -> None:
     drop_tables()
-    initialize_db(
+    create_tables(
       row_data_path=self.data.data_path,
       column_data_path=self.data.column_data_path,
       id_column=self.data.id_column,
