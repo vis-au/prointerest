@@ -13,7 +13,7 @@ import { selectedDTNode } from "./selection-in-dt";
 import { selectionInSecondaryView } from "./selection-in-secondary-view";
 import { resetViewTransform } from "./zoom";
 
-export const CHUNK_SIZE = 10000;
+export const CHUNK_SIZE = 1000;
 
 const currentInterval = 1000;
 export const updateInterval = writable(currentInterval);
@@ -23,15 +23,8 @@ export const progressionState = writable("paused" as ProgressionState);
 let currentlyWaiting = false;
 export const waitingForChunk = writable(currentlyWaiting);
 
+export const UPDATE_INTERVAL = 3; // fixed interval after which DOI values are recomputed
 export const currentChunkNo = writable(0);
-
-const UPDATE_INTERVAL = 5;
-currentChunkNo.subscribe(async ($chunkNo) => {
-  if ($chunkNo > 0 && $chunkNo % UPDATE_INTERVAL === 0) {
-    await trainPredictorModel();
-    console.log(await getFullDoiUpdate());
-  }
-});
 
 const currentDoiValues: Map<number, number> = new Map();
 
@@ -51,9 +44,21 @@ const progressionCallback = () => {
         currentDoiValues.set(id, doi);
       });
 
-      currentChunkNo.update((chunkNo) => chunkNo + 1);
+      currentChunkNo.update((chunkNo) => {
+        if (chunkNo > 0 && chunkNo % UPDATE_INTERVAL === 0) {
+          trainPredictorModel().then(() => {
+            getFullDoiUpdate().then((d) => {
+              d.ids.forEach((id, i) => {
+                currentDoiValues.set(+id, d.dois[i]);
+              });
+            });
+          });
+        }
+
+        return chunkNo + 1;
+      });
       averageDoiPerChunk.update((averageDois) => averageDois.concat(mean(chunk.dois)));
-      doiValues.update(() => currentDoiValues);
+      doiValues.set(currentDoiValues);
 
       currentlyWaiting = false;
       waitingForChunk.set(currentlyWaiting);
