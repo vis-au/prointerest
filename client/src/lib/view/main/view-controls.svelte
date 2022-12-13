@@ -18,7 +18,7 @@
   import { bin } from "d3";
 
   let binsGenerator = bin().thresholds(25);
-  $: doiBins = binsGenerator(Array.from($doiValues.values())).map((d) => d.length);
+  $: doiBins = binsGenerator(Array.from($doiValues.values()).concat(0, 1)).map((d) => d.length);
 </script>
 
 <Row id="view-controls">
