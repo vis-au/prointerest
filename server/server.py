@@ -54,6 +54,21 @@ def get_next_chunk():
     )
 
 
+@app.route("/train_model", methods=["GET"])
+def get_train_model():
+    retrain_dt()
+    return cors_response("ok")
+
+
+@app.route("/full_doi_update", methods=["GET"])
+def get_full_doi_update():
+    ids, dois = full_doi_update()
+    ids = ids.tolist()
+    dois = dois.tolist()
+
+    return cors_response({"ids": ids, "dois": dois})
+
+
 @app.route("/size", methods=["GET"])
 def get_size():
     size = get_data_size()
@@ -198,6 +213,7 @@ def send_axis_dimension():
 
 @app.route("/config/<component>", methods=["POST"])
 def send_configuration(component):
+    # FIXME: legacy code
     if component == "outlierness":
         if request.args.get("metric") is not None:
             metric = request.args.get("metric")
@@ -227,30 +243,6 @@ def send_interaction():
     return cors_response(True)
 
 
-@app.route("/suggested_items", methods=["GET"])
-def get_suggested_items():
-    pass
-
-
-@app.route("/doi/<ids>", methods=["POST"])
-def get_doi(ids):
-    interest = get_dois(ids)
-    return cors_response(interest)
-
-
-@app.route("/prediction", methods=["GET"])
-def get_prediction():
-    items: list
-    return cors_response([])
-
-
-data_path = "./data/nyc_taxis.shuffled_full.csv.gz"
-column_data_path = "./data/nyc_taxis.shuffled_full.parquet"
-id_column = "tripID"
-total_db_size = 112145904  # full size of database
-n_dims = 17  # number of dimensions in the data
-
-
 def taxi_process_chunk(chunk: pd.DataFrame):
     dropoff = chunk["tpep_dropoff_datetime"]
     pickup = chunk["tpep_pickup_datetime"]
@@ -262,11 +254,12 @@ def taxi_process_chunk(chunk: pd.DataFrame):
 
 if __name__ == "__main__":
     drop_tables()
+
     create_tables(
-        row_data_path=data_path,
-        column_data_path=column_data_path,
-        id_column=id_column,
-        total_size=total_db_size,
+        row_data_path="./data/nyc_taxis.shuffled_full.csv.gz",
+        column_data_path="./data/nyc_taxis.shuffled_full.parquet",
+        id_column="tripID",
+        total_size=112145904,
         process_chunk_callback=taxi_process_chunk,
     )
     app.run(debug=True)

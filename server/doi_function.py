@@ -194,6 +194,7 @@ def doi_f(X: np.ndarray):
 
     df["id"] = df.index
 
+    # FIXME: currently uses hardcoded 50/50 weights between the two doi components
     doi = feature_comp.compute_doi(df) * 0.5 + interaction_comp.compute_doi(df) * 0.5
 
     return doi
@@ -204,9 +205,7 @@ def doi_prediction(X: np.ndarray):
     df = df.drop(columns=[2, 3, 7, 18, 19])  # non-numerical columns
     df = df.astype(np.float64)
 
-    df["id"] = df.index
-
-    doi = regtree.predict(X)
+    doi = regtree.predict(df)
 
     return doi
 
@@ -237,10 +236,11 @@ def compute_dois(
 
 
 def full_doi_update(use_doi_f: bool = False) -> np.ndarray:
-    """Update the DOI for all items in storage"""
+    """Update the DOI for every single item in storage."""
 
     df = storage.get_available_items()
     ids = df[ID]
+    # df.columns = list(range(len(df.columns)))
     X = df.to_numpy()
 
     doi = doi_f(X) if use_doi_f else doi_prediction(X)
@@ -252,11 +252,13 @@ def retrain_dt() -> None:
     """Retrain the regression tree model."""
     global regtree
 
-    X_items = context.get_context_items(TREE_TRAINING_SIZE, current_chunk_no)
-    y_doi = None
+    df = context.get_context_items(TREE_TRAINING_SIZE, current_chunk_no)
+    df.columns = list(range(len(df.columns)))
+    y = doi_f(df)
 
-    max_depth = 3
-    regtree = DecisionTreeRegressor(random_state=0, max_depth=max_depth)
-    regtree.fit(X_items, y_doi)
+    df = df.drop(columns=[2, 3, 7, 18, 19])
+
+    regtree = DecisionTreeRegressor(random_state=0, max_depth=3)
+    regtree.fit(df, y)
 
     return None

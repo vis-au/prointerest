@@ -1,8 +1,7 @@
-import pandas as pd
-import numpy as np
 import duckdb
-
-from database import ID, CHUNK, get_dois
+import numpy as np
+import pandas as pd
+from database import CHUNK, ID, get_dois
 
 DF = "stored_db"
 
@@ -54,9 +53,7 @@ class StorageStrategy:
         elif len(self.storage) == 0:
             return pd.DataFrame()
 
-        response = self.cursor.execute(
-            f"SELECT * FROM {DF} WHERE {ID} IN {tuple(ids)}"
-        )
+        response = self.cursor.execute(f"SELECT * FROM {DF} WHERE {ID} IN {tuple(ids)}")
 
         return response.fetchdf() if as_df else response.fetchall()
 
