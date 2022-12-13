@@ -2,7 +2,7 @@ import { mean } from "d3";
 import { writable } from "svelte/store";
 
 import type { ProgressionState } from "$lib/types/progression-state";
-import { getNextChunk } from "$lib/util/requests";
+import { getFullDoiUpdate, getNextChunk, trainPredictorModel } from "$lib/util/requests";
 import { sendReset } from "../util/requests";
 import { activeBrush, activeLasso } from "./active-brush";
 import { activeDecisionTree } from "./active-decision-tree";
@@ -24,6 +24,14 @@ let currentlyWaiting = false;
 export const waitingForChunk = writable(currentlyWaiting);
 
 export const currentChunkNo = writable(0);
+
+const UPDATE_INTERVAL = 5;
+currentChunkNo.subscribe(async ($chunkNo) => {
+  if ($chunkNo > 0 && $chunkNo % UPDATE_INTERVAL === 0) {
+    await trainPredictorModel();
+    console.log(await getFullDoiUpdate());
+  }
+});
 
 const currentDoiValues: Map<number, number> = new Map();
 

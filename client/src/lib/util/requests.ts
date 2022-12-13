@@ -166,7 +166,7 @@ export async function sendSteeringFilters(filters: DimensionFilter) {
   return sendRequestToBaseURL("/steer", "POST", { filters });
 }
 
-export async function _sendSteeringByExampleItems(
+export async function steerByExampleItems(
   interestings: DataItem[],
   uninterestings: DataItem[],
   dimensions: string[]
@@ -220,4 +220,12 @@ export async function getRegressionTree(
     label: interest,
     use_regression: true
   });
+}
+
+export async function trainPredictorModel() {
+  return sendRequestToBaseURL("/train_model", "GET");
+}
+
+export async function getFullDoiUpdate() {
+  return sendRequestToBaseURL("/full_doi_update", "GET");
 }
