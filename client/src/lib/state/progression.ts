@@ -14,7 +14,7 @@ import { selectionInSecondaryView } from "./selection-in-secondary-view";
 import { resetViewTransform } from "./zoom";
 import { latestDoiUpdate } from "./latest-doi-update";
 
-export const CHUNK_SIZE = 10000;
+export const CHUNK_SIZE = 1000;
 
 const currentInterval = 1000;
 export const updateInterval = writable(currentInterval);

@@ -1,4 +1,5 @@
-import { writable } from "svelte/store";
+import { bin, range } from "d3";
+import { derived, writable } from "svelte/store";
 import { latestItems } from "./latest-chunk";
 import { latestDoiUpdate } from "./latest-doi-update";
 import { currentChunkNo } from "./progression";
@@ -18,9 +19,21 @@ latestItems.subscribe(($latestItems) => {
 });
 
 latestDoiUpdate.subscribe(($latestDoiUpdate) => {
-  $latestDoiUpdate.ids.forEach((id) => {
+  $latestDoiUpdate?.ids.forEach((id) => {
     currentDoiTimestamps.set(+id, chunkNo);
   });
 
   doiTimestamps.set(currentDoiTimestamps);
+});
+
+export const doiAgeHistogram = derived([doiTimestamps], ([$doiTimestamps]) => {
+  if (doiTimestamps === null) {
+    return [];
+  }
+
+  const timestamps = Array.from($doiTimestamps.values());
+  const binGenerator = bin().thresholds(range(0, chunkNo, 1));
+  const bins = binGenerator(timestamps);
+
+  return bins;
 });

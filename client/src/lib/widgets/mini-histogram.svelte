@@ -42,7 +42,7 @@
   }
   div.mini-histogram .bin {
     box-sizing: border-box;
-    border: 1px solid #333;
+    border: 0.5px solid #888;
     background: white;
   }
   div.mini-histogram .bin:hover {

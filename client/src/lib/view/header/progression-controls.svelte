@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { doiAgeHistogram } from "$lib/state/doi-ages";
   import { averageDoiPerChunk } from "$lib/state/doi-values";
   import { processedData, totalSize } from "$lib/state/processed-data";
   import {
@@ -14,6 +15,7 @@
   import MiniHistogram from "$lib/widgets/mini-histogram.svelte";
   import ProgressBar from "$lib/widgets/progress-bar.svelte";
   import Row from "$lib/widgets/row.svelte";
+  import { max } from "d3";
   import ControlButton from "../../widgets/control-button.svelte";
 
   export let x = 0;
@@ -25,6 +27,8 @@
   const width = 120;
 
   $: progress = $processedData.length / $totalSize;
+
+  let show: "age" | "mean" = "age";
 </script>
 
 <div
@@ -38,14 +42,25 @@
   <Row>
     <Row>
       <span>Iteration: <BigNumber>{$currentChunkNo}</BigNumber></span>
-      <MiniHistogram
-        id="mean-doi-per-chunk"
-        domain={[0, 1]}
-        width={150}
-        height={25}
-        values={$averageDoiPerChunk}
-        histogramStyle="padding:0 5px;"
-      />
+      {#if show === "mean"}
+        <MiniHistogram
+          id="mean-doi-per-chunk"
+          domain={[0, 1]}
+          width={150}
+          height={25}
+          values={$averageDoiPerChunk}
+          histogramStyle="padding:0 5px;"
+        />
+      {:else}
+        <MiniHistogram
+          id="doi-age-per-item"
+          domain={[0, max($doiAgeHistogram.map((d) => d.length))]}
+          width={150}
+          height={25}
+          values={$doiAgeHistogram.map((d) => d.length)}
+          histogramStyle="padding:0 5px;"
+        />
+      {/if}
     </Row>
     <Column>
       <div class="progression-text">
