@@ -205,7 +205,9 @@ def doi_prediction(X: np.ndarray):
     df = df.drop(columns=[2, 3, 7, 18, 19])  # non-numerical columns
     df = df.astype(np.float64)
 
-    doi = regtree.predict(df)
+    doi = regtree.predict(df).reshape(
+        -1,
+    )
 
     return doi
 
