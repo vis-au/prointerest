@@ -13,7 +13,7 @@ import { selectedDTNode } from "./selection-in-dt";
 import { selectionInSecondaryView } from "./selection-in-secondary-view";
 import { resetViewTransform } from "./zoom";
 
-export const CHUNK_SIZE = 1000;
+export const CHUNK_SIZE = 10000;
 
 const currentInterval = 1000;
 export const updateInterval = writable(currentInterval);
@@ -28,10 +28,37 @@ export const currentChunkNo = writable(0);
 
 const currentDoiValues: Map<number, number> = new Map();
 
-const progressionCallback = () => {
+let isDoiFunctionCurrentlyDirty = false;
+export const isDoiFunctionDirty = writable(isDoiFunctionCurrentlyDirty);
+isDoiFunctionDirty.subscribe((flag) => (isDoiFunctionCurrentlyDirty = flag));
+
+async function fullDoiUpdate() {
+  await trainPredictorModel();
+
+  const update = await getFullDoiUpdate();
+
+  update.ids.forEach((id, i) => {
+    currentDoiValues.set(+id, update.dois[i]);
+  });
+
+  doiValues.set(currentDoiValues);
+}
+
+const progressionCallback = async () => {
   if (!currentlyWaiting) {
     currentlyWaiting = true;
     waitingForChunk.set(true);
+
+    if (isDoiFunctionCurrentlyDirty) {
+      // FIXME: triggers a full update of DOI values in a fixed interval. This should be replaced
+      // by an on-demand approach, which updates only if the DOI values are outdated.
+      await fullDoiUpdate();
+      isDoiFunctionDirty.set(false);
+      currentlyWaiting = false;
+      waitingForChunk.set(currentlyWaiting);
+      return;
+    }
+
     getNextChunk(CHUNK_SIZE).then((chunk) => {
       processedData.update((processed) => {
         return [...processed, ...chunk.chunk];
@@ -46,17 +73,12 @@ const progressionCallback = () => {
 
       currentChunkNo.update((chunkNo) => {
         if (chunkNo > 0 && chunkNo % UPDATE_INTERVAL === 0) {
-          trainPredictorModel().then(() => {
-            getFullDoiUpdate().then((d) => {
-              d.ids.forEach((id, i) => {
-                currentDoiValues.set(+id, d.dois[i]);
-              });
-            });
-          });
+          isDoiFunctionDirty.set(true);
         }
 
         return chunkNo + 1;
       });
+
       averageDoiPerChunk.update((averageDois) => averageDois.concat(mean(chunk.dois)));
       doiValues.set(currentDoiValues);
 
