@@ -44,47 +44,48 @@ async function fullDoiUpdate() {
   doiValues.set(currentDoiValues);
 }
 
+async function nextChunk() {
+  const chunk = await getNextChunk(CHUNK_SIZE);
+
+  processedData.update((processed) => {
+    return [...processed, ...chunk.chunk];
+  });
+  chunk.dois.forEach((doi, i) => {
+    currentDoiValues.set(chunk.chunk[i][0], doi);
+  });
+  chunk.updated_dois.forEach((doi, i) => {
+    const id = chunk.updated_dois[i];
+    currentDoiValues.set(id, doi);
+  });
+
+  currentChunkNo.update((chunkNo) => {
+    if (chunkNo > 0 && chunkNo % UPDATE_INTERVAL === 0) {
+      // FIXME: triggers a full update of DOI values in a fixed interval. This should be replaced
+      // by an on-demand approach, which updates only if the DOI values are outdated.
+      isDoiFunctionDirty.set(true);
+    }
+
+    return chunkNo + 1;
+  });
+
+  averageDoiPerChunk.update((averageDois) => averageDois.concat(mean(chunk.dois)));
+  doiValues.set(currentDoiValues);
+}
+
 const progressionCallback = async () => {
   if (!currentlyWaiting) {
     currentlyWaiting = true;
     waitingForChunk.set(true);
 
     if (isDoiFunctionCurrentlyDirty) {
-      // FIXME: triggers a full update of DOI values in a fixed interval. This should be replaced
-      // by an on-demand approach, which updates only if the DOI values are outdated.
       await fullDoiUpdate();
       isDoiFunctionDirty.set(false);
-      currentlyWaiting = false;
-      waitingForChunk.set(currentlyWaiting);
-      return;
+    } else {
+      await nextChunk(); // side effect: sets isDoiFunctionDirty flag in reg. intervals
     }
 
-    getNextChunk(CHUNK_SIZE).then((chunk) => {
-      processedData.update((processed) => {
-        return [...processed, ...chunk.chunk];
-      });
-      chunk.dois.forEach((doi, i) => {
-        currentDoiValues.set(chunk.chunk[i][0], doi);
-      });
-      chunk.updated_dois.forEach((doi, i) => {
-        const id = chunk.updated_dois[i];
-        currentDoiValues.set(id, doi);
-      });
-
-      currentChunkNo.update((chunkNo) => {
-        if (chunkNo > 0 && chunkNo % UPDATE_INTERVAL === 0) {
-          isDoiFunctionDirty.set(true);
-        }
-
-        return chunkNo + 1;
-      });
-
-      averageDoiPerChunk.update((averageDois) => averageDois.concat(mean(chunk.dois)));
-      doiValues.set(currentDoiValues);
-
-      currentlyWaiting = false;
-      waitingForChunk.set(currentlyWaiting);
-    });
+    currentlyWaiting = false;
+    waitingForChunk.set(currentlyWaiting);
   }
 };
 
