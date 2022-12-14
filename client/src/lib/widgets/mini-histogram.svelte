@@ -43,6 +43,7 @@
   div.mini-histogram .bin {
     box-sizing: border-box;
     border: 1px solid #333;
+    background: white;
   }
   div.mini-histogram .bin:hover {
     opacity: 0.73;
