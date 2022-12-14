@@ -12,6 +12,7 @@ import { processedData } from "./processed-data";
 import { selectedDTNode } from "./selection-in-dt";
 import { selectionInSecondaryView } from "./selection-in-secondary-view";
 import { resetViewTransform } from "./zoom";
+import { latestDoiUpdate } from "./latest-doi-update";
 
 export const CHUNK_SIZE = 10000;
 
@@ -41,6 +42,7 @@ async function fullDoiUpdate() {
     currentDoiValues.set(+id, update.dois[i]);
   });
 
+  latestDoiUpdate.set(update);
   doiValues.set(currentDoiValues);
 }
 
