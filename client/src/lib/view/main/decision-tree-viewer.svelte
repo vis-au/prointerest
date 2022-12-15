@@ -267,11 +267,7 @@
                   dx={LEAF_NODE_WIDTH / 2}
                   dy={scaleLeafSize.range()[1] + FONT_SIZE}
                 >
-                  {separateThousands(
-                    truncateFloat(
-                      sizeEncoding === "doi" ? node.data.value[0] : node.data.items.length
-                    )
-                  )}
+                  {separateThousands(truncateFloat(node.data.value[0]))}
                 </text>
               </g>
             {/each}
