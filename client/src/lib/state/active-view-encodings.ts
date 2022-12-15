@@ -6,8 +6,8 @@ import { isDimensionInteresting } from "./interesting-dimensions";
 export const activeViewEncodings: Writable<Encodings> = writable({
   x: null,
   y: null,
-  color: null,
-  size: null
+  color: "count",
+  size: "count"
 });
 
 export const PRIMARY_COLOR: [number, number, number] = [255, 165, 0];

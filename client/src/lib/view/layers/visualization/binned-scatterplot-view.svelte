@@ -55,15 +55,15 @@
   function updateScales() {
     const minCount = min($bins, (d: HexbinBin<DataItem>) => d.length) || 0;
     const maxCount = max($bins, (d: HexbinBin<DataItem>) => d.length) || 1;
-    const sizeIsCountColorIsDoi =
-      $activeViewEncodings.size === "count" && $activeViewEncodings.color === "doi";
 
     if ($colorScale.range().length === 3) {
-      $colorScale.domain(sizeIsCountColorIsDoi ? [-1, 0, 1] : [maxCount, 0, minCount]);
-      sizeScale.domain([minCount, maxCount]);
+      $colorScale.domain(
+        $activeViewEncodings.color === "doi" ? [-1, 0, 1] : [maxCount, 0, minCount]
+      );
+      sizeScale.domain($activeViewEncodings.size === "count" ? [minCount, maxCount] : [0, 1]);
     } else {
-      $colorScale.domain(sizeIsCountColorIsDoi ? [0, 1] : [minCount, maxCount]);
-      sizeScale.domain([minCount, maxCount]);
+      $colorScale.domain($activeViewEncodings.color === "doi" ? [0, 1] : [minCount, maxCount]);
+      sizeScale.domain($activeViewEncodings.size === "count" ? [minCount, maxCount] : [0, 1]);
     }
   }
 

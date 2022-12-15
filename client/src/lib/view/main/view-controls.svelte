@@ -8,6 +8,7 @@
   import { dimensions } from "$lib/state/processed-data";
   import { resetViewTransform } from "$lib/state/zoom";
   import { brushModes } from "$lib/types/brush-mode";
+  import { colorEncodings, sizeEncodings } from "$lib/types/encodings";
   import { viewModes } from "$lib/types/view-modes";
   import Alternatives from "$lib/widgets/alternatives.svelte";
   import ControlButton from "$lib/widgets/control-button.svelte";
@@ -29,6 +30,20 @@
       alternatives={viewModes}
       bind:activeAlternative={$activeViewMode}
     />
+    {#if $activeViewMode === "binned"}
+      <h2>Size</h2>
+      <Alternatives
+        name="hexbin-size-encoding"
+        alternatives={sizeEncodings}
+        bind:activeAlternative={$activeViewEncodings.size}
+      />
+      <h2>Color</h2>
+      <Alternatives
+        name="hexbin-color-encoding"
+        alternatives={colorEncodings}
+        bind:activeAlternative={$activeViewEncodings.color}
+      />
+    {/if}
     <ControlButton on:click={resetViewTransform} style="margin-left:25px;padding:2px 10px">
       reset zoom
     </ControlButton>
