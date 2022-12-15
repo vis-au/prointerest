@@ -14,6 +14,7 @@
   export let usePresetInterval = true;
   export let groupDimension: string = null;
   export let showTitle = false;
+  export let useLogScale = false;
 
   const dispatch = createEventDispatcher();
   const POINT_COLOR = "#555";
@@ -85,7 +86,8 @@
             },
             y: {
               aggregate: "count",
-              title: null
+              title: null,
+              scale: { type: useLogScale ? "symlog" : "linear" }
             },
             color: { value: "#ddd" }
           }

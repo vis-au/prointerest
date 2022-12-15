@@ -27,6 +27,7 @@
   let histogramMode: "stack interest in selection" | "stack selected" | "stack interesting" =
     "stack interesting";
   let showDoiValues = true;
+  let useLogScale = false;
 
   $: _items = histogramMode === "stack interest in selection" ? $selectedItems : $items;
   $: data = _items.map(dataItemToRecord);
@@ -80,6 +81,9 @@
       <Toggle id="doi-values" style="margin-right:10px" bind:active={showDoiValues}>
         show DOI histogram
       </Toggle>
+      <Toggle id="log-scale" style="margin-right:10px" bind:active={useLogScale}>
+        use log scale
+      </Toggle>
     </Row>
     <ControlButton on:click={() => ($isSecondaryViewCollapsed = true)}>close</ControlButton>
   </Row>
@@ -110,6 +114,7 @@
         colors={[getRGB(HIGHLIGHT_COLOR), getRGB(PRIMARY_COLOR)]}
         width={310}
         height={height * 0.4}
+        {useLogScale}
         on:end={onBrush}
       />
     </Column>
