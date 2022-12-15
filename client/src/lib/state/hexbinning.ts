@@ -4,11 +4,19 @@ import type { ZoomTransform } from "d3";
 import { hexbin } from "d3-hexbin";
 import { writable } from "svelte/store";
 
-const currentHexBinning = hexbin<DataItem>().radius(10);
+let currentHexbinRadius = 10;
+export const hexbinRadius = writable(currentHexbinRadius);
+
+let currentHexBinning = hexbin<DataItem>().radius(currentHexbinRadius);
 export const hexbinning = writable(currentHexBinning);
 
-let transform: ZoomTransform;
+hexbinRadius.subscribe(($hexbinRadius) => {
+  currentHexbinRadius = $hexbinRadius;
+  currentHexBinning = hexbin<DataItem>().radius(currentHexbinRadius);
+  hexbinning.set(currentHexBinning);
+});
 
+let transform: ZoomTransform;
 currentTransform.subscribe((t) => {
   transform = t;
   currentHexBinning

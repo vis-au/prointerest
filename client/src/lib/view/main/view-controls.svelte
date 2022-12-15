@@ -15,8 +15,10 @@
   import Dropdown from "$lib/widgets/dropdown.svelte";
   import HistogramSlider from "$lib/widgets/histogram-slider.svelte";
   import Row from "$lib/widgets/row.svelte";
+  import Slider from "$lib/widgets/slider.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
   import { bin } from "d3";
+  import { hexbinRadius } from "$lib/state/hexbinning";
 
   let binsGenerator = bin().thresholds(25);
   $: doiBins = binsGenerator(Array.from($doiValues.values()).concat(0, 1)).map((d) => d.length);
@@ -36,6 +38,18 @@
         name="hexbin-size-encoding"
         alternatives={sizeEncodings}
         bind:activeAlternative={$activeViewEncodings.size}
+      />
+      <Slider
+        id="hexbin-radius"
+        label="r"
+        width={100}
+        sliderWidth={80}
+        min={1}
+        max={50}
+        bind:value={$hexbinRadius}
+        showValue={false}
+        updateLive={false}
+        showDomain={false}
       />
       <h2>Color</h2>
       <Alternatives
