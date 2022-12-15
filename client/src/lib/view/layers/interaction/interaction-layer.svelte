@@ -54,7 +54,7 @@
       $activeInteractionMode = "zoom";
     } else if (event.key === " ") {
       $progressionState === "paused" ? startProgression() : pauseProgression();
-    } else if (event.key === "Backspace") {
+    } else if (event.key === "Backspace" && event.ctrlKey) {
       resetProgression();
     } else if (event.key === "Enter") {
       $isSecondaryViewCollapsed = !$isSecondaryViewCollapsed;
