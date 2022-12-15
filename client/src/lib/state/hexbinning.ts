@@ -7,20 +7,24 @@ import { writable } from "svelte/store";
 let currentHexbinRadius = 10;
 export const hexbinRadius = writable(currentHexbinRadius);
 
-let currentHexBinning = hexbin<DataItem>().radius(currentHexbinRadius);
+const currentHexBinning = hexbin<DataItem>().radius(currentHexbinRadius);
 export const hexbinning = writable(currentHexBinning);
+
+function updateHexbinning() {
+  currentHexBinning
+    .radius(currentHexbinRadius)
+    .x((d) => transform.applyX(d.position.x))
+    .y((d) => transform.applyY(d.position.y));
+  hexbinning.set(currentHexBinning);
+}
 
 hexbinRadius.subscribe(($hexbinRadius) => {
   currentHexbinRadius = $hexbinRadius;
-  currentHexBinning = hexbin<DataItem>().radius(currentHexbinRadius);
-  hexbinning.set(currentHexBinning);
+  updateHexbinning();
 });
 
 let transform: ZoomTransform;
 currentTransform.subscribe((t) => {
   transform = t;
-  currentHexBinning
-    .x((d) => transform.applyX(d.position.x))
-    .y((d) => transform.applyY(d.position.y));
-  hexbinning.set(currentHexBinning);
+  updateHexbinning();
 });

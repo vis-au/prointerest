@@ -48,7 +48,7 @@
         max={50}
         bind:value={$hexbinRadius}
         showValue={false}
-        updateLive={false}
+        updateLive={true}
         showDomain={false}
       />
       <h2>Color</h2>
