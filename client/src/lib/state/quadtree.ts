@@ -7,11 +7,14 @@ import { processedData } from "./processed-data";
 import { scaleX, scaleY } from "./scales";
 import { activeViewEncodings } from "./active-view-encodings";
 import { dimensions } from "./processed-data";
-import { CHUNK_SIZE } from "./progression";
+import { chunkSize } from "./progression";
 import { latestChunk } from "./latest-chunk";
 
 let currentQuadtree = createQuadtree();
 export const quadtree = writable(currentQuadtree);
+
+let currentChunkSize = 0;
+chunkSize.subscribe(($chunkSize) => (currentChunkSize = $chunkSize));
 
 let currentScaleX: ScaleLinear<number, number> = null;
 let currentScaleY: ScaleLinear<number, number> = null;
@@ -58,7 +61,10 @@ export const processedItems = writable([] as DataItem[]);
 // is run asynchronously to ensure that the scales are set
 setTimeout(() => {
   processedData.subscribe((newData) => {
-    const newDatas = newData.slice(newData.length - newData.length - CHUNK_SIZE, newData.length);
+    const newDatas = newData.slice(
+      newData.length - newData.length - currentChunkSize,
+      newData.length
+    );
 
     if (newData.length === 0) {
       recreateQuadtree();

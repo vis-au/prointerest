@@ -14,7 +14,9 @@ import { selectionInSecondaryView } from "./selection-in-secondary-view";
 import { resetViewTransform } from "./zoom";
 import { latestDoiUpdate } from "./latest-doi-update";
 
-export const CHUNK_SIZE = 10000;
+let currentChunkSize = 10000;
+export const chunkSize = writable(currentChunkSize);
+chunkSize.subscribe(($chunkSize) => (currentChunkSize = $chunkSize));
 
 const currentInterval = 1000;
 export const updateInterval = writable(currentInterval);
@@ -47,7 +49,7 @@ async function fullDoiUpdate() {
 }
 
 async function nextChunk() {
-  const chunk = await getNextChunk(CHUNK_SIZE);
+  const chunk = await getNextChunk(currentChunkSize);
 
   processedData.update((processed) => {
     return [...processed, ...chunk.chunk];
