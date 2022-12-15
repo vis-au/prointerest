@@ -14,7 +14,9 @@ let currentQuadtree = createQuadtree();
 export const quadtree = writable(currentQuadtree);
 
 let currentChunkSize = 0;
-chunkSize.subscribe(($chunkSize) => (currentChunkSize = $chunkSize));
+setTimeout(() => {
+  chunkSize.subscribe(($chunkSize) => (currentChunkSize = $chunkSize));
+}, 0);
 
 let currentScaleX: ScaleLinear<number, number> = null;
 let currentScaleY: ScaleLinear<number, number> = null;

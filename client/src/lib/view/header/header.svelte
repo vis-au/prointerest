@@ -5,6 +5,7 @@
     selectedDoiDimensions
   } from "$lib/state/interesting-dimensions";
   import { dimensions } from "$lib/state/processed-data";
+  import { isDoiFunctionDirty } from "$lib/state/progression";
   import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
   import type { DOIDimension } from "$lib/types/doi-dimension";
   import { sendDimenionWeights } from "$lib/util/requests";
@@ -34,6 +35,11 @@
   function removeDimension(event: CustomEvent<string>) {
     $isDimensionInteresting[event.detail] = false;
   }
+
+  function onDimensionWeightsChanged() {
+    sendDimenionWeights($doiDimensionWeights);
+    $isDoiFunctionDirty = true;
+  }
 </script>
 
 <header style="height:{height}px">
@@ -53,7 +59,7 @@
         bind:valueWeights={selectedDimensionWeights}
         bind:activeWeight={$selectedDoiWeight}
         on:remove-weight={removeDimension}
-        on:end={() => sendDimenionWeights($doiDimensionWeights)}
+        on:end={onDimensionWeightsChanged}
       />
       <Options
         options={$dimensions}

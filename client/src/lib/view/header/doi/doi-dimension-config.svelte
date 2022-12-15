@@ -3,6 +3,7 @@
   import { interestingIntervals, selectedDoiDimensions } from "$lib/state/interesting-dimensions";
   import { randomDataSample } from "$lib/state/sampled-data";
   import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
+  import { isDoiFunctionDirty } from "$lib/state/progression";
   import { truncateFloat } from "$lib/util/number-transform";
   import { getDimensionExtent, sendInterestingDimensionRange } from "$lib/util/requests";
   import type { DOIDimension } from "$lib/types/doi-dimension";
@@ -22,6 +23,7 @@
       $interestingIntervals[dimension] = interval;
     }
     sendInterestingDimensionRange(dimension, interval);
+    $isDoiFunctionDirty = true;
   }
 
   function getSelectedDimensionExtents() {
@@ -44,7 +46,6 @@
 </script>
 
 <DoiConfig
-  on:close
   title="Select interesting range"
   message="Items with values in that range along this dimension get a higher degree of interest."
 >
