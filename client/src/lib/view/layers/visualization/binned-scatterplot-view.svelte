@@ -5,6 +5,11 @@
   import { afterUpdate, onMount } from "svelte";
 
   import { colorScale } from "$lib/state/active-color-scale";
+  import {
+    activeViewEncodings,
+    getRGB,
+    UNINTERESTING_COLOR
+  } from "$lib/state/active-view-encodings";
   import { bins, uninterestingBins } from "$lib/state/bins";
   import { hexbinning } from "$lib/state/hexbinning";
   import type DataItem from "$lib/types/data-item";
@@ -13,12 +18,9 @@
   export let width = 100;
   export let height = 100;
 
-  const UNINTERESTING_COLOR = "rgba(255, 255, 255, 0)";
-
   let updateInterval: number;
   let canvasElement: HTMLCanvasElement;
   let uninterestingCanvasElement: HTMLCanvasElement;
-  let useSizeEncoding = false;
 
   const sizeScale = scaleLog();
 
@@ -29,16 +31,16 @@
   ) {
     ctx.clearRect(0, 0, width, height);
     ctx.beginPath();
-    ctx.strokeStyle = "rgba(255,255,255,1)";
+    ctx.strokeStyle = getRGB(UNINTERESTING_COLOR);
     ctx.lineWidth = 2;
 
     (renderInteresting ? $bins : $uninterestingBins).forEach((bin) => {
       ctx.translate(bin.x, bin.y);
       ctx.fillStyle = renderInteresting
-        ? $colorScale(useSizeEncoding ? bin["doi"] : bin.length)
-        : UNINTERESTING_COLOR;
+        ? $colorScale($activeViewEncodings.color === "doi" ? bin["doi"] : bin.length)
+        : getRGB(UNINTERESTING_COLOR);
 
-      const scaleFactor = useSizeEncoding ? sizeScale(bin.length) : 1;
+      const scaleFactor = $activeViewEncodings.size === "count" ? sizeScale(bin.length) : 1;
       ctx.scale(scaleFactor, scaleFactor);
       ctx.stroke(hexagonPath);
       ctx.fill(hexagonPath);
@@ -53,12 +55,14 @@
   function updateScales() {
     const minCount = min($bins, (d: HexbinBin<DataItem>) => d.length) || 0;
     const maxCount = max($bins, (d: HexbinBin<DataItem>) => d.length) || 1;
+    const sizeIsCountColorIsDoi =
+      $activeViewEncodings.size === "count" && $activeViewEncodings.color === "doi";
 
     if ($colorScale.range().length === 3) {
-      $colorScale.domain(useSizeEncoding ? [-1, 0, 1] : [maxCount, 0, minCount]);
+      $colorScale.domain(sizeIsCountColorIsDoi ? [-1, 0, 1] : [maxCount, 0, minCount]);
       sizeScale.domain([minCount, maxCount]);
     } else {
-      $colorScale.domain(useSizeEncoding ? [0, 1] : [minCount, maxCount]);
+      $colorScale.domain(sizeIsCountColorIsDoi ? [0, 1] : [minCount, maxCount]);
       sizeScale.domain([minCount, maxCount]);
     }
   }
