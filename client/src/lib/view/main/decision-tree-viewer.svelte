@@ -20,7 +20,7 @@
   export let decisionTree: DecisionTree;
   export let height = 500;
   export let width = 500;
-  export let sizeEncoding: "doi" | "items" = "items";
+  export let sizeEncoding: "doi" | "items" = "doi";
   export let style = "";
 
   // tree rendering partially adapted to svelte
@@ -94,10 +94,7 @@
     });
 
   // maps interest to the size of leaf nodes
-  $: scaleLeafSize = scaleLinear(
-    [0, sizeEncoding === "doi" ? 1 : root?.value],
-    [0, MAX_LEAF_NODE_HEIGHT]
-  );
+  $: scaleLeafSize = scaleLinear([0, 1], [0, MAX_LEAF_NODE_HEIGHT]);
 
   // maps interest to the width of links
   $: scaleLinkSize = scaleLinear([0, root?.value || 1], [1, MAX_PATH_WIDTH]);
@@ -257,9 +254,7 @@
                 <rect
                   class="value"
                   width={LEAF_NODE_WIDTH}
-                  height={scaleLeafSize(
-                    sizeEncoding === "doi" ? node.data.value[0] : node.data.items.length
-                  )}
+                  height={scaleLeafSize(node.data.value[0])}
                 />
 
                 <text
