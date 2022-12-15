@@ -1,6 +1,7 @@
 <script lang="ts">
   import { doiAgeHistogram } from "$lib/state/doi-ages";
   import { averageDoiPerChunk } from "$lib/state/doi-values";
+  import { chunkSize } from "$lib/state/progression";
   import { processedData, totalSize } from "$lib/state/processed-data";
   import {
     currentChunkNo,
@@ -13,6 +14,7 @@
   import BigNumber from "$lib/widgets/big-number.svelte";
   import Column from "$lib/widgets/column.svelte";
   import MiniHistogram from "$lib/widgets/mini-histogram.svelte";
+  import NumberInput from "$lib/widgets/number-input.svelte";
   import ProgressBar from "$lib/widgets/progress-bar.svelte";
   import Row from "$lib/widgets/row.svelte";
   import { max } from "d3";
@@ -61,6 +63,10 @@
           histogramStyle="padding:0 5px;"
         />
       {/if}
+    </Row>
+    <Row>
+      <span>#items/chunk:</span>
+      <NumberInput id="chunk-size" bind:value={$chunkSize} />
     </Row>
     <Column>
       <div class="progression-text">
