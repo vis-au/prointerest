@@ -182,6 +182,11 @@ def send_steering_by_examples():
     # list of items that are of interest to the user
     items = res["items"]
     columns = res["dimensions"]
+
+    if len(items) == 0:
+        print("steering examples empty")
+        return cors_response("ok")
+
     items = pd.DataFrame(np.array(items), columns=columns)
 
     # FIXME: use the actual subspace of interest!
