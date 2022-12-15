@@ -1,12 +1,13 @@
 <script lang="ts">
   import { max, min } from "d3-array";
   import type { HexbinBin } from "d3-hexbin";
+  import { scaleLog } from "d3-scale";
   import { afterUpdate, onMount } from "svelte";
 
-  import type DataItem from "$lib/types/data-item";
   import { colorScale } from "$lib/state/active-color-scale";
   import { bins, uninterestingBins } from "$lib/state/bins";
   import { hexbinning } from "$lib/state/hexbinning";
+  import type DataItem from "$lib/types/data-item";
 
   export let id = "binned-scatterplot-view";
   export let width = 100;
@@ -17,6 +18,9 @@
   let updateInterval: number;
   let canvasElement: HTMLCanvasElement;
   let uninterestingCanvasElement: HTMLCanvasElement;
+  let useSizeEncoding = true;
+
+  const sizeScale = scaleLog();
 
   function renderBins(ctx: CanvasRenderingContext2D, hexagonPath: Path2D, useInteresting: boolean) {
     ctx.clearRect(0, 0, width, height);
@@ -27,22 +31,29 @@
     (useInteresting ? $bins : $uninterestingBins).forEach((bin) => {
       ctx.translate(bin.x, bin.y);
       ctx.fillStyle = useInteresting ? $colorScale(bin.length) : UNINTERESTING_COLOR;
+
+      const scaleFactor = useSizeEncoding ? sizeScale(bin.length) : 1;
+      ctx.scale(scaleFactor, scaleFactor);
       ctx.stroke(hexagonPath);
       ctx.fill(hexagonPath);
+
       ctx.translate(-bin.x, -bin.y);
+      ctx.setTransform(1, 0, 0, 1, 0, 0); // reset the ctx transform
     });
 
     ctx.closePath();
   }
 
-  function updateColorScale() {
+  function updateScales() {
     const minCount = min($bins, (d: HexbinBin<DataItem>) => d.length) || 0;
     const maxCount = max($bins, (d: HexbinBin<DataItem>) => d.length) || 1;
 
     if ($colorScale.range().length === 3) {
       $colorScale.domain([maxCount, 0, minCount]);
+      sizeScale.domain([minCount, maxCount]);
     } else {
       $colorScale.domain([minCount, maxCount]);
+      sizeScale.domain([minCount, maxCount]);
     }
   }
 
@@ -55,7 +66,7 @@
     clearInterval(updateInterval);
 
     // update the color scale here, right before rendering the data
-    updateColorScale();
+    updateScales();
     renderBins(canvasElement.getContext("2d"), hexagonPath, true);
     renderBins(uninterestingCanvasElement.getContext("2d"), hexagonPath, false);
   }
