@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { D3BrushEvent } from "d3-brush";
   import { brush } from "d3-brush";
-  import { geoPath } from "d3-geo";
   import type { GeoPermissibleObjects } from "d3-geo";
+  import { geoPath } from "d3-geo";
   import { select } from "d3-selection";
 
   import { createEventDispatcher, onMount } from "svelte";

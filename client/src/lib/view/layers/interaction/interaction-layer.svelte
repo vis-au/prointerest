@@ -2,32 +2,32 @@
   import type { DoiInteraction } from "$lib/provenance/doi-interaction";
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import { interactionLog } from "$lib/provenance/interaction-log";
-  import type ScatterplotBrush from "$lib/provenance/scatterplot-brush-interaction";
-  import type ScatterplotLassoBrush from "$lib/provenance/scatterplot-lasso-brush-interaction";
 
-  import { bins } from "$lib/state/bins";
   import { activeBrush, activeLasso } from "$lib/state/active-brush";
   import { activeDecisionTree } from "$lib/state/active-decision-tree";
   import { activeInteractionMode } from "$lib/state/active-interaction-mode";
+  import { bins } from "$lib/state/bins";
   import { hexbinning } from "$lib/state/hexbinning";
   import { hoveredPosition } from "$lib/state/hovered-position";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { dimensions } from "$lib/state/processed-data";
-  import { quadtree } from "$lib/state/quadtree";
-  import { scaleX, scaleY } from "$lib/state/scales";
-  import { selectedBins } from "$lib/state/selected-bins";
   import {
     pauseProgression,
     progressionState,
     resetProgression,
     startProgression
   } from "$lib/state/progression";
+  import { quadtree } from "$lib/state/quadtree";
+  import { scaleX, scaleY } from "$lib/state/scales";
+  import { selectedBins } from "$lib/state/selected-bins";
+  import { selectedItems } from "$lib/state/selected-items";
   import { currentTransform, isZooming } from "$lib/state/zoom";
 
   import { getDummyDataItem } from "$lib/util/dummy-data-item";
   import { getPointsInPolygon, getPointsInRect } from "$lib/util/find-in-quadtree";
-  import { getDecisionTree, getRegressionTree } from "$lib/util/requests";
+  import { getRegressionTree, steerByExampleItems } from "$lib/util/requests";
 
+  import ControlButton from "$lib/widgets/control-button.svelte";
   import BrushLayer from "./brush-layer.svelte";
   import SelectionLayer from "./selection-layer.svelte";
   import ZoomLayer from "./zoom-layer.svelte";
@@ -65,8 +65,12 @@
     $interactionLog.add(interaction);
   }
 
-  async function trainDecisionTree(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
-    const interesting = brushInteraction.getAffectedItems();
+  async function steer() {
+    const interesting = $selectedItems;
+
+    if (interesting.length === 0) {
+      return;
+    }
 
     // find data to train against, by finding (at most twice as many) uninteresting items
     const uninteresting = $quadtree
@@ -74,15 +78,11 @@
       .filter((item) => interesting.indexOf(item) === -1)
       .filter((_, i) => i < interesting.length * 2);
 
-    $activeDecisionTree = await getDecisionTree(interesting, uninteresting, $dimensions);
-  }
-
-  async function trainRegressionTree(brushInteraction: ScatterplotBrush | ScatterplotLassoBrush) {
-    const interesting = brushInteraction.getAffectedItems();
-
     const scores = Array.from({ length: interesting.length }).map(Math.random);
 
     $activeDecisionTree = await getRegressionTree(interesting, scores, $dimensions);
+
+    return steerByExampleItems(interesting, uninteresting, $dimensions);
   }
 
   function onBrushEnd() {
@@ -152,6 +152,19 @@
     const interaction = interactionFactory.createSelectInteraction(x, y);
     onInteraction(interaction);
   }
+
+  let steerButtonPosition = [null, null];
+
+  $: if ($activeBrush && !$isZooming) {
+    const [_x1, _y1] = $activeBrush[1];
+
+    const x = $currentTransform.applyX($scaleX(_x1)) - 45;
+    const y = $currentTransform.applyY($scaleY(_y1)) + 5;
+
+    steerButtonPosition = [x, y];
+  } else if ($isZooming) {
+    steerButtonPosition = [null, null];
+  }
 </script>
 
 <div class="interaction-canvas-container" class:zooming={$isZooming}>
@@ -174,6 +187,14 @@
     on:hover={onHover}
     on:end={onBrushEnd}
   />
+  {#if activeBrush}
+    <ControlButton
+      style="position:absolute;left:{steerButtonPosition[0]}px;top:{steerButtonPosition[1]}px"
+      on:click={steer}
+    >
+      steer
+    </ControlButton>
+  {/if}
 </div>
 
 <svelte:window on:keydown={onKeyDown} on:keyup={onKeyUp} />
