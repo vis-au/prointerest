@@ -29,8 +29,6 @@
   const width = 120;
 
   $: progress = $processedData.length / $totalSize;
-
-  let show: "age" | "mean" = "age";
 </script>
 
 <div
@@ -44,25 +42,24 @@
   <Row>
     <Row>
       <span>Iteration: <BigNumber>{$currentChunkNo}</BigNumber></span>
-      {#if show === "mean"}
-        <MiniHistogram
-          id="mean-doi-per-chunk"
-          domain={[0, 1]}
-          width={150}
-          height={25}
-          values={$averageDoiPerChunk}
-          histogramStyle="padding:0 5px;"
-        />
-      {:else}
-        <MiniHistogram
-          id="doi-age-per-item"
-          domain={[0, max($doiAgeHistogram.map((d) => d.length))]}
-          width={150}
-          height={25}
-          values={$doiAgeHistogram.map((d) => d.length)}
-          histogramStyle="padding:0 5px;"
-        />
-      {/if}
+      <span>avg doi/chunk:</span>
+      <MiniHistogram
+        id="mean-doi-per-chunk"
+        domain={[0, 1]}
+        width={125}
+        height={25}
+        values={$averageDoiPerChunk}
+        histogramStyle="padding:0 5px;"
+      />
+      <span>doi ages</span>
+      <MiniHistogram
+        id="doi-age-per-item"
+        domain={[0, max($doiAgeHistogram.map((d) => d.length))]}
+        width={125}
+        height={25}
+        values={$doiAgeHistogram.map((d) => d.length)}
+        histogramStyle="padding:0 5px;"
+      />
     </Row>
     <Row>
       <span>#items/chunk:</span>

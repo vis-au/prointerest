@@ -16,7 +16,7 @@
 
   export let height: number;
 
-  const maxWidth = 700;
+  const doiWeightWidth = 500;
   let selectedDimensionWeights = new Map<DOIDimension, number>();
 
   $: {
@@ -51,7 +51,7 @@
       <h2>DOI features:</h2>
       <WeightedValues
         id="selected-doi-dimensions"
-        totalSize={maxWidth}
+        totalSize={doiWeightWidth}
         weightsRemovable={true}
         useDarkmode={true}
         backgroundColor="#008080"
