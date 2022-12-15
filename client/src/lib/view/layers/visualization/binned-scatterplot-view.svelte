@@ -18,19 +18,25 @@
   let updateInterval: number;
   let canvasElement: HTMLCanvasElement;
   let uninterestingCanvasElement: HTMLCanvasElement;
-  let useSizeEncoding = true;
+  let useSizeEncoding = false;
 
   const sizeScale = scaleLog();
 
-  function renderBins(ctx: CanvasRenderingContext2D, hexagonPath: Path2D, useInteresting: boolean) {
+  function renderBins(
+    ctx: CanvasRenderingContext2D,
+    hexagonPath: Path2D,
+    renderInteresting: boolean
+  ) {
     ctx.clearRect(0, 0, width, height);
     ctx.beginPath();
     ctx.strokeStyle = "rgba(255,255,255,1)";
     ctx.lineWidth = 2;
 
-    (useInteresting ? $bins : $uninterestingBins).forEach((bin) => {
+    (renderInteresting ? $bins : $uninterestingBins).forEach((bin) => {
       ctx.translate(bin.x, bin.y);
-      ctx.fillStyle = useInteresting ? $colorScale(bin.length) : UNINTERESTING_COLOR;
+      ctx.fillStyle = renderInteresting
+        ? $colorScale(useSizeEncoding ? bin["doi"] : bin.length)
+        : UNINTERESTING_COLOR;
 
       const scaleFactor = useSizeEncoding ? sizeScale(bin.length) : 1;
       ctx.scale(scaleFactor, scaleFactor);
@@ -49,10 +55,10 @@
     const maxCount = max($bins, (d: HexbinBin<DataItem>) => d.length) || 1;
 
     if ($colorScale.range().length === 3) {
-      $colorScale.domain([maxCount, 0, minCount]);
+      $colorScale.domain(useSizeEncoding ? [-1, 0, 1] : [maxCount, 0, minCount]);
       sizeScale.domain([minCount, maxCount]);
     } else {
-      $colorScale.domain([minCount, maxCount]);
+      $colorScale.domain(useSizeEncoding ? [0, 1] : [minCount, maxCount]);
       sizeScale.domain([minCount, maxCount]);
     }
   }
