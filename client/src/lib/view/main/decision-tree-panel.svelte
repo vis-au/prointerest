@@ -3,98 +3,41 @@
   import { activeFDLTree } from "$lib/state/active-fdl-tree";
   import { selectedDTNode } from "$lib/state/selection-in-dt";
   import Alternatives from "$lib/widgets/alternatives.svelte";
-  import ControlButton from "../../widgets/control-button.svelte";
   import DecisionTreeViewer from "./decision-tree-viewer.svelte";
+  import ViewPanel from "./view-panel.svelte";
 
   export let x = 0;
   export let y = 0;
   export let width = 500;
   export let height = 500;
 
-  let isHidden = true; // flag for whether the tree is visible or not
   let currentlyShownTree = "decision tree";
 
-  function hide() {
-    isHidden = true;
-  }
-
-  function show() {
-    isHidden = false;
-  }
 </script>
 
-<div
-  class="decision-tree-panel"
-  class:active={$selectedDTNode !== null}
-  style="left:{x}px;top:{y}px;"
->
-  {#if isHidden}
-    <ControlButton id="toggle-dt-panel" style="width:2rem;height:2rem" on:click={show}
-      >DT</ControlButton
-    >
-  {:else}
-    <div class="container">
-      <h2>
-        <div class="left">
-          Show
-          <Alternatives
-            name="currently-shown-tree"
-            alternatives={["decision tree", "FDL tree"]}
-            bind:activeAlternative={currentlyShownTree}
-          />
-        </div>
-
-        <div class="right">
-          <ControlButton on:click={hide} style="width:20px;height:20px;line-height:20px;padding:0">
-            <div style="transform:rotate(45deg)">+</div>
-          </ControlButton>
-        </div>
-      </h2>
-
-      <DecisionTreeViewer
-        id="tree-viewer"
-        {width}
-        {height}
-        decisionTree={currentlyShownTree === "decision tree" ? $activeDecisionTree : $activeFDLTree}
-      />
-    </div>
-  {/if}
-</div>
+<ViewPanel label="DT" {x} {y} active={$selectedDTNode !== null}>
+  <div class="header" slot="header">
+    Show
+    <Alternatives
+      name="currently-shown-tree"
+      alternatives={["decision tree", "FDL tree"]}
+      bind:activeAlternative={currentlyShownTree}
+    />
+  </div>
+  <DecisionTreeViewer
+    slot="body"
+    id="tree-viewer"
+    {width}
+    {height}
+    decisionTree={currentlyShownTree === "decision tree" ? $activeDecisionTree : $activeFDLTree}
+  />
+</ViewPanel>
 
 <style>
-  .decision-tree-panel {
-    position: absolute;
-    font-size: 12px;
-  }
-  .decision-tree-panel.active {
-    border: 1px solid orange;
-  }
-  .decision-tree-panel h2 {
-    display: flex;
-    font-size: 14px;
-    font-weight: normal;
-    line-height: 1;
-    margin: 0;
-    margin-bottom: 15px;
-    padding: 0;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .decision-tree-panel h2 div.left,
-  .decision-tree-panel h2 div.right {
+  div.header {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-  }
-  .decision-tree-panel h2 div.left {
-    margin-right: 25px;
-  }
-  .decision-tree-panel .container {
-    background: white;
-    border: 1px solid #e8eaed;
-    box-shadow: 0 1px 3px -2px #aaa;
-    border-radius: 4px;
-    padding: 1rem;
   }
 </style>
