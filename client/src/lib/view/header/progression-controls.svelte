@@ -1,23 +1,18 @@
 <script lang="ts">
-  import { doiAgeHistogram } from "$lib/state/doi-ages";
-  import { averageDoiPerChunk } from "$lib/state/doi-values";
-  import { chunkSize } from "$lib/state/progression";
   import { processedData, totalSize } from "$lib/state/processed-data";
   import {
-    currentChunkNo,
-    pauseProgression,
-    progressionState,
-    resetProgression,
-    startProgression
+      chunkSize, currentChunkNo,
+      pauseProgression,
+      progressionState,
+      resetProgression,
+      startProgression
   } from "$lib/state/progression";
   import { abbreviate } from "$lib/util/number-transform";
   import BigNumber from "$lib/widgets/big-number.svelte";
   import Column from "$lib/widgets/column.svelte";
-  import MiniHistogram from "$lib/widgets/mini-histogram.svelte";
   import NumberInput from "$lib/widgets/number-input.svelte";
   import ProgressBar from "$lib/widgets/progress-bar.svelte";
   import Row from "$lib/widgets/row.svelte";
-  import { max } from "d3";
   import ControlButton from "../../widgets/control-button.svelte";
 
   export let x = 0;
@@ -40,26 +35,8 @@
   {style}
 >
   <Row>
-    <Row>
+    <Row style="margin-right:20px">
       <span>Iteration: <BigNumber>{$currentChunkNo}</BigNumber></span>
-      <span>avg doi/chunk:</span>
-      <MiniHistogram
-        id="mean-doi-per-chunk"
-        domain={[0, 1]}
-        width={125}
-        height={25}
-        values={$averageDoiPerChunk}
-        histogramStyle="padding:0 5px;"
-      />
-      <span>doi ages</span>
-      <MiniHistogram
-        id="doi-age-per-item"
-        domain={[0, max($doiAgeHistogram.map((d) => d.length))]}
-        width={125}
-        height={25}
-        values={$doiAgeHistogram.map((d) => d.length)}
-        histogramStyle="padding:0 5px;"
-      />
     </Row>
     <Row>
       <span>#items/chunk:</span>

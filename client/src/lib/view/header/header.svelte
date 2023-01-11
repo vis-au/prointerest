@@ -1,8 +1,8 @@
 <script lang="ts">
   import {
-    doiDimensionWeights,
-    isDimensionInteresting,
-    selectedDoiDimensions
+      doiDimensionWeights,
+      isDimensionInteresting,
+      selectedDoiDimensions
   } from "$lib/state/interesting-dimensions";
   import { dimensions } from "$lib/state/processed-data";
   import { isDoiFunctionDirty } from "$lib/state/progression";

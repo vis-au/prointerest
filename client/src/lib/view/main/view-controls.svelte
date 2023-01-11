@@ -1,9 +1,13 @@
 <script>
+  import { bin, max } from "d3";
+
   import { scatterplotBrush } from "$lib/state/active-scatterplot-brush";
   import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { activeViewMode } from "$lib/state/active-view-mode";
+  import { doiAgeHistogram } from "$lib/state/doi-ages";
   import { doiLimit } from "$lib/state/doi-limit";
-  import { doiValues } from "$lib/state/doi-values";
+  import { averageDoiPerChunk, doiValues } from "$lib/state/doi-values";
+  import { hexbinRadius } from "$lib/state/hexbinning";
   import { isRecentChunkVisible } from "$lib/state/is-recent-chunk-visible";
   import { dimensions } from "$lib/state/processed-data";
   import { resetViewTransform } from "$lib/state/zoom";
@@ -14,19 +18,49 @@
   import ControlButton from "$lib/widgets/control-button.svelte";
   import Dropdown from "$lib/widgets/dropdown.svelte";
   import HistogramSlider from "$lib/widgets/histogram-slider.svelte";
+  import MiniHistogram from "$lib/widgets/mini-histogram.svelte";
   import Row from "$lib/widgets/row.svelte";
   import Slider from "$lib/widgets/slider.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
-  import { bin } from "d3";
-  import { hexbinRadius } from "$lib/state/hexbinning";
+  import ViewConfigurationPanel from "./view-configuration-panel.svelte";
 
   let binsGenerator = bin().thresholds(25);
   $: doiBins = binsGenerator(Array.from($doiValues.values()).concat(0, 1)).map((d) => d.length);
 </script>
 
 <Row id="view-controls">
-  <div class="configuration">
-    <h2>View</h2>
+  <ViewConfigurationPanel label="DOI" active={true}>
+    <HistogramSlider
+      id="doi-limit"
+      label="DOI limit"
+      width={300}
+      min={0}
+      max={1}
+      updateLive={false}
+      values={doiBins}
+      bind:value={$doiLimit}
+    />
+    <h2>avg doi/chunk:</h2>
+    <MiniHistogram
+      id="mean-doi-per-chunk"
+      domain={[0, 1]}
+      width={100}
+      height={25}
+      values={$averageDoiPerChunk}
+      histogramStyle="padding:0 5px;"
+    />
+    <h2>doi ages</h2>
+    <MiniHistogram
+      id="doi-age-per-item"
+      domain={[0, max($doiAgeHistogram.map((d) => d.length))]}
+      width={100}
+      height={25}
+      values={$doiAgeHistogram.map((d) => d.length)}
+      histogramStyle="padding:0 5px;"
+    />
+  </ViewConfigurationPanel>
+
+  <ViewConfigurationPanel label="View">
     <Alternatives
       name="view-modes"
       alternatives={viewModes}
@@ -61,11 +95,13 @@
     <ControlButton on:click={resetViewTransform} style="margin-left:25px;padding:2px 10px">
       reset zoom
     </ControlButton>
-  </div>
-  <div class="configuration">
+  </ViewConfigurationPanel>
+
+  <ViewConfigurationPanel label="Chunk">
     <Toggle id="show-recent-chunk" bind:active={$isRecentChunkVisible}>Show recent chunk</Toggle>
-  </div>
-  <div class="configuration">
+  </ViewConfigurationPanel>
+
+  <ViewConfigurationPanel label="Axes">
     <h2>Axes</h2>
     <Dropdown id="x-encoding" className="encoding" bind:selectedValue={$activeViewEncodings.x}>
       {#each $dimensions as dim}
@@ -77,27 +113,15 @@
         <option>{dim}</option>
       {/each}
     </Dropdown>
-  </div>
-  <div class="configuration">
-    <h2>Brush</h2>
+  </ViewConfigurationPanel>
+
+  <ViewConfigurationPanel label="Brush">
     <Alternatives
       name="scatterplot-brush-mode"
       alternatives={brushModes}
       bind:activeAlternative={$scatterplotBrush}
     />
-  </div>
-  <div class="configuration">
-    <HistogramSlider
-      id="doi-limit"
-      label="DOI limit"
-      width={300}
-      min={0}
-      max={1}
-      updateLive={false}
-      values={doiBins}
-      bind:value={$doiLimit}
-    />
-  </div>
+  </ViewConfigurationPanel>
 </Row>
 
 <style>
@@ -105,7 +129,8 @@
     position: absolute;
     top: 0;
     box-sizing: border-box;
-    justify-content: space-around;
+    justify-content: flex-start;
+    align-items: stretch;
     width: 100%;
     background: rgba(255, 255, 255, 0.73);
     padding: 5px 30px;
@@ -123,13 +148,6 @@
   :global(div.configuration .encoding) {
     max-width: 150px;
     margin: 0 5px;
-  }
-
-  div.configuration {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-right: 10px;
   }
 
   h2 {

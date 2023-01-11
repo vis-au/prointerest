@@ -4,7 +4,6 @@
   import { selectAll } from "d3-selection";
   import { afterUpdate, onMount } from "svelte";
 
-  import { HIGHLIGHT_COLOR, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
   import { doiLimit } from "$lib/state/doi-limit";
   import { doiValues } from "$lib/state/doi-values";
   import { items } from "$lib/state/items";
@@ -51,8 +50,7 @@
         getPosition: (d: DataItem) => [t.applyX(d.position.x), t.applyY(d.position.y)],
         getRadius: radius,
         getLineWidth: 0,
-        getFillColor: (d: DataItem) =>
-          $doiValues.get(d.id) >= $doiLimit ? PRIMARY_COLOR : HIGHLIGHT_COLOR,
+        getFillColor: (d: DataItem) => $doiValues.get(d.id) >= $doiLimit ? [0, 0, 0, 1] : [0, 0, 0, 0.3],
         lineWidthUnits: "pixels",
         stroked: false,
         data: interestingData

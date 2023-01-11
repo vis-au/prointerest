@@ -1,11 +1,13 @@
 <script lang="ts">
   import { afterUpdate } from "svelte";
-  import { currentTransform } from "$lib/state/zoom";
+
+  import { getRGB, HIGHLIGHT_COLOR } from "$lib/state/active-view-encodings";
   import { latestInterestingItems } from "$lib/state/latest-chunk";
+  import { currentTransform } from "$lib/state/zoom";
 
   export let width: number;
   export let height: number;
-  export let color = "rgba(0, 0, 0, 1)"; // black color of points
+  export let color = getRGB(HIGHLIGHT_COLOR); // black color of points
   export let radius = 1.5; // size of points
 
   let canvasElement: HTMLCanvasElement = null;

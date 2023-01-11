@@ -39,6 +39,7 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: flex-end;
+    background: #efefef;
   }
   div.mini-histogram .bin {
     box-sizing: border-box;
