@@ -1,7 +1,6 @@
 <script lang="ts">
   import { max, min } from "d3-array";
   import type { HexbinBin } from "d3-hexbin";
-  import { scaleLog } from "d3-scale";
   import { afterUpdate, onMount } from "svelte";
 
   import { colorScale } from "$lib/state/active-color-scale";
@@ -13,6 +12,7 @@
   import { bins, uninterestingBins } from "$lib/state/bins";
   import { hexbinning } from "$lib/state/hexbinning";
   import type DataItem from "$lib/types/data-item";
+    import { scaleBinSize } from "$lib/state/scales";
 
   export let id = "binned-scatterplot-view";
   export let width = 100;
@@ -21,8 +21,6 @@
   let updateInterval: number;
   let canvasElement: HTMLCanvasElement;
   let uninterestingCanvasElement: HTMLCanvasElement;
-
-  const sizeScale = scaleLog();
 
   function renderBins(
     ctx: CanvasRenderingContext2D,
@@ -40,7 +38,7 @@
         ? $colorScale($activeViewEncodings.color === "doi" ? bin["doi"] : bin.length)
         : getRGB(UNINTERESTING_COLOR);
 
-      const scaleFactor = $activeViewEncodings.size === "count" ? sizeScale(bin.length) : 1;
+      const scaleFactor = $activeViewEncodings.size === "count" ? $scaleBinSize(bin.length) : 1;
       ctx.scale(scaleFactor, scaleFactor);
       ctx.stroke(hexagonPath);
       ctx.fill(hexagonPath);
@@ -60,10 +58,10 @@
       $colorScale.domain(
         $activeViewEncodings.color === "doi" ? [-1, 0, 1] : [maxCount, 0, minCount]
       );
-      sizeScale.domain($activeViewEncodings.size === "count" ? [minCount, maxCount] : [0, 1]);
+      $scaleBinSize.domain($activeViewEncodings.size === "count" ? [minCount, maxCount] : [0, 1]);
     } else {
       $colorScale.domain($activeViewEncodings.color === "doi" ? [0, 1] : [minCount, maxCount]);
-      sizeScale.domain($activeViewEncodings.size === "count" ? [minCount, maxCount] : [0, 1]);
+      $scaleBinSize.domain($activeViewEncodings.size === "count" ? [minCount, maxCount] : [0, 1]);
     }
   }
 

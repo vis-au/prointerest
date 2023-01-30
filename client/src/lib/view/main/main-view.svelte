@@ -25,7 +25,7 @@
   {/if}
 
   {#if $isRecentChunkVisible}
-    <RecentPoints {width} {height} />
+    <RecentPoints {width} {height} useBinning={$activeViewMode === "binned"} />
   {/if}
 
   <Axes {width} {height} />

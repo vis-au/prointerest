@@ -1,5 +1,5 @@
 import { getDimensionExtent } from "$lib/util/requests";
-import { scaleLinear } from "d3-scale";
+import { scaleLinear, scaleLog } from "d3-scale";
 import { writable } from "svelte/store";
 import { activeViewEncodings } from "./active-view-encodings";
 
@@ -11,6 +11,7 @@ const margin = 0.05;
 
 export const scaleX = writable(currentScaleX);
 export const scaleY = writable(currentScaleY);
+export const scaleBinSize = writable(scaleLog());
 
 async function updateScales() {
   if (xDimension === null || yDimension === null) {

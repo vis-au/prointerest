@@ -2,6 +2,7 @@ import type DataItem from "$lib/types/data-item";
 import { derived, writable } from "svelte/store";
 import { doiLimit } from "./doi-limit";
 import { doiValues } from "./doi-values";
+import { hexbinning } from "./hexbinning";
 import { processedData } from "./processed-data";
 import { arrayToDataItem } from "./quadtree";
 import { scaleX, scaleY } from "./scales";
@@ -40,6 +41,19 @@ export const latestInterestingItems = derived(
     });
   }
 );
+
+export const latestInterestingBins = derived([latestInterestingItems, hexbinning], ([$latestInterestingItems, $hexbinning]) => {
+  return $hexbinning($latestInterestingItems);
+});
+
+// export const bins = derived(
+//   [interestingItems, randomDataSample, hexbinning, isZooming],
+//   ([$interestingItems, $randomDataSample, $hexbinning, $isZooming]) => {
+//     const bins = $hexbinning($isZooming ? $randomDataSample : $interestingItems);
+//     bins.forEach((bin) => (bin["doi"] = getAvgDoiInBin(bin)));
+//     return bins;
+//   }
+// );
 
 // if the data is cleared/reset, so should be the latest chunk
 processedData?.subscribe((newData) => {
