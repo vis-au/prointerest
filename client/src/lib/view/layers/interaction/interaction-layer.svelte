@@ -155,16 +155,16 @@
 
   let steerButtonPosition = [null, null];
 
-  $: if ($activeBrush && !$isZooming) {
-    const [_x1, _y1] = $activeBrush[1];
+  $: if (($activeBrush || $activeLasso) && !$isZooming) {
+    const [_x1, _y1] = $activeBrush ? $activeBrush[1] : $activeLasso[0];
 
     const x = $currentTransform.applyX($scaleX(_x1)) - 45;
     const y = $currentTransform.applyY($scaleY(_y1)) + 5;
 
     steerButtonPosition = [x, y];
-  } else if ($isZooming) {
+  } else {
     steerButtonPosition = [null, null];
-  }
+  };
 </script>
 
 <div class="interaction-canvas-container" class:zooming={$isZooming}>
@@ -187,7 +187,7 @@
     on:hover={onHover}
     on:end={onBrushEnd}
   />
-  {#if activeBrush}
+  {#if ($activeBrush || $activeLasso)}
     <ControlButton
       style="position:absolute;left:{steerButtonPosition[0]}px;top:{steerButtonPosition[1]}px"
       on:click={steer}
