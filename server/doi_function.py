@@ -195,7 +195,8 @@ def doi_f(X: np.ndarray):
     df["id"] = df.index
 
     # FIXME: currently uses hardcoded 50/50 weights between the two doi components
-    doi = feature_comp.compute_doi(df) * 0.5 + interaction_comp.compute_doi(df) * 0.5
+    # doi = feature_comp.compute_doi(df) * 0.5 + interaction_comp.compute_doi(df) * 0.5
+    doi = feature_comp.compute_doi(df)
 
     return doi
 
