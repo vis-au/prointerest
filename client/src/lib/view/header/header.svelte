@@ -15,8 +15,8 @@
   import ProgressionControls from "./progression-controls.svelte";
 
   export let height: number;
+  let width: number;
 
-  const doiWeightWidth = 500;
   let selectedDimensionWeights = new Map<DOIDimension, number>();
 
   $: {
@@ -42,7 +42,7 @@
   }
 </script>
 
-<header style="height:{height}px">
+<header style="height:{height}px" bind:clientWidth={width}>
   <div class="title">
     <img src="static/logo.svg" alt="the ProInterest logo" height={height * 0.8} />
   </div>
@@ -51,7 +51,7 @@
       <h2>DOI features:</h2>
       <WeightedValues
         id="selected-doi-dimensions"
-        totalSize={doiWeightWidth}
+        totalSize={width * 0.45}
         weightsRemovable={true}
         useDarkmode={true}
         backgroundColor="#008080"
