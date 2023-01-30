@@ -13,7 +13,7 @@
   <ControlButton
     on:click={toggle}
     mode={active ? "dark" : "light"}
-    style="padding:5px 10px;margin-right:10px;"
+    style="padding:5px 10px;"
   >
     {label}
   </ControlButton>
@@ -26,11 +26,11 @@
 <style>
   div.configuration {
     display: flex;
-    border-left: 2px solid black;
     flex-direction: row;
     align-items: center;
-    padding: 0 5px;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
+    border: 1px solid #ddd;
+    padding: 2px 5px;
+    margin: 0 5px;
+    border-radius: 4px;
   }
 </style>

@@ -1,10 +1,9 @@
 <script>
-  import { bin, max } from "d3";
+  import { bin } from "d3";
 
   import { scatterplotBrush } from "$lib/state/active-scatterplot-brush";
   import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { activeViewMode } from "$lib/state/active-view-mode";
-  import { doiAgeHistogram } from "$lib/state/doi-ages";
   import { doiLimit } from "$lib/state/doi-limit";
   import { averageDoiPerChunk, doiValues } from "$lib/state/doi-values";
   import { hexbinRadius } from "$lib/state/hexbinning";
@@ -49,7 +48,7 @@
       values={$averageDoiPerChunk}
       histogramStyle="padding:0 5px;"
     />
-    <h2>doi ages</h2>
+    <!-- <h2>doi ages</h2>
     <MiniHistogram
       id="doi-age-per-item"
       domain={[0, max($doiAgeHistogram.map((d) => d.length))]}
@@ -57,7 +56,7 @@
       height={25}
       values={$doiAgeHistogram.map((d) => d.length)}
       histogramStyle="padding:0 5px;"
-    />
+    /> -->
   </ViewConfigurationPanel>
 
   <ViewConfigurationPanel label="View">
@@ -133,7 +132,7 @@
     align-items: stretch;
     width: 100%;
     background: rgba(255, 255, 255, 0.73);
-    padding: 5px 30px;
+    padding: 5px;
     border-radius: 4px;
   }
 
