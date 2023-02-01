@@ -15,6 +15,7 @@
   export let groupDimension: string = null;
   export let showTitle = false;
   export let useLogScale = false;
+  export let uncertainty: number = null;
 
   const dispatch = createEventDispatcher();
   const POINT_COLOR = "#555";
@@ -93,8 +94,8 @@
           }
         },
         {
-          transform: [{ filter: { param: "brush" } }],
           mark: { type: "bar", tooltip: true },
+          transform: [{ filter: { param: "brush" } }],
           encoding: {
             x: {
               bin: { maxbins: bins },
@@ -111,6 +112,35 @@
     }
   };
 
+  $: uncertaintyLayer = {
+    mark: {
+      type: "bar",
+      tooltip: true,
+      color: {
+        gradient: "linear",
+        x1: 1,
+        y1: 1,
+        x2: 1,
+        y2: 0,
+        stops: [
+          {offset: 0, color: "rgba(255,255,255,1)"},
+          {offset: uncertainty, color: "rgba(255,255,255,0)"},
+        ]
+      }
+    },
+    transform: [{ filter: { param: "brush" } }],
+    encoding: {
+      x: {
+        bin: { maxbins: bins },
+        field: { repeat: "repeat" }
+      },
+      y: {
+        aggregate: "count",
+        title: null
+      }
+    }
+  };
+
   $: if (showTitle) {
     histogram.spec.layer[1].encoding.x["title"] = false;
   }
@@ -119,6 +149,9 @@
     // FIXME: the code below does not work, as it seems to be a bug in vega-lite
     // https://github.com/vega/vega-lite/issues/8348
     // view?.signal("brush", {"trip_distance": [12.706451612903226,20.129032258064516]}).run();
+  }
+  $: if (uncertainty !== null) {
+    (histogram.spec.layer as Record<string, unknown>[]).push(uncertaintyLayer);
   }
 </script>
 

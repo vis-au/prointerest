@@ -14,6 +14,7 @@
   export let usePresetInterval = true;
   export let groupDimension: string = null;
   export let showTitle = false;
+  export let uncertainty: number = null;
 
   const dispatch = createEventDispatcher();
 
@@ -85,6 +86,35 @@
     ]
   };
 
+  $: uncertaintyLayer = {
+    mark: {
+      type: "bar",
+      tooltip: true,
+      color: {
+        gradient: "linear",
+        x1: 1,
+        y1: 1,
+        x2: 1,
+        y2: 0,
+        stops: [
+          {offset: 0, color: "rgba(255,255,255,1)"},
+          {offset: uncertainty, color: "rgba(255,255,255,0)"},
+        ]
+      }
+    },
+    transform: [{ filter: { param: "brush" } }],
+    encoding: {
+      x: {
+        bin: { maxbins: bins },
+        field: { repeat: "repeat" }
+      },
+      y: {
+        aggregate: "count",
+        title: null
+      }
+    }
+  };
+
   $: if (!showTitle) {
     histogram.layer[0].encoding.x["title"] = false;
   }
@@ -93,6 +123,9 @@
   }
   $: if (usePresetInterval && selectedInterval !== null && data) {
     histogram.layer[0].params[0]["value"] = { x: selectedInterval };
+  }
+  $: if (uncertainty !== null) {
+    (histogram.layer as Record<string, unknown>[]).push(uncertaintyLayer);
   }
 </script>
 
