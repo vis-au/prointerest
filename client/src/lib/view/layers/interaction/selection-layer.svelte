@@ -71,13 +71,15 @@
     ctx.beginPath();
     ctx.fillStyle = "rgba(0, 0, 0, 0.0)";
     ctx.lineWidth = lineWidth;
+    ctx.globalAlpha = 0.7;
     secondaryViewSelectionBins.forEach((bin) => {
-      ctx.strokeStyle = color(bin.length);
       ctx.translate(bin.x, bin.y);
-      ctx.stroke(hexagonPath);
+      ctx.fillStyle = color(bin.length);
+      // ctx.stroke(hexagonPath);
       ctx.fill(hexagonPath);
       ctx.translate(-bin.x, -bin.y);
     });
+    ctx.globalAlpha = 1;
     ctx.closePath();
   }
 
@@ -85,13 +87,14 @@
     ctx.beginPath();
     ctx.fillStyle = "rgba(0, 0, 0, 0.0)";
     ctx.lineWidth = lineWidth;
+    ctx.globalAlpha = 0.7;
     dtSelectionBins.forEach((bin) => {
-      ctx.strokeStyle = color(bin.length);
       ctx.translate(bin.x, bin.y);
-      ctx.stroke(hexagonPath);
+      ctx.fillStyle = color(bin.length);
       ctx.fill(hexagonPath);
       ctx.translate(-bin.x, -bin.y);
     });
+    ctx.globalAlpha = 1;
     ctx.closePath();
   }
 
