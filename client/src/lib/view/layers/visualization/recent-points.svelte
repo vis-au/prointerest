@@ -1,11 +1,10 @@
 <script lang="ts">
   import { afterUpdate } from "svelte";
 
-  import { activeViewEncodings, getRGB, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
+  import { getRGB, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
   import { latestInterestingBins, latestInterestingItems } from "$lib/state/latest-chunk";
   import { currentTransform } from "$lib/state/zoom";
   import { hexbinning } from "$lib/state/hexbinning";
-  import { scaleBinSize } from "$lib/state/scales";
 
   export let width: number;
   export let height: number;
@@ -59,16 +58,13 @@
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = "rgba(255,255,255,0.3)";
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.beginPath();
 
     const hexagonPath = new Path2D($hexbinning.hexagon());
 
     $latestInterestingBins.forEach((bin) => {
       ctx.translate(bin.x, bin.y);
-
-      const scaleFactor = $activeViewEncodings.size === "count" ? $scaleBinSize(bin.length) : 1;
-      ctx.scale(scaleFactor, scaleFactor);
       ctx.stroke(hexagonPath);
       ctx.fill(hexagonPath);
 
