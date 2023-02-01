@@ -125,7 +125,10 @@
     histogram.layer[0].params[0]["value"] = { x: selectedInterval };
   }
   $: if (uncertainty !== null) {
-    (histogram.layer as Record<string, unknown>[]).push(uncertaintyLayer);
+    (histogram.layer as Record<string, unknown>[])[2] = uncertaintyLayer;
+  } else {
+    (histogram.layer as Record<string, unknown>[]).splice(2, 1);
+    histogram = histogram;
   }
 </script>
 

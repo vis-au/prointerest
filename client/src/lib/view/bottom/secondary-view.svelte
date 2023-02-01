@@ -28,6 +28,7 @@
     "stack interesting";
   let showDoiValues = true;
   let useLogScale = false;
+  let showUncertainty = false;
 
   $: _items = histogramMode === "stack interest in selection" ? $selectedItems : $items;
   $: data = _items.map(dataItemToRecord);
@@ -84,6 +85,9 @@
       <Toggle id="log-scale" style="margin-right:10px" bind:active={useLogScale}>
         use log scale
       </Toggle>
+      <Toggle id="show-uncertainty" style="margin-right:10px" bind:active={showUncertainty}>
+        show uncertainty
+      </Toggle>
     </Row>
     <ControlButton on:click={() => ($isSecondaryViewCollapsed = true)}>close</ControlButton>
   </Row>
@@ -115,6 +119,7 @@
         width={310}
         height={height * 0.4}
         {useLogScale}
+        uncertainty={showUncertainty ? 0.5 : null}
         on:end={onBrush}
       />
     </Column>

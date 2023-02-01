@@ -151,7 +151,10 @@
     // view?.signal("brush", {"trip_distance": [12.706451612903226,20.129032258064516]}).run();
   }
   $: if (uncertainty !== null) {
-    (histogram.spec.layer as Record<string, unknown>[]).push(uncertaintyLayer);
+    (histogram.spec.layer as Record<string, unknown>[])[2] = uncertaintyLayer;
+  } else {
+    (histogram.spec.layer as Record<string, unknown>[]).splice(2, 1);
+    histogram = histogram;
   }
 </script>
 
