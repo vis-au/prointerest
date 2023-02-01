@@ -21,6 +21,7 @@
   import { scaleX, scaleY } from "$lib/state/scales";
   import { selectedBins } from "$lib/state/selected-bins";
   import { selectedItems } from "$lib/state/selected-items";
+    import { isPointInView } from "$lib/state/viewport";
   import { currentTransform, isZooming } from "$lib/state/zoom";
 
   import { getDummyDataItem } from "$lib/util/dummy-data-item";
@@ -42,6 +43,9 @@
   interactionFactory.getTimestamp = $interactionLog.getLatestTimestamp;
   $: interactionFactory.width = width;
   $: interactionFactory.height = height;
+
+  $: isSteerButtonVisible = ($activeBrush || $activeLasso)
+    && isPointInView(steerButtonPosition[0], steerButtonPosition[1], 50);
 
   function onKeyDown(event: KeyboardEvent) {
     if (event.key === "Control") {
@@ -187,7 +191,7 @@
     on:hover={onHover}
     on:end={onBrushEnd}
   />
-  {#if ($activeBrush || $activeLasso)}
+  {#if isSteerButtonVisible}
     <ControlButton
       style="position:absolute;left:{steerButtonPosition[0]}px;top:{steerButtonPosition[1]}px"
       on:click={steer}

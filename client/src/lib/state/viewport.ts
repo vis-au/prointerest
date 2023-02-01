@@ -8,3 +8,10 @@ const vp = {
 };
 
 export const viewPort = writable(vp);
+
+export function isPointInView(x: number, y: number, padding=0) {
+  return x - padding > vp.minX
+    && x + padding < vp.maxX
+    && y - padding > vp.minY
+    && y + padding < vp.maxY;
+}
