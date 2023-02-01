@@ -38,7 +38,11 @@
         ? $colorScale($activeViewEncodings.color === "doi" ? bin["doi"] : bin.length)
         : getRGB(UNINTERESTING_COLOR);
 
-      const scaleFactor = $activeViewEncodings.size === "count" ? $scaleBinSize(bin.length) : 1;
+      const scaleFactor = $activeViewEncodings.size === "count"
+        ? $scaleBinSize(bin.length)
+        : $activeViewEncodings.size === "doi"
+          ? $scaleBinSize(bin["doi"])
+          : 1;
       ctx.scale(scaleFactor, scaleFactor);
       ctx.stroke(hexagonPath);
       ctx.fill(hexagonPath);
@@ -58,11 +62,11 @@
       $colorScale.domain(
         $activeViewEncodings.color === "doi" ? [-1, 0, 1] : [maxCount, 0, minCount]
       );
-      $scaleBinSize.domain($activeViewEncodings.size === "count" ? [minCount, maxCount] : [0, 1]);
     } else {
       $colorScale.domain($activeViewEncodings.color === "doi" ? [0, 1] : [minCount, maxCount]);
-      $scaleBinSize.domain($activeViewEncodings.size === "count" ? [minCount, maxCount] : [0, 1]);
     }
+
+    $scaleBinSize.domain($activeViewEncodings.size === "count" ? [minCount, maxCount] : [0, 1]);
   }
 
   function render() {
