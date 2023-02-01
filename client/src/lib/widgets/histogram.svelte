@@ -98,7 +98,7 @@
         y2: 0,
         stops: [
           {offset: 0, color: "rgba(255,255,255,1)"},
-          {offset: uncertainty, color: "rgba(255,255,255,0)"},
+          {offset: 1 - uncertainty, color: "rgba(255,255,255,0)"},
         ]
       }
     },

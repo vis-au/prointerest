@@ -7,7 +7,7 @@
   import { selectedDoiDimensions } from "$lib/state/interesting-dimensions";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
   import { items } from "$lib/state/items";
-  import { dimensions } from "$lib/state/processed-data";
+  import { dimensions, processedData, totalSize } from "$lib/state/processed-data";
   import { quadtree } from "$lib/state/quadtree";
   import { selectedItems } from "$lib/state/selected-items";
   import { selectionInSecondaryView } from "$lib/state/selection-in-secondary-view";
@@ -119,7 +119,7 @@
         width={310}
         height={height * 0.4}
         {useLogScale}
-        uncertainty={showUncertainty ? 0.5 : null}
+        uncertainty={showUncertainty ? $processedData.length / $totalSize : null}
         on:end={onBrush}
       />
     </Column>

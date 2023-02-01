@@ -124,7 +124,7 @@
         y2: 0,
         stops: [
           {offset: 0, color: "rgba(255,255,255,1)"},
-          {offset: uncertainty, color: "rgba(255,255,255,0)"},
+          {offset: 1 - uncertainty, color: "rgba(255,255,255,0)"},
         ]
       }
     },
@@ -151,7 +151,8 @@
     // view?.signal("brush", {"trip_distance": [12.706451612903226,20.129032258064516]}).run();
   }
   $: if (uncertainty !== null) {
-    (histogram.spec.layer as Record<string, unknown>[])[2] = uncertaintyLayer;
+    (histogram.spec.layer as Record<string, unknown>[]).push(uncertaintyLayer);
+    histogram = histogram;
   } else {
     (histogram.spec.layer as Record<string, unknown>[]).splice(2, 1);
     histogram = histogram;
