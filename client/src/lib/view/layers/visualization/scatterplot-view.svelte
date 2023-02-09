@@ -1,17 +1,17 @@
 <script lang="ts">
   import { Deck, OrthographicView } from "@deck.gl/core";
   import { ScatterplotLayer } from "@deck.gl/layers";
+  import { rgb } from "d3";
   import { selectAll } from "d3-selection";
   import { afterUpdate, onMount } from "svelte";
 
-  import { doiValues } from "$lib/state/doi-values";
-  import { items } from "$lib/state/items";
   import { colorScale } from "$lib/state/active-color-scale";
+  import { activeViewEncodings, rgbToColorArray } from "$lib/state/active-view-encodings";
+  import { doiValues } from "$lib/state/doi-values";
+  import { interestingItems } from "$lib/state/items";
   import { randomDataSample } from "$lib/state/sampled-data";
   import { currentTransform, isZooming } from "$lib/state/zoom";
   import type DataItem from "$lib/types/data-item";
-  import { activeViewEncodings, rgbToColorArray } from "$lib/state/active-view-encodings";
-    import { rgb } from "d3";
 
   export let id = "deck-gl-scatterplot";
   export let width = 100;
@@ -19,7 +19,7 @@
   export let radius = 2; // size of points
   export let orientation = "right"; // left or right side of the screen?
 
-  $: interestingData = $isZooming ? $randomDataSample : $items;
+  $: interestingData = $isZooming ? $randomDataSample : $interestingItems;
 
   const INITIAL_VIEW_STATE = {
     zoom: 0,
