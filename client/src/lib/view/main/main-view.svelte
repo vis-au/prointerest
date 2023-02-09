@@ -2,16 +2,16 @@
   import { colorScale } from "$lib/state/active-color-scale";
   import { activeViewMode } from "$lib/state/active-view-mode";
   import { isRecentChunkVisible } from "$lib/state/is-recent-chunk-visible";
+  import DecisionTreePanel from "$lib/view/main/decision-tree-panel.svelte";
   import BrushLayer from "../layers/interaction/brushed-regions-layer.svelte";
   import InteractionLayer from "../layers/interaction/interaction-layer.svelte";
-  import ScatterplotView from "../layers/visualization/scatterplot-view.svelte";
-  import BinnedScatterplotView from "../layers/visualization/binned-scatterplot-view.svelte";
   import Axes from "../layers/visualization/axes.svelte";
+  import BinnedScatterplotView from "../layers/visualization/binned-scatterplot-view.svelte";
+  import RecentPoints from "../layers/visualization/recent-points.svelte";
+  import ScatterplotView from "../layers/visualization/scatterplot-view.svelte";
   import ColorLegend from "./color-legend.svelte";
   import Tooltip from "./tooltip.svelte";
   import ViewControls from "./view-controls.svelte";
-  import RecentPoints from "../layers/visualization/recent-points.svelte";
-  import DecisionTreePanel from "$lib/view/main/decision-tree-panel.svelte";
 
   export let width: number;
   export let height: number;

@@ -42,18 +42,14 @@ export const latestInterestingItems = derived(
   }
 );
 
+export const latestBins = derived([latestItems, hexbinning], ([$latestItems, $hexbinning]) => {
+  return $hexbinning($latestItems);
+});
+
 export const latestInterestingBins = derived([latestInterestingItems, hexbinning], ([$latestInterestingItems, $hexbinning]) => {
   return $hexbinning($latestInterestingItems);
 });
 
-// export const bins = derived(
-//   [interestingItems, randomDataSample, hexbinning, isZooming],
-//   ([$interestingItems, $randomDataSample, $hexbinning, $isZooming]) => {
-//     const bins = $hexbinning($isZooming ? $randomDataSample : $interestingItems);
-//     bins.forEach((bin) => (bin["doi"] = getAvgDoiInBin(bin)));
-//     return bins;
-//   }
-// );
 
 // if the data is cleared/reset, so should be the latest chunk
 processedData?.subscribe((newData) => {

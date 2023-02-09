@@ -7,7 +7,7 @@
   import { doiLimit } from "$lib/state/doi-limit";
   import { averageDoiPerChunk, doiValues } from "$lib/state/doi-values";
   import { hexbinRadius } from "$lib/state/hexbinning";
-  import { isRecentChunkVisible } from "$lib/state/is-recent-chunk-visible";
+  import { isRecentChunkVisible, isOnlyInterestingRecentDataVisible } from "$lib/state/is-recent-chunk-visible";
   import { dimensions } from "$lib/state/processed-data";
   import { resetViewTransform } from "$lib/state/zoom";
   import { brushModes } from "$lib/types/brush-mode";
@@ -97,7 +97,10 @@
   </ViewConfigurationPanel>
 
   <ViewConfigurationPanel label="Chunk">
-    <Toggle id="show-recent-chunk" bind:active={$isRecentChunkVisible}>Show recent chunk</Toggle>
+    <Toggle id="show-recent-chunk" bind:active={$isRecentChunkVisible}>Highlight recent</Toggle>
+    {#if $isRecentChunkVisible}
+      <Toggle id="show-only-interesting-recent-chunk"  bind:active={$isOnlyInterestingRecentDataVisible}>Only interesting</Toggle>
+    {/if}
   </ViewConfigurationPanel>
 
   <ViewConfigurationPanel label="Axes">

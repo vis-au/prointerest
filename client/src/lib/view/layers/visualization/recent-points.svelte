@@ -2,9 +2,10 @@
   import { afterUpdate } from "svelte";
 
   import { getRGB, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
-  import { latestInterestingBins, latestInterestingItems } from "$lib/state/latest-chunk";
-  import { currentTransform } from "$lib/state/zoom";
   import { hexbinning } from "$lib/state/hexbinning";
+  import { latestBins, latestInterestingBins, latestItems, latestInterestingItems } from "$lib/state/latest-chunk";
+  import { currentTransform } from "$lib/state/zoom";
+    import { isOnlyInterestingRecentDataVisible } from "$lib/state/is-recent-chunk-visible";
 
   export let width: number;
   export let height: number;
@@ -18,6 +19,9 @@
   const opacity = 0.1;
   const lineWidth = 1;
   $: pointSize = radius * 2 + lineWidth * 2;
+
+  $: items = $isOnlyInterestingRecentDataVisible ? $latestInterestingItems : $latestItems;
+  $: bins = $isOnlyInterestingRecentDataVisible ? $latestInterestingBins : $latestBins;
 
   // https://stackoverflow.com/a/13916313
   function renderPoints() {
@@ -43,7 +47,7 @@
 
     const t = $currentTransform;
 
-    const positions = $latestInterestingItems.map((item) => {
+    const positions = items.map((item) => {
       return t.apply([item.position.x, item.position.y]);
     });
 
@@ -63,7 +67,7 @@
 
     const hexagonPath = new Path2D($hexbinning.hexagon());
 
-    $latestInterestingBins.forEach((bin) => {
+    bins.forEach((bin) => {
       ctx.translate(bin.x, bin.y);
       ctx.stroke(hexagonPath);
       ctx.fill(hexagonPath);
