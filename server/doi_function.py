@@ -11,6 +11,7 @@ from context_item_selection_strategy.sampling_based_context import (
 from context_item_selection_strategy.doi_based_context import DoiBasedContext
 from database import ID, ID_INDEX, get_dimensions_in_data
 from doi_component.doi_component import DoiComponent
+from doi_component.numeric_dimension_component import NumericDimensionComponent
 from doi_component.feature_component import FeatureComponent
 from doi_component.interaction_component import InteractionComponent
 from doi_component.provenance_component import ProvenanceComponent
@@ -56,7 +57,15 @@ def create_feature_component():
     )
 
 
+def create_dimension_component():
+    return NumericDimensionComponent(
+        weights=DIMENSION_WEIGHTS,
+        get_dimensions_in_data=get_dimensions_in_data,
+    )
+
+
 feature_comp: DoiComponent = create_feature_component()
+dimension_comp: DoiComponent = create_dimension_component()
 interaction_comp = InteractionComponent()
 
 storage: StorageStrategy = WindowingStorage(STORAGE_SIZE)
@@ -67,12 +76,13 @@ update: OutdatedItemSelectionStrategy = None
 
 
 def reset_doi_component():
-    global storage, context, feature_comp, DIMENSION_INTERVALS
+    global storage, context, feature_comp, dimension_comp, DIMENSION_INTERVALS
     storage = WindowingStorage(STORAGE_SIZE)
     context = DoiBasedContext(n_dims=20, storage=storage, n_bins=25)
 
     DIMENSION_INTERVALS = {}
     feature_comp = create_feature_component()
+    dimension_comp = create_dimension_component()
     interaction_comp.clear()
 
 
@@ -132,6 +142,7 @@ def set_dimension_weights(weights: dict):
         DIMENSION_WEIGHTS[dimension] = weights[dimension]
 
     feature_comp.weights = DIMENSION_WEIGHTS
+    dimension_comp.weights = DIMENSION_WEIGHTS
 
 
 def set_dimension_range_of_interest(dimension: str, min_value: float, max_value: float):
@@ -196,7 +207,7 @@ def doi_f(X: np.ndarray):
 
     # FIXME: currently uses hardcoded 50/50 weights between the two doi components
     # doi = feature_comp.compute_doi(df) * 0.5 + interaction_comp.compute_doi(df) * 0.5
-    doi = feature_comp.compute_doi(df)
+    doi = dimension_comp.compute_doi(df)
 
     return doi
 
@@ -242,6 +253,11 @@ def full_doi_update(use_doi_f: bool = False) -> np.ndarray:
     """Update the DOI for every single item in storage."""
 
     df = storage.get_available_items()
+
+    # df[ID] below fails if length is zero
+    if len(df) == 0:
+        return np.array([]).reshape((0, 1)), np.array([]).reshape((0, 1))
+
     ids = df[ID]
     # df.columns = list(range(len(df.columns)))
     X = df.to_numpy()
