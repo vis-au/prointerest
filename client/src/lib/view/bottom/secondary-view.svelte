@@ -2,7 +2,7 @@
   import InteractionFactory from "$lib/provenance/doi-interaction-factory";
   import type HistogramBrushInteraction from "$lib/provenance/histogram-brush-interaction";
   import { interactionLog } from "$lib/provenance/interaction-log";
-  import { getRGB, HIGHLIGHT_COLOR, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
+  import { colorArrayToRGB, HIGHLIGHT_COLOR, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
   import { doiLimit } from "$lib/state/doi-limit";
   import { selectedDoiDimensions } from "$lib/state/interesting-dimensions";
   import { isSecondaryViewCollapsed } from "$lib/state/is-secondary-view-collapsed";
@@ -95,13 +95,13 @@
     <Column>
       <div class="colors">
         <div class="interesting color">
-          <div class="legend" style:background={getRGB(PRIMARY_COLOR)} />
+          <div class="legend" style:background={colorArrayToRGB(PRIMARY_COLOR)} />
           <span class="label">
             {histogramMode === "stack selected" ? "selected" : "interesting"}
           </span>
         </div>
         <div class="uninteresting color">
-          <div class="legend" style:background={getRGB(HIGHLIGHT_COLOR)} />
+          <div class="legend" style:background={colorArrayToRGB(HIGHLIGHT_COLOR)} />
           <span class="label">
             {histogramMode === "stack selected" ? "not selected" : "uninteresting"}
           </span>
@@ -115,7 +115,7 @@
         dimensions={$selectedDoiDimensions.concat(showDoiValues ? ["doi"] : [])}
         showTitle={false}
         groupDimension={histogramMode === "stack selected" ? "selected" : "interesting"}
-        colors={[getRGB(HIGHLIGHT_COLOR), getRGB(PRIMARY_COLOR)]}
+        colors={[colorArrayToRGB(HIGHLIGHT_COLOR), colorArrayToRGB(PRIMARY_COLOR)]}
         width={310}
         height={height * 0.4}
         {useLogScale}

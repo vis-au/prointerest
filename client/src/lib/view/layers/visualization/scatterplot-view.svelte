@@ -4,12 +4,14 @@
   import { selectAll } from "d3-selection";
   import { afterUpdate, onMount } from "svelte";
 
-  import { doiLimit } from "$lib/state/doi-limit";
   import { doiValues } from "$lib/state/doi-values";
   import { items } from "$lib/state/items";
+  import { colorScale } from "$lib/state/active-color-scale";
   import { randomDataSample } from "$lib/state/sampled-data";
   import { currentTransform, isZooming } from "$lib/state/zoom";
   import type DataItem from "$lib/types/data-item";
+  import { activeViewEncodings, rgbToColorArray } from "$lib/state/active-view-encodings";
+    import { rgb } from "d3";
 
   export let id = "deck-gl-scatterplot";
   export let width = 100;
@@ -44,13 +46,21 @@
 
     const t = $currentTransform;
 
+    const color = $colorScale.copy();
+    color.domain([0, 1]);
+
+    const getFillColor = $activeViewEncodings.color === "doi"
+      ? (d: DataItem) => rgbToColorArray(rgb(color($doiValues.get(d.id))))
+      : [0, 0, 0];
+
     layers = [
       new ScatterplotLayer({
         id: `${id}-layer`,
+        opacity: 0.1,
         getPosition: (d: DataItem) => [t.applyX(d.position.x), t.applyY(d.position.y)],
         getRadius: radius,
         getLineWidth: 0,
-        getFillColor: (d: DataItem) => $doiValues.get(d.id) >= $doiLimit ? [0, 0, 0, 1] : [0, 0, 0, 0.3],
+        getFillColor,
         lineWidthUnits: "pixels",
         stroked: false,
         data: interestingData

@@ -6,7 +6,7 @@
   import { colorScale } from "$lib/state/active-color-scale";
   import {
       activeViewEncodings,
-      getRGB,
+      colorArrayToRGB,
       UNINTERESTING_COLOR
   } from "$lib/state/active-view-encodings";
   import { bins, uninterestingBins } from "$lib/state/bins";
@@ -29,14 +29,14 @@
   ) {
     ctx.clearRect(0, 0, width, height);
     ctx.beginPath();
-    ctx.strokeStyle = getRGB(UNINTERESTING_COLOR);
+    ctx.strokeStyle = colorArrayToRGB(UNINTERESTING_COLOR);
     ctx.lineWidth = 2;
 
     (renderInteresting ? $bins : $uninterestingBins).forEach((bin) => {
       ctx.translate(bin.x, bin.y);
       ctx.fillStyle = renderInteresting
         ? $colorScale($activeViewEncodings.color === "doi" ? bin["doi"] : bin.length)
-        : getRGB(UNINTERESTING_COLOR);
+        : colorArrayToRGB(UNINTERESTING_COLOR);
 
       const scaleFactor = $activeViewEncodings.size === "count"
         ? $scaleBinSize(bin.length)

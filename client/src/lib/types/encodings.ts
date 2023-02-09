@@ -1,8 +1,8 @@
-export type ColorEncoding = "count" | "doi";
+export type ColorEncoding = "none" | "count" | "doi";
 export const colorEncodings: ColorEncoding[] = ["count", "doi"];
 
-export type SizeEncoding = "count" | "fixed" | "doi";
-export const sizeEncodings: SizeEncoding[] = ["count", "fixed", "doi"];
+export type SizeEncoding = "fixed" | "count" | "doi";
+export const sizeEncodings: SizeEncoding[] = ["fixed", "count", "doi"];
 
 export interface Encodings {
   x: string;

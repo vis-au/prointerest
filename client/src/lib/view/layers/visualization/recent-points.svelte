@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterUpdate } from "svelte";
 
-  import { getRGB, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
+  import { colorArrayToRGB, PRIMARY_COLOR } from "$lib/state/active-view-encodings";
   import { hexbinning } from "$lib/state/hexbinning";
   import { latestBins, latestInterestingBins, latestItems, latestInterestingItems } from "$lib/state/latest-chunk";
   import { currentTransform } from "$lib/state/zoom";
@@ -9,7 +9,7 @@
 
   export let width: number;
   export let height: number;
-  export let color = getRGB(PRIMARY_COLOR); // black color of points
+  export let color = colorArrayToRGB(PRIMARY_COLOR); // black color of points
   export let radius = 1.5; // size of points
   export let useBinning = true;
 

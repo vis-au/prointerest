@@ -37,16 +37,14 @@
 
   <DecisionTreePanel x={10} y={90} />
 
-  {#if $activeViewMode === "binned"}
-    <ColorLegend
-      id="color"
-      x={width - 240}
-      y={height - 100}
-      title="Bin color"
-      blockSize={10}
-      steps={10}
-      bind:colorScale={$colorScale}
-    />
-  {/if}
+  <ColorLegend
+    id="color"
+    x={width - 240}
+    y={height - 100}
+    title="Bin color"
+    blockSize={10}
+    steps={10}
+    bind:colorScale={$colorScale}
+  />
   <ViewControls />
 </main>

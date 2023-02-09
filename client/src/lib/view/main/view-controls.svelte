@@ -84,13 +84,13 @@
         updateLive={true}
         showDomain={false}
       />
-      <h2>Color</h2>
-      <Alternatives
-        name="hexbin-color-encoding"
-        alternatives={colorEncodings}
-        bind:activeAlternative={$activeViewEncodings.color}
-      />
     {/if}
+    <h2>Color</h2>
+    <Alternatives
+      name="hexbin-color-encoding"
+      alternatives={colorEncodings}
+      bind:activeAlternative={$activeViewEncodings.color}
+    />
     <ControlButton on:click={resetViewTransform} style="margin-left:25px;padding:2px 10px">
       reset zoom
     </ControlButton>
