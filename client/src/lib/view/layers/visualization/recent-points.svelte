@@ -56,7 +56,7 @@
   function renderBins() {
     const ctx = canvasElement.getContext("2d");
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = "rgba(255,255,255,0.3)";
+    ctx.fillStyle = "rgba(255,255,255,0)";
     ctx.strokeStyle = color;
     ctx.lineWidth = 1;
     ctx.beginPath();
