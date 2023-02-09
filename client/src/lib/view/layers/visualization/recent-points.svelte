@@ -10,13 +10,13 @@
   export let width: number;
   export let height: number;
   export let color = colorArrayToRGB(PRIMARY_COLOR); // black color of points
-  export let radius = 1.5; // size of points
+  export let radius = 3; // size of points
   export let useBinning = true;
 
   let canvasElement: HTMLCanvasElement = null;
   let offCanvas: HTMLCanvasElement = null;
 
-  const opacity = 0.1;
+  const opacity = 0.3;
   const lineWidth = 1;
   $: pointSize = radius * 2 + lineWidth * 2;
 
@@ -27,15 +27,12 @@
   function renderPoints() {
     const ctx = canvasElement.getContext("2d");
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = "rgba(255,255,255,0.3)";
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
 
     const offCtx = offCanvas.getContext("2d");
     offCtx.clearRect(0, 0, pointSize, pointSize);
-    offCtx.fillStyle = ctx.fillStyle;
-    offCtx.strokeStyle = ctx.strokeStyle;
-    offCtx.lineWidth = ctx.lineWidth;
+    offCtx.fillStyle = "transparent";
+    offCtx.strokeStyle = color;
+    offCtx.lineWidth = lineWidth;
 
     // draw the circle once ...
     offCtx.beginPath();
