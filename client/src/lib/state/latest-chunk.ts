@@ -1,5 +1,6 @@
 import type DataItem from "$lib/types/data-item";
 import { derived, writable } from "svelte/store";
+import { getAvgDoiInBin } from "$lib/util/avg-doi-in-bin";
 import { doiLimit } from "./doi-limit";
 import { doiValues } from "./doi-values";
 import { hexbinning } from "./hexbinning";
@@ -43,11 +44,15 @@ export const latestInterestingItems = derived(
 );
 
 export const latestBins = derived([latestItems, hexbinning], ([$latestItems, $hexbinning]) => {
-  return $hexbinning($latestItems);
+  const bins = $hexbinning($latestItems);
+  bins.forEach((bin) => (bin["doi"] = getAvgDoiInBin(bin)));
+  return bins;
 });
 
 export const latestInterestingBins = derived([latestInterestingItems, hexbinning], ([$latestInterestingItems, $hexbinning]) => {
-  return $hexbinning($latestInterestingItems);
+  const bins = $hexbinning($latestInterestingItems);
+  bins.forEach((bin) => (bin["doi"] = getAvgDoiInBin(bin)));
+  return bins;
 });
 
 

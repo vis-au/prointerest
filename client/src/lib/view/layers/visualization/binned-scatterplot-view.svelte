@@ -5,14 +5,14 @@
 
   import { colorScale } from "$lib/state/active-color-scale";
   import {
-    activeViewEncodings,
-    getRGB,
-    UNINTERESTING_COLOR
+      activeViewEncodings,
+      getRGB,
+      UNINTERESTING_COLOR
   } from "$lib/state/active-view-encodings";
   import { bins, uninterestingBins } from "$lib/state/bins";
   import { hexbinning } from "$lib/state/hexbinning";
+  import { scaleBinSize } from "$lib/state/scales";
   import type DataItem from "$lib/types/data-item";
-    import { scaleBinSize } from "$lib/state/scales";
 
   export let id = "binned-scatterplot-view";
   export let width = 100;
@@ -41,8 +41,9 @@
       const scaleFactor = $activeViewEncodings.size === "count"
         ? $scaleBinSize(bin.length)
         : $activeViewEncodings.size === "doi"
-          ? $scaleBinSize(bin["doi"])
+          ? bin["doi"]  // range of doi property is also [0, 1]
           : 1;
+
       ctx.scale(scaleFactor, scaleFactor);
       ctx.stroke(hexagonPath);
       ctx.fill(hexagonPath);
@@ -66,6 +67,8 @@
       $colorScale.domain($activeViewEncodings.color === "doi" ? [0, 1] : [minCount, maxCount]);
     }
 
+    // if the bin size is scaled, it's either to the number of items per bin, or it is for the avg
+    // DOI value in the bin, in which case the domoain is [0, 1].
     $scaleBinSize.domain($activeViewEncodings.size === "count" ? [minCount, maxCount] : [0, 1]);
   }
 

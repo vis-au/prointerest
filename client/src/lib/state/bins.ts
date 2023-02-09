@@ -1,19 +1,10 @@
-import type DataItem from "$lib/types/data-item";
-import { mean } from "d3-array";
-import type { HexbinBin } from "d3-hexbin";
+import { getAvgDoiInBin } from "$lib/util/avg-doi-in-bin";
 import { derived } from "svelte/store";
-import { doiValues } from "./doi-values";
 import { hexbinning } from "./hexbinning";
 import { interestingItems, uninterestingItems } from "./items";
 import { randomDataSample } from "./sampled-data";
 import { isZooming } from "./zoom";
 
-let currentDoiValues: Map<number, number> = null;
-doiValues.subscribe(($doiValues) => (currentDoiValues = $doiValues));
-
-function getAvgDoiInBin(bin: HexbinBin<DataItem>) {
-  return mean(bin.map((d) => currentDoiValues.get(d.id)));
-}
 
 export const bins = derived(
   [interestingItems, randomDataSample, hexbinning, isZooming],
