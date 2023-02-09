@@ -35,7 +35,7 @@
 
   <Tooltip />
 
-  <DecisionTreePanel x={10} y={60} />
+  <DecisionTreePanel x={10} y={90} />
 
   {#if $activeViewMode === "binned"}
     <ColorLegend
