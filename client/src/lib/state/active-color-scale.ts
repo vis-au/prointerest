@@ -1,9 +1,9 @@
-import { interpolateBuPu, scaleSequential, scaleSequentialLog } from "d3";
+import { interpolateViridis, scaleSequential, scaleSequentialLog } from "d3";
 import { writable } from "svelte/store";
 import type { Writable } from "svelte/store";
 import type { ColorScaleType } from "$lib/types/color";
 
-let currentScheme = interpolateBuPu;
+let currentScheme = interpolateViridis;
 export const colorScheme = writable(currentScheme);
 
 let currentScaleType: ColorScaleType = "linear";
