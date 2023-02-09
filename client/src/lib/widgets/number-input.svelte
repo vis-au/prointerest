@@ -2,9 +2,10 @@
   export let id: string;
   export let value: number;
 	export let disabled = false;
+	export let style = "";
 </script>
 
-<input id="{id}-number-input" class="number-input" type="number" bind:value={ value } {disabled} />
+<input id="{id}-number-input" class="number-input" type="number" bind:value={ value } {disabled} {style} />
 
 <style>
 	input.number-input {
@@ -17,6 +18,7 @@
 		border: 1px solid transparent;
 		border-radius: 3px;
     -moz-appearance: textfield;
+    appearance: textfield;
 		text-align: center;
 		background: #333;
 		color: white;

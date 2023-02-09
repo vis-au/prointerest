@@ -7,7 +7,7 @@
   import { doiLimit } from "$lib/state/doi-limit";
   import { averageDoiPerChunk, doiValues } from "$lib/state/doi-values";
   import { hexbinRadius } from "$lib/state/hexbinning";
-  import { isRecentChunkVisible, isOnlyInterestingRecentDataVisible } from "$lib/state/is-recent-chunk-visible";
+  import { isOnlyInterestingRecentDataVisible, isRecentChunkVisible } from "$lib/state/is-recent-chunk-visible";
   import { dimensions } from "$lib/state/processed-data";
   import { resetViewTransform } from "$lib/state/zoom";
   import { brushModes } from "$lib/types/brush-mode";
@@ -18,6 +18,7 @@
   import Dropdown from "$lib/widgets/dropdown.svelte";
   import HistogramSlider from "$lib/widgets/histogram-slider.svelte";
   import MiniHistogram from "$lib/widgets/mini-histogram.svelte";
+  import NumberInput from "$lib/widgets/number-input.svelte";
   import Row from "$lib/widgets/row.svelte";
   import Slider from "$lib/widgets/slider.svelte";
   import Toggle from "$lib/widgets/toggle.svelte";
@@ -25,6 +26,10 @@
 
   let binsGenerator = bin().thresholds(25);
   $: doiBins = binsGenerator(Array.from($doiValues.values()).concat(0, 1)).map((d) => d.length);
+
+  let autoSteer = false;
+  let autoSteerThreshold = 100;
+  let autoSteerInterval = 10;
 </script>
 
 <Row id="view-controls">
@@ -96,7 +101,23 @@
     </ControlButton>
   </ViewConfigurationPanel>
 
-  <ViewConfigurationPanel label="Chunk">
+  <ViewConfigurationPanel label="Progression">
+    <Row>
+      <Toggle id="auto-steer" bind:active={autoSteer}>
+        auto-steer based on top
+        <NumberInput
+          id="auto-steer-threshold"
+          value={autoSteerThreshold}
+          style="margin-left:0;margin-right:0" />
+        items every
+        <NumberInput
+          id="auto-steer-interval"
+          value={autoSteerInterval}
+          style="margin-left:0;margin-right:0" />
+        chunks
+      </Toggle>
+    </Row>
+
     <Toggle id="show-recent-chunk" bind:active={$isRecentChunkVisible}>Highlight recent</Toggle>
     {#if $isRecentChunkVisible}
       <Toggle id="show-only-interesting-recent-chunk"  bind:active={$isOnlyInterestingRecentDataVisible}>Only interesting</Toggle>
