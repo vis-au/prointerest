@@ -5,12 +5,13 @@
       selectedDoiDimensions
   } from "$lib/state/interesting-dimensions";
   import { dimensions } from "$lib/state/processed-data";
-  import { isDoiFunctionDirty } from "$lib/state/progression";
+  import { isDoiFunctionDirty, useOurDoiApproach } from "$lib/state/progression";
   import { selectedDoiWeight } from "$lib/state/selected-doi-weight";
   import type { DOIDimension } from "$lib/types/doi-dimension";
   import { sendDimenionWeights } from "$lib/util/requests";
   import Options from "$lib/widgets/options.svelte";
   import Row from "$lib/widgets/row.svelte";
+  import Toggle from "$lib/widgets/toggle.svelte";
   import WeightedValues from "$lib/widgets/weighted-values.svelte";
   import ProgressionControls from "./progression-controls.svelte";
 
@@ -51,7 +52,7 @@
       <h2>DOI features:</h2>
       <WeightedValues
         id="selected-doi-dimensions"
-        totalSize={width * 0.45}
+        totalSize={width * 0.35}
         weightsRemovable={true}
         useDarkmode={true}
         backgroundColor="#008080"
@@ -69,6 +70,7 @@
         useDarkMode={true}
         style="margin-left: 25px"
       />
+      <Toggle bind:active={$useOurDoiApproach} style="max-width:{width*0.1}px;overflow:hidden">optimize DOI</Toggle>
     </Row>
   </Row>
   <ProgressionControls useAbsolutePositioning={false} useDarkMode={true} style="flex-grow:0" />

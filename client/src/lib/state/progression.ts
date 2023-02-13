@@ -48,6 +48,10 @@ async function fullDoiUpdate() {
   doiValues.set(currentDoiValues);
 }
 
+let currentlyUsingOurDoiApproach = true;
+export const useOurDoiApproach = writable(currentlyUsingOurDoiApproach);
+useOurDoiApproach.subscribe(flag => currentlyUsingOurDoiApproach = flag);
+
 async function nextChunk() {
   const chunk = await getNextChunk(currentChunkSize);
 
