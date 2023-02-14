@@ -53,7 +53,7 @@ export const useOurDoiApproach = writable(currentlyUsingOurDoiApproach);
 useOurDoiApproach.subscribe(flag => currentlyUsingOurDoiApproach = flag);
 
 async function nextChunk() {
-  const chunk = await getNextChunk(currentChunkSize);
+  const chunk = await getNextChunk(currentChunkSize, currentlyUsingOurDoiApproach);
 
   processedData.update((processed) => {
     return [...processed, ...chunk.chunk];
