@@ -2,23 +2,20 @@ from typing import List, Literal, Tuple
 
 import numpy as np
 import pandas as pd
-from context_item_selection_strategy.context_item_selection_strategy import (
-    ContextItemSelectionStrategy,
-)
-from context_item_selection_strategy.sampling_based_context import (
-    RandomSamplingBasedContext,
-)
+from context_item_selection_strategy.context_item_selection_strategy import \
+    ContextItemSelectionStrategy
 from context_item_selection_strategy.doi_based_context import DoiBasedContext
+from context_item_selection_strategy.sampling_based_context import \
+    RandomSamplingBasedContext
 from database import ID, ID_INDEX, get_dimensions_in_data
 from doi_component.doi_component import DoiComponent
-from doi_component.numeric_dimension_component import NumericDimensionComponent
 from doi_component.feature_component import FeatureComponent
 from doi_component.interaction_component import InteractionComponent
+from doi_component.numeric_dimension_component import NumericDimensionComponent
 from doi_component.provenance_component import ProvenanceComponent
 from doi_component.scagnostics_component import ScagnosticsComponent
-from outdated_item_selection_strategy.outdated_item_selection_strategy import (
-    OutdatedItemSelectionStrategy,
-)
+from outdated_item_selection_strategy.outdated_item_selection_strategy import \
+    OutdatedItemSelectionStrategy
 from sklearn.tree import DecisionTreeRegressor
 from storage_strategy.storage_strategy import StorageStrategy
 from storage_strategy.windowing_storage import WindowingStorage
@@ -198,7 +195,9 @@ def log_interaction(
     current_interactions_count += 1
 
 
-def doi_f(X: np.ndarray):
+def doi_f(X: np.ndarray, doi_comp: DoiComponent = None):
+    doi_comp = dimension_comp if doi_comp is None else doi_comp
+
     df = pd.DataFrame(X)
     df = df.drop(columns=[2, 3, 7, 18, 19])  # non-numerical columns
     df = df.astype(np.float64)
@@ -207,7 +206,7 @@ def doi_f(X: np.ndarray):
 
     # FIXME: currently uses hardcoded 50/50 weights between the two doi components
     # doi = feature_comp.compute_doi(df) * 0.5 + interaction_comp.compute_doi(df) * 0.5
-    doi = dimension_comp.compute_doi(df)
+    doi = doi_comp.compute_doi(df)
 
     return doi
 
@@ -225,16 +224,22 @@ def doi_prediction(X: np.ndarray):
 
 
 def compute_dois(
-    items: list, use_doi_f: bool = True
+    items: list,
+    use_doi_f: bool = True,  # use doi function or regression-tree approximation?
+    use_optimizations: bool = True,  # use context strategies?
+    context_size: int = CONTEXT_SIZE  # number of items used as context
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     global current_chunk_no
 
     X = np.array(items)
 
-    context_items = context.get_context_items(CONTEXT_SIZE, current_chunk_no)
+    context_items = []
+    if use_optimizations:
+        context_items = context.get_context_items(context_size, current_chunk_no)
+
     context_ids = context_items[ID].tolist() if len(context_items) > 0 else []
 
-    X_ = np.concatenate((X, context_items), axis=0)
+    X_ = np.concatenate((X, context_items), axis=0) if use_optimizations else X.copy()
 
     dois_with_context = doi_f(X_) if use_doi_f else doi_prediction(X_)
 

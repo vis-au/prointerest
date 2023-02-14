@@ -38,10 +38,11 @@ def get_dim_extent(dimension):
 @app.route("/next_chunk", methods=["GET"])
 def get_next_chunk():
     chunk_size = int(request.args.get("size"))
+    optimize = True if str(request.args.get("optimize")) == "true" else False
     chunk = get_next_chunk_from_db(chunk_size, filters=STEERING_FILTERS)
 
     ids = np.array(chunk)[:, 0].tolist()
-    dois, updated_ids, updated_dois = compute_dois(chunk)
+    dois, updated_ids, updated_dois = compute_dois(chunk, use_optimizations=optimize)
     save_dois(ids, dois.tolist())
 
     return cors_response(
