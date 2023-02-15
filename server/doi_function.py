@@ -142,7 +142,17 @@ def set_dimension_weights(weights: dict):
     dimension_comp.weights = DIMENSION_WEIGHTS
 
 
-def set_dimension_range_of_interest(dimension: str, min_value: float, max_value: float):
+def set_dimension_intervals(intervals: dict):
+    global DIMENSION_INTERVALS
+    DIMENSION_INTERVALS = {}
+
+    for dimension in intervals:
+        DIMENSION_INTERVALS[dimension] = intervals[dimension]
+
+    feature_comp.intervals = DIMENSION_INTERVALS
+
+
+def set_dimension_interval(dimension: str, min_value: float, max_value: float):
     global DIMENSION_INTERVALS
 
     if min_value is None or max_value is None:
