@@ -56,5 +56,5 @@ class FeatureComponent(DoiComponent):
             # instead of [0, 1], use the provided weight if the dimension matches
             X_mask[:, i] = X_mask[:, i] * self.weights[dimension]
 
-        X_mask = X_mask.sum(axis=1)  # sum over weights where rows match filters
+        X_mask = X_mask.sum(axis=1).reshape((-1, 1))  # sum over weights where rows match filters
         return X_mask
