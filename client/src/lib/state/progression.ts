@@ -2,7 +2,7 @@ import { mean } from "d3";
 import { writable } from "svelte/store";
 
 import type { ProgressionState } from "$lib/types/progression-state";
-import { getFullDoiUpdate, getNextChunk, trainPredictorModel } from "$lib/util/requests";
+import { getNextChunk } from "$lib/util/requests";
 import { sendReset } from "../util/requests";
 import { activeBrush, activeLasso } from "./active-brush";
 import { activeDecisionTree } from "./active-decision-tree";
@@ -12,7 +12,6 @@ import { processedData } from "./processed-data";
 import { selectedDTNode } from "./selection-in-dt";
 import { selectionInSecondaryView } from "./selection-in-secondary-view";
 import { resetViewTransform } from "./zoom";
-import { latestDoiUpdate } from "./latest-doi-update";
 
 let currentChunkSize = 10000;
 export const chunkSize = writable(currentChunkSize);
@@ -35,22 +34,11 @@ let isDoiFunctionCurrentlyDirty = false;
 export const isDoiFunctionDirty = writable(isDoiFunctionCurrentlyDirty);
 isDoiFunctionDirty.subscribe((flag) => (isDoiFunctionCurrentlyDirty = flag));
 
-async function fullDoiUpdate() {
-  await trainPredictorModel();
-
-  const update = await getFullDoiUpdate();
-
-  update.ids.forEach((id, i) => {
-    currentDoiValues.set(+id, update.dois[i]);
-  });
-
-  latestDoiUpdate.set(update);
-  doiValues.set(currentDoiValues);
-}
 
 let currentlyUsingOurDoiApproach = true;
 export const useOurDoiApproach = writable(currentlyUsingOurDoiApproach);
 useOurDoiApproach.subscribe(flag => currentlyUsingOurDoiApproach = flag);
+
 
 async function nextChunk() {
   const chunk = await getNextChunk(currentChunkSize, currentlyUsingOurDoiApproach);
@@ -86,7 +74,7 @@ const progressionCallback = async () => {
     waitingForChunk.set(true);
 
     if (isDoiFunctionCurrentlyDirty) {
-      await fullDoiUpdate();
+      // TODO: do something to "clean" the DOI values
       isDoiFunctionDirty.set(false);
     } else {
       await nextChunk(); // side effect: sets isDoiFunctionDirty flag in reg. intervals

@@ -222,11 +222,3 @@ export async function getRegressionTree(
     use_regression: true
   });
 }
-
-export async function trainPredictorModel() {
-  return sendRequestToBaseURL("/train_model", "GET");
-}
-
-export async function getFullDoiUpdate(): Promise<{ dois: number[]; ids: string[] }> {
-  return sendRequestToBaseURL("/full_doi_update", "GET");
-}

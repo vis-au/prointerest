@@ -1,7 +1,6 @@
 import { bin, range } from "d3";
 import { derived, writable } from "svelte/store";
 import { latestItems } from "./latest-chunk";
-import { latestDoiUpdate } from "./latest-doi-update";
 import { currentChunkNo } from "./progression";
 
 const currentDoiTimestamps = new Map<number, number>();
@@ -13,14 +12,6 @@ currentChunkNo.subscribe(($currentChunkNo) => (chunkNo = $currentChunkNo));
 latestItems.subscribe(($latestItems) => {
   $latestItems.forEach((item) => {
     currentDoiTimestamps.set(item.id, chunkNo);
-  });
-
-  doiTimestamps.set(currentDoiTimestamps);
-});
-
-latestDoiUpdate.subscribe(($latestDoiUpdate) => {
-  $latestDoiUpdate?.ids.forEach((id) => {
-    currentDoiTimestamps.set(+id, chunkNo);
   });
 
   doiTimestamps.set(currentDoiTimestamps);
