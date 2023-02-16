@@ -55,21 +55,6 @@ def get_next_chunk():
     )
 
 
-@app.route("/train_model", methods=["GET"])
-def get_train_model():
-    retrain_dt()
-    return cors_response("ok")
-
-
-@app.route("/full_doi_update", methods=["GET"])
-def get_full_doi_update():
-    ids, dois = full_doi_update()
-    ids = ids.tolist()
-    dois = dois.tolist()
-
-    return cors_response({"ids": ids, "dois": dois})
-
-
 @app.route("/size", methods=["GET"])
 def get_size():
     size = get_data_size()

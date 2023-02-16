@@ -262,37 +262,3 @@ def compute_dois(
 
     current_chunk_no += 1
     return new_dois, context_ids, updated_dois
-
-
-def full_doi_update(use_doi_f: bool = False) -> np.ndarray:
-    """Update the DOI for every single item in storage."""
-
-    df = storage.get_available_items()
-
-    # df[ID] below fails if length is zero
-    if len(df) == 0:
-        return np.array([]).reshape((0, 1)), np.array([]).reshape((0, 1))
-
-    ids = df[ID]
-    # df.columns = list(range(len(df.columns)))
-    X = df.to_numpy()
-
-    doi = doi_f(X) if use_doi_f else doi_prediction(X)
-
-    return ids, doi
-
-
-def retrain_dt() -> None:
-    """Retrain the regression tree model."""
-    global regtree
-
-    df = context.get_context_items(TREE_TRAINING_SIZE, current_chunk_no)
-    df.columns = list(range(len(df.columns)))
-    y = doi_f(df)
-
-    df = df.drop(columns=[2, 3, 7, 18, 19])
-
-    regtree = DecisionTreeRegressor(random_state=0, max_depth=3)
-    regtree.fit(df, y)
-
-    return None
