@@ -1,6 +1,6 @@
 import pandas as pd
 from numpy.random import randint, rand
-from .storage_strategy import DF, StorageStrategy
+from .storage_strategy import STORAGE_DB, StorageStrategy
 
 
 class ReservoirSamplingStorage(StorageStrategy):
@@ -38,4 +38,4 @@ class ReservoirSamplingStorage(StorageStrategy):
             self.reservoir_sample(chunk)
 
         self.storage.reset_index(drop=True, inplace=True)
-        self.cursor.register(DF, self.storage)
+        self.cursor.register(STORAGE_DB, self.storage)

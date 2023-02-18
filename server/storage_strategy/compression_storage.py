@@ -1,7 +1,8 @@
 import pandas as pd
 from numpy import append
 from sklearn.cluster import KMeans
-from .storage_strategy import DF, ID, CHUNK, StorageStrategy
+
+from .storage_strategy import CHUNK, ID, STORAGE_DB, StorageStrategy
 
 
 class CompressionStorage(StorageStrategy):
@@ -24,7 +25,7 @@ class CompressionStorage(StorageStrategy):
         # the updated storage are the new cluster centers
         centers = self.kmeans.cluster_centers_
         self.storage = pd.DataFrame(centers)
-        self.cursor.register(DF, self.storage)
+        self.cursor.register(STORAGE_DB, self.storage)
 
         # update the chunk storage
         # FIXME: items in storage have no chunks, which means that using kmeans hinders some of the
