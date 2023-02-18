@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from database import CHUNK, ID, get_dois
 
-DF = "stored_db"
+STORAGE_DB = "stored_db"
 
 
 class StorageStrategy:
@@ -20,9 +20,28 @@ class StorageStrategy:
     def get_available_items(self) -> pd.DataFrame:
         return self.storage
 
+    def get_n_items_from_query(self, where_clause: str, n: int = None):
+        if len(self.storage) == 0:
+            return pd.DataFrame()
+
+        # register if not already
+        if not self.is_storage_registered and len(self.storage) > 0:
+            self.cursor.register(STORAGE_DB, self.storage)
+            self.is_storage_registered = True
+
+        query = f"SELECT * FROM {STORAGE_DB} WHERE {where_clause}"
+
+        # optionally limit the query to the first n items
+        if n is not None:
+            query += f" LIMIT {n}"
+
+        response = self.cursor.execute(query)
+
+        return response.fetchdf()
+
     def get_available_ids(self) -> pd.Series:
         if not self.is_storage_registered and len(self.storage) > 0:
-            self.cursor.register(DF, self.storage)
+            self.cursor.register(STORAGE_DB, self.storage)
             self.is_storage_registered = True
             return pd.Series()
         elif len(self.storage) == 0:
@@ -47,13 +66,15 @@ class StorageStrategy:
 
     def get_items_for_ids(self, ids: list, as_df=False):
         if not self.is_storage_registered and len(self.storage) > 0:
-            self.cursor.register(DF, self.storage)
+            self.cursor.register(STORAGE_DB, self.storage)
             self.is_storage_registered = True
             return pd.DataFrame()
         elif len(self.storage) == 0:
             return pd.DataFrame()
 
-        response = self.cursor.execute(f"SELECT * FROM {DF} WHERE {ID} IN {tuple(ids)}")
+        response = self.cursor.execute(
+            f"SELECT * FROM {STORAGE_DB} WHERE {ID} IN {tuple(ids)}"
+        )
 
         return response.fetchdf() if as_df else response.fetchall()
 
