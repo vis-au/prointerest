@@ -209,14 +209,13 @@ def doi_f(X: np.ndarray, doi_comp: DoiComponent = None):
     doi_comp = dimension_comp if doi_comp is None else doi_comp
 
     df = pd.DataFrame(X)
-    df = df.drop(columns=[2, 3, 7, 18, 19])  # non-numerical columns
-    df = df.astype(np.float64)
-
     df["id"] = df.index
 
     # FIXME: currently uses hardcoded 50/50 weights between the two doi components
     # doi = feature_comp.compute_doi(df) * 0.5 + interaction_comp.compute_doi(df) * 0.5
     doi = doi_comp.compute_doi(df)
+    if len(DIMENSION_INTERVALS) > 0:
+        doi = doi * 0.5 + feature_comp.compute_doi(df) * 0.5
 
     return doi
 
