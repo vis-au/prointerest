@@ -87,6 +87,13 @@ def get_most_interest_leaf_node(tree: dict):
     return all_leaf_nodes[i_most_interesting]
 
 
+def get_least_interesting_leaf_node(tree: dict):
+    all_leaf_nodes = get_leaf_nodes(tree)
+
+    i_least_interesting = min(enumerate(all_leaf_nodes), key=lambda x: x[1].interest)[0]
+    return all_leaf_nodes[i_least_interesting]
+
+
 class DoiRegressionModel:
     storage: StorageStrategy  # access to items in the database
     tree: DecisionTreeRegressor  # model used of the data based on DOI function
@@ -149,7 +156,8 @@ class DoiRegressionModel:
         numeric_df = df.select_dtypes(include=[np.number])
         return self.tree.predict(numeric_df)
 
-    def get_context_items(self, n: int) -> pd.DataFrame:
+    def _get_stratified_context(self, n: int) -> pd.DataFrame:
+        """Samples a maximum of n/|leafs| from each leaf node into the context."""
         leaf_nodes = self._get_leaf_nodes()
         n_items_per_leaf = math.ceil(n / len(leaf_nodes))
 
@@ -162,6 +170,27 @@ class DoiRegressionModel:
         context_items = pd.concat(context_items)
 
         return context_items
+
+    def _get_min_max_context(self, n: int) -> pd.DataFrame:
+        """Samples half from the leaf with maximum value and half from leaf with minimum value."""
+        n_items_per_leaf = math.ceil(n / 2)
+        tree_as_dict = _tree_to_json(self.tree, self.column_labels)
+
+        min_doi_leaf = get_least_interesting_leaf_node(tree_as_dict)
+        max_doi_leaf = get_most_interest_leaf_node(tree_as_dict)
+
+        min_doi_items = self._get_n_items_for_leaf_node(n_items_per_leaf, min_doi_leaf)
+        max_doi_items = self._get_n_items_for_leaf_node(n_items_per_leaf, max_doi_leaf)
+
+        context_items = pd.concat([min_doi_items, max_doi_items], ignore_index=True)
+
+        return context_items
+
+    def get_context_items(self, n: int, strategy: str = "stratified") -> pd.DataFrame:
+        if strategy == "stratified":
+            return self._get_stratified_context(n)
+        elif strategy == "minmax":
+            return self._get_min_max_context(n)
 
     def get_outdated_items(
         self, new_df: pd.DataFrame, new_dois: np.ndarray
