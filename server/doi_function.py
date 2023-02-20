@@ -1,12 +1,8 @@
-from typing import List, Literal, Tuple
+from typing import List, Literal
 
 import numpy as np
 import pandas as pd
-from context_item_selection_strategy.context_item_selection_strategy import \
-    ContextItemSelectionStrategy
-from context_item_selection_strategy.doi_based_context import DoiBasedContext
-from context_item_selection_strategy.sampling_based_context import \
-    RandomSamplingBasedContext
+
 from database import ID, ID_INDEX, get_dimensions_in_data
 from doi_component.doi_component import DoiComponent
 from doi_component.feature_component import FeatureComponent
@@ -14,17 +10,9 @@ from doi_component.interaction_component import InteractionComponent
 from doi_component.numeric_dimension_component import NumericDimensionComponent
 from doi_component.provenance_component import ProvenanceComponent
 from doi_component.scagnostics_component import ScagnosticsComponent
-from outdated_item_selection_strategy.outdated_item_selection_strategy import \
-    OutdatedItemSelectionStrategy
-from sklearn.tree import DecisionTreeRegressor
-from storage_strategy.storage_strategy import StorageStrategy
-from storage_strategy.windowing_storage import WindowingStorage
 
 # INTEREST COMPUTATION
-CONTEXT_SIZE = 1000
-UPDATE_INTERVAL = 10
 STORAGE_SIZE = 100000
-TREE_TRAINING_SIZE = 50000
 
 current_chunk_no = 0  # keeps track of how "old" the latest data is
 current_interactions_count = 0  # keeps track of how many interactions took place
@@ -34,9 +22,6 @@ DIMENSION_WEIGHTS = {}
 
 # contains the interesting value ranges within each dimension
 DIMENSION_INTERVALS = {}
-
-# model for predicting the degree of interest function
-regtree = DecisionTreeRegressor(random_state=0)
 
 scagnostics_comp = ScagnosticsComponent(
     [5, 17]
@@ -65,19 +50,12 @@ feature_comp: DoiComponent = create_feature_component()
 dimension_comp: DoiComponent = create_dimension_component()
 interaction_comp = InteractionComponent()
 
-storage: StorageStrategy = WindowingStorage(STORAGE_SIZE)
-context: ContextItemSelectionStrategy = RandomSamplingBasedContext(
-    n_dims=20, storage=storage
-)
-update: OutdatedItemSelectionStrategy = None
-
 
 def reset_doi_component():
-    global storage, context, feature_comp, dimension_comp, DIMENSION_INTERVALS
-    storage = WindowingStorage(STORAGE_SIZE)
-    context = DoiBasedContext(n_dims=20, storage=storage, n_bins=25)
+    global feature_comp, dimension_comp, DIMENSION_INTERVALS, DIMENSION_WEIGHTS
 
     DIMENSION_INTERVALS = {}
+    DIMENSION_WEIGHTS = {}
     feature_comp = create_feature_component()
     dimension_comp = create_dimension_component()
     interaction_comp.clear()
@@ -205,59 +183,11 @@ def log_interaction(
     current_interactions_count += 1
 
 
-def doi_f(X: np.ndarray, doi_comp: DoiComponent = None):
-    doi_comp = dimension_comp if doi_comp is None else doi_comp
-
-    df = pd.DataFrame(X)
-    df["id"] = df.index
-
-    # FIXME: currently uses hardcoded 50/50 weights between the two doi components
-    # doi = feature_comp.compute_doi(df) * 0.5 + interaction_comp.compute_doi(df) * 0.5
-    doi = doi_comp.compute_doi(df)
-    if len(DIMENSION_INTERVALS) > 0:
-        doi = doi * 0.5 + feature_comp.compute_doi(df) * 0.5
-
-    return doi
-
-
-def doi_prediction(X: np.ndarray):
-    df = pd.DataFrame(X)
-    df = df.drop(columns=[2, 3, 7, 18, 19])  # non-numerical columns
-    df = df.astype(np.float64)
-
-    doi = regtree.predict(df).reshape(
-        -1,
-    )
-
-    return doi
-
-
-def compute_dois(
-    items: list,
-    use_doi_f: bool = True,  # use doi function or regression-tree approximation?
-    use_optimizations: bool = True,  # use context strategies?
-    context_size: int = CONTEXT_SIZE  # number of items used as context
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def compute_dois(df: pd.DataFrame) -> np.ndarray:
     global current_chunk_no
 
-    X = np.array(items)
+    dois = dimension_comp.compute_doi(df)
+    if len(DIMENSION_INTERVALS) > 0:
+        dois = dois * 0.5 + feature_comp.compute_doi(df) * 0.5
 
-    context_items = []
-    if use_optimizations:
-        context_items = context.get_context_items(context_size, current_chunk_no)
-
-    context_ids = context_items[ID].tolist() if len(context_items) > 0 else []
-
-    X_ = np.concatenate((X, context_items), axis=0) if use_optimizations else X.copy()
-
-    dois_with_context = doi_f(X_) if use_doi_f else doi_prediction(X_)
-
-    new_dois = dois_with_context[: len(X)]
-    updated_dois = dois_with_context[len(X) :]
-
-    df = pd.DataFrame(items)
-    df.rename(columns={0: ID}, inplace=True)
-    storage.insert_chunk(df, current_chunk_no)
-
-    current_chunk_no += 1
-    return new_dois, context_ids, updated_dois
+    return dois

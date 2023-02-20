@@ -97,7 +97,7 @@ class DoiRegressionModel:
     def __init__(
         self,
         storage: StorageStrategy,
-        max_depth: int = 2,
+        max_depth: int = 3,
         validity_threshold: float = 0.8,
         interest_threshold: int = 0.75,
     ) -> None:
@@ -140,12 +140,13 @@ class DoiRegressionModel:
         self._train(new_df, new_dois)
 
     def score(self, new_df: pd.DataFrame, new_dois: np.ndarray):
+        assert new_df.shape[0] == len(new_dois)
         return self.tree.score(new_df, new_dois)
 
     def predict_doi(self, df: pd.DataFrame):
         return self.tree.predict(df)
 
-    def get_context_items(self, n: int, current_chunk: int = None) -> pd.DataFrame:
+    def get_context_items(self, n: int) -> pd.DataFrame:
         leaf_nodes = self._get_leaf_nodes()
         n_items_per_leaf = math.ceil(n / len(leaf_nodes))
 
@@ -178,9 +179,19 @@ class DoiRegressionModel:
         # TODO: return a list of all leaf nodes that are performing below the threshold
 
         new_tree = self.tree.copy()
+
+        # TODO: train on new data+context!
         new_tree.train(new_df, new_dois)
 
-        for leaf_node in leaf_nodes:
-            sample = self._get_n_items_for_leaf_node()
+        outdated_df = pd.DataFrame([], columns=new_df.columns)
 
-        self.update()
+        # determine, which items are affected by this retraining
+        for leaf_node in leaf_nodes:
+            sample = self._get_n_items_for_leaf_node(SAMPLE_SIZE, leaf_node)
+            score = self.score(sample, new_tree.predict(sample))
+
+            if score < self.validity_threshold:
+                outdated_df = pd.concat(outdated_df, sample, ignore_index=True)
+
+        self.tree = new_tree
+        return outdated_df
