@@ -133,18 +133,21 @@ class DoiRegressionModel:
 
     def _train(self, df: pd.DataFrame, dois: np.ndarray) -> None:
         assert df.shape[0] == len(dois)
-        self.column_labels = df.columns
-        self.tree.fit(df, dois)
+        numeric_df = df.select_dtypes(include=[np.number])
+        self.column_labels = numeric_df.columns
+        self.tree.fit(numeric_df, dois)
 
     def update(self, new_df: pd.DataFrame, new_dois: np.ndarray) -> None:
         self._train(new_df, new_dois)
 
     def score(self, new_df: pd.DataFrame, new_dois: np.ndarray):
         assert new_df.shape[0] == len(new_dois)
-        return self.tree.score(new_df, new_dois)
+        numeric_df = new_df.select_dtypes(include=[np.number])
+        return self.tree.score(numeric_df, new_dois)
 
     def predict_doi(self, df: pd.DataFrame):
-        return self.tree.predict(df)
+        numeric_df = df.select_dtypes(include=[np.number])
+        return self.tree.predict(numeric_df)
 
     def get_context_items(self, n: int) -> pd.DataFrame:
         leaf_nodes = self._get_leaf_nodes()
