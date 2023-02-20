@@ -186,6 +186,16 @@ def log_interaction(
 def compute_dois(df: pd.DataFrame) -> np.ndarray:
     global current_chunk_no
 
+    # remove non-numerical columns as they crash the tree's training step
+    drop_cols = [
+        "tpep_pickup_datetime",
+        "tpep_dropoff_datetime",
+        "store_and_fwd_flag",
+    ]
+    df = df.drop(columns=drop_cols)
+    df = df.astype(np.float32)
+
+    # for legacy purposes, replace the dolumns with a numbered index
     dois = dimension_comp.compute_doi(df)
     if len(DIMENSION_INTERVALS) > 0:
         dois = dois * 0.5 + feature_comp.compute_doi(df) * 0.5

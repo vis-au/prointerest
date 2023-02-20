@@ -29,17 +29,11 @@ class FeatureComponent(DoiComponent):
         """
         # HACK: convert the dimension labels into numbers, because the input data only has indeces
         dimensions = self.get_dimensions_in_data()
-        subspace = [
-            dimensions.index(dimension) for dimension in list(self.weights.keys())
-        ]
+        subspace = list(self.weights.keys())
         X_ = X[subspace]
         X_mask = np.zeros_like(X_)
 
         for i, dimension in enumerate(self.weights):
-            dim_index = dimensions.index(
-                dimension
-            )  # get the column name in the dataframe ...
-
             # assume everything to be interesting if no interval is provided
             interval = (
                 self.intervals[dimension]
@@ -51,10 +45,12 @@ class FeatureComponent(DoiComponent):
             max_value = interval[1]
 
             # create boolean index whether a row matches the filter for that dimension
-            X_mask[:, i] = (X[dim_index] >= min_value) & (X[dim_index] <= max_value)
+            X_mask[:, i] = (X[dimension] >= min_value) & (X[dimension] <= max_value)
 
             # instead of [0, 1], use the provided weight if the dimension matches
             X_mask[:, i] = X_mask[:, i] * self.weights[dimension]
 
-        X_mask = X_mask.sum(axis=1).reshape((-1, 1))  # sum over weights where rows match filters
+        X_mask = X_mask.sum(axis=1).reshape(
+            (-1, 1)
+        )  # sum over weights where rows match filters
         return X_mask

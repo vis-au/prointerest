@@ -26,10 +26,7 @@ class NumericDimensionComponent(DoiComponent):
         than items with lower values.
         """
         # HACK: convert the dimension labels into numbers, because the input data only has indeces
-        dimensions = self.get_dimensions_in_data()
-        subspace = [
-            dimensions.index(dimension) for dimension in list(self.weights.keys())
-        ]
+        subspace = list(self.weights.keys())
         X_ = X[subspace]
 
         # sets the DOI value per dimension

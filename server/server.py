@@ -38,19 +38,22 @@ def get_dim_extent(dimension):
 @app.route("/next_chunk", methods=["GET"])
 def get_next_chunk():
     chunk_size = int(request.args.get("size"))
-    optimize = True if str(request.args.get("optimize")) == "true" else False
-    chunk = get_next_chunk_from_db(chunk_size, filters=STEERING_FILTERS)
+    chunk = get_next_chunk_from_db(chunk_size, filters=STEERING_FILTERS, as_df=True)
 
-    ids = np.array(chunk)[:, 0].tolist()
-    dois, updated_ids, updated_dois = compute_dois(chunk, use_optimizations=optimize)
+    # TODO: connect this flag to DOI function
+    optimize = str(request.args.get("optimize")) == "true"
+
+    ids = np.array(chunk[ID])
+    dois = compute_dois(chunk)
     save_dois(ids, dois.tolist())
 
+    # TODO: connect to doi tree update functions
     return cors_response(
         {
-            "chunk": chunk,
+            "chunk": chunk.values.tolist(),
             "dois": dois.tolist(),
-            "updated_ids": updated_ids,
-            "updated_dois": updated_dois.tolist(),
+            "updated_ids": [],
+            "updated_dois": [],
         }
     )
 
@@ -237,8 +240,8 @@ def send_interaction():
 def taxi_process_chunk(chunk: pd.DataFrame):
     dropoff = chunk["tpep_dropoff_datetime"]
     pickup = chunk["tpep_pickup_datetime"]
-    chunk["duration"] = dropoff - pickup
-    chunk["duration"] = chunk["duration"].apply(lambda x: x.total_seconds())
+    chunk["trip_duration"] = dropoff - pickup
+    chunk["trip_duration"] = chunk["trip_duration"].apply(lambda x: x.total_seconds())
     chunk["ratio"] = chunk["tip_amount"] / chunk["total_amount"]
     return chunk
 
