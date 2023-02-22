@@ -1,8 +1,9 @@
+import math
 from dataclasses import dataclass
 
 import numpy as np
 import pandas as pd
-import math
+from database import ID, update_dois
 from sklearn.tree import DecisionTreeRegressor
 from steering import _tree_to_json
 from storage_strategy.storage_strategy import StorageStrategy
@@ -99,6 +100,12 @@ class DoiRegressionModel:
     tree: DecisionTreeRegressor  # model used of the data based on DOI function
     validity_threshold: float  # ABOVE IS GOOD, BELOW IS BAD
     interest_threshold: float  # ABOVE IS INTERESTING, BELOW IS NOT
+    include_previous_chunks_in_training: bool = (
+        True  # retrain on historic results or not?
+    )
+    update_all_dois_after_retraining: bool = (
+        True  # should "old" values be updated with new model?
+    )
     column_labels: "list[str]" = []
 
     def __init__(
@@ -138,24 +145,6 @@ class DoiRegressionModel:
         query = leaf_node.get_query()
         return self.storage.get_n_items_from_query(query)
 
-    def _train(self, df: pd.DataFrame, dois: np.ndarray) -> None:
-        assert df.shape[0] == len(dois)
-        numeric_df = df.select_dtypes(include=[np.number])
-        self.column_labels = numeric_df.columns
-        self.tree.fit(numeric_df, dois)
-
-    def update(self, new_df: pd.DataFrame, new_dois: np.ndarray) -> None:
-        self._train(new_df, new_dois)
-
-    def score(self, new_df: pd.DataFrame, new_dois: np.ndarray):
-        assert new_df.shape[0] == len(new_dois)
-        numeric_df = new_df.select_dtypes(include=[np.number])
-        return self.tree.score(numeric_df, new_dois)
-
-    def predict_doi(self, df: pd.DataFrame):
-        numeric_df = df.select_dtypes(include=[np.number])
-        return self.tree.predict(numeric_df)
-
     def _get_stratified_context(self, n: int) -> pd.DataFrame:
         """Samples a maximum of n/|leafs| from each leaf node into the context."""
         leaf_nodes = self._get_leaf_nodes()
@@ -185,6 +174,49 @@ class DoiRegressionModel:
         context_items = pd.concat([min_doi_items, max_doi_items], ignore_index=True)
 
         return context_items
+
+    def _train(self, df: pd.DataFrame, dois: np.ndarray) -> None:
+        assert df.shape[0] == len(dois)
+        numeric_df = df.select_dtypes(include=[np.number])
+        self.column_labels = numeric_df.columns
+
+        if self.include_previous_chunks_in_training and hasattr(self.tree, "tree_"):
+            # FIXME: use context_size parameter
+            context_df = self.get_context_items(len(df))
+            context_df = context_df.select_dtypes(include=[np.number])
+            context_dois = self.predict_doi(context_df).reshape((-1,))
+            dois = dois.reshape((-1,))
+
+            training_df = pd.concat([numeric_df, context_df])
+            training_dois = np.concatenate([dois, context_dois], axis=0)
+            self.tree.fit(training_df, training_dois)
+        else:
+            self.tree.fit(numeric_df, dois)
+
+    def _repredict_all_dois(self) -> None:
+        outdated_items = self.storage.get_available_items()
+        outdated_ids = outdated_items[ID]
+        outdated_items = outdated_items.select_dtypes(include=[np.number])
+
+        new_dois = self.tree.predict(outdated_items)
+        update_dois(ids=outdated_ids.tolist(), dois=new_dois.tolist())
+        return outdated_ids, new_dois
+
+    def update(
+        self, new_df: pd.DataFrame, new_dois: np.ndarray, update_outdated: bool = False
+    ) -> None:
+        self._train(new_df, new_dois)
+        if update_outdated:
+            self._repredict_all_dois()
+
+    def score(self, new_df: pd.DataFrame, new_dois: np.ndarray):
+        assert new_df.shape[0] == len(new_dois)
+        numeric_df = new_df.select_dtypes(include=[np.number])
+        return self.tree.score(numeric_df, new_dois)
+
+    def predict_doi(self, df: pd.DataFrame):
+        numeric_df = df.select_dtypes(include=[np.number])
+        return self.tree.predict(numeric_df)
 
     def get_context_items(self, n: int, strategy: str = "stratified") -> pd.DataFrame:
         if strategy == "stratified":
