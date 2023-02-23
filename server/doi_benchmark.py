@@ -85,7 +85,7 @@ class Benchmark:
     context_strats: str or list = "stratified"
     intervals: int or range = 0
     measure_doi_error: bool = False
-    update_dois_after_training: bool = False
+    update_dois_after_training: bool = True
 
     def _compute_doi_error_stats(self, storage: StorageStrategy):
         all_items_df = storage.get_available_items()
