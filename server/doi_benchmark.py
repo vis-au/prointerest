@@ -85,6 +85,7 @@ class Benchmark:
     context_size: int or range = 0
     context_strats: str or list = "stratified"
     intervals: int or range = 0
+    include_previous_chunks_in_training: bool or list = True
     measure_doi_error: bool = False
     measure_timings: bool = False
     update_dois_after_training: bool = True
@@ -137,6 +138,11 @@ class Benchmark:
             if type(self.update_dois_after_training) is list
             else [self.update_dois_after_training]
         )
+        include_previous_chunks_in_training = (
+            self.include_previous_chunks_in_training
+            if type(self.include_previous_chunks_in_training) is list
+            else [self.include_previous_chunks_in_training]
+        )
 
         return product(
             max_depths,
@@ -146,6 +152,7 @@ class Benchmark:
             test_n_chunks,
             context_strats,
             update_dois_after_trainings,
+            include_previous_chunks_in_training
         )
 
     def run(self):
@@ -163,11 +170,16 @@ class Benchmark:
             n_chunks,
             context_strat,
             update_dois_after_training,
+            include_previous_chunks_in_training
         ) in test_cases:
             reset(intervals=INTERVALS, weights=WEIGHTS)
 
             storage = WindowingStorage(max_size=10000000)
-            model = DoiRegressionModel(storage, max_depth=max_depth)
+            model = DoiRegressionModel(
+                storage,
+                max_depth=max_depth,
+                include_previous_chunks_in_training=include_previous_chunks_in_training
+            )
 
             for i in range(n_chunks):
                 # measure the runtime by timing before and after the computation
@@ -199,6 +211,7 @@ class Benchmark:
                         "interval": interval,
                         "n_chunks": n_chunks,
                         "chunk": i,
+                        "include_previous_chunks_in_training": include_previous_chunks_in_training,
                         "score": model.score(chunk_df, new_dois),
                     }
                 )
