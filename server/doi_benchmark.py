@@ -1,4 +1,5 @@
 from itertools import product
+from time import time
 from dataclasses import dataclass
 import pandas as pd
 import numpy as np
@@ -85,6 +86,7 @@ class Benchmark:
     context_strats: str or list = "stratified"
     intervals: int or range = 0
     measure_doi_error: bool = False
+    measure_timings: bool = False
     update_dois_after_training: bool = True
 
     def _compute_doi_error_stats(self, storage: StorageStrategy):
@@ -151,6 +153,8 @@ class Benchmark:
 
         test_cases = self._get_test_cases()
 
+        now = None  # stores timing information
+
         for (
             max_depth,
             chunk_size,
@@ -166,6 +170,10 @@ class Benchmark:
             model = DoiRegressionModel(storage, max_depth=max_depth)
 
             for i in range(n_chunks):
+                # measure the runtime by timing before and after the computation
+                if self.measure_timings:
+                    now = time()
+
                 # no context on first iteration because storage is empty
                 if i == 0:
                     chunk_df, new_dois = get_next_progressive_result(
@@ -194,6 +202,9 @@ class Benchmark:
                         "score": model.score(chunk_df, new_dois),
                     }
                 )
+
+                if self.measure_timings:
+                    score["time"] = now - time()
 
                 if self.measure_doi_error:
                     error_stats = self._compute_doi_error_stats(storage)
