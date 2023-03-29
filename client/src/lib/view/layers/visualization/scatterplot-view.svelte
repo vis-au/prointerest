@@ -1,12 +1,11 @@
 <script lang="ts">
   import { Deck, OrthographicView } from "@deck.gl/core";
   import { ScatterplotLayer } from "@deck.gl/layers";
-  import { rgb } from "d3";
+  import { scalePow } from "d3";
   import { selectAll } from "d3-selection";
   import { afterUpdate, onMount } from "svelte";
 
-  import { colorScale } from "$lib/state/active-color-scale";
-  import { activeViewEncodings, rgbToColorArray } from "$lib/state/active-view-encodings";
+  import { activeViewEncodings } from "$lib/state/active-view-encodings";
   import { doiValues } from "$lib/state/doi-values";
   import { interestingItems } from "$lib/state/items";
   import { randomDataSample } from "$lib/state/sampled-data";
@@ -46,17 +45,15 @@
 
     const t = $currentTransform;
 
-    const color = $colorScale.copy();
-    color.domain([0, 1]);
+    const colorScale = scalePow([0, 1], [0, 255]).exponent(2);
 
     const getFillColor = $activeViewEncodings.color === "doi"
-      ? (d: DataItem) => rgbToColorArray(rgb(color($doiValues.get(d.id))))
-      : [0, 0, 0];
+      ? (d: DataItem) => [0, 0, 0, colorScale($doiValues.get(d.id) || 0)]
+      : () => [0, 0, 0, 125];
 
     layers = [
       new ScatterplotLayer({
         id: `${id}-layer`,
-        opacity: 0.1,
         getPosition: (d: DataItem) => [t.applyX(d.position.x), t.applyY(d.position.y)],
         getRadius: radius,
         getLineWidth: 0,
