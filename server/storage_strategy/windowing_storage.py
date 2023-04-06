@@ -11,6 +11,7 @@ class WindowingStorage(StorageStrategy):
         self.storage = self.storage.append(chunk)
         self.storage.reset_index(drop=True, inplace=True)
         self.cursor.register(STORAGE_DB, self.storage)
+        self.is_storage_registered = True
 
         chunk_no_df = pd.DataFrame(chunk[ID])
         chunk_no_df[CHUNK] = chunk_no
