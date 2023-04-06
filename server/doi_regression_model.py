@@ -118,11 +118,13 @@ class DoiRegressionModel:
         max_depth: int = 3,
         validity_threshold: float = 0.95,
         interest_threshold: int = 0.75,
+        include_previous_chunks_in_training: bool = False
     ) -> None:
         self.storage = storage
         self.tree = DecisionTreeRegressor(max_depth=max_depth)
         self.validity_threshold = validity_threshold
         self.interest_threshold = interest_threshold
+        self.include_previous_chunks_in_training = include_previous_chunks_in_training
 
     def __str__(self) -> str:
         return str(_tree_to_json(self.tree, self.trained_column_labels))
@@ -209,16 +211,25 @@ class DoiRegressionModel:
         self.trained_column_labels = numeric_df.columns
         outdated_tree = deepcopy(self.tree)
 
+        # hasattr checks if the prior model is trained
         if self.include_previous_chunks_in_training and hasattr(self.tree, "tree_"):
-            # FIXME: use context_size parameter
-            context_df = self.get_context_items(len(df))
-            context_df = context_df.select_dtypes(include=[np.number])
-            context_dois = self.predict_doi(context_df).reshape((-1,))
-            dois = dois.reshape((-1,))
+        #     # retraining strategy 1: include context and predicted doi in training
+        #     # FIXME: uses same size as chunk size for training
+        #     context_df = self.get_context_items(len(df))
+        #     context_df = context_df.select_dtypes(include=[np.number])
+        #     context_dois = self.predict_doi(context_df).reshape((-1,))
+        #     dois = dois.reshape((-1,))
 
-            training_df = pd.concat([numeric_df, context_df], ignore_index=True)
-            training_dois = np.concatenate([dois, context_dois], axis=0)
-            self.tree.fit(training_df, training_dois)
+        #     training_df = pd.concat([numeric_df, context_df], ignore_index=True)
+        #     training_dois = np.concatenate([dois, context_dois], axis=0)
+        #     self.tree.fit(training_df, training_dois)
+        # elif hasattr(self.tree, "tree_"):
+            # retraining strategy 2: predict the doi with the current model and include the weighted
+            # sum as training labels
+            prior_dois = self.predict_doi(numeric_df).reshape((-1,))
+            dois = dois.reshape((-1, ))
+            training_dois = (dois + prior_dois) / 2
+            self.tree.fit(numeric_df, training_dois)
         else:
             self.tree.fit(numeric_df, dois)
 

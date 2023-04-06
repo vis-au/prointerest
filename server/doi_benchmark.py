@@ -38,6 +38,7 @@ def get_next_progressive_result(
     storage: StorageStrategy,
     get_context=None,
     chunk_size: int = CHUNK_SIZE,
+    chunk_no: int = 0
 ):
     """Wrapper function for getting a new chunk, computing the DOI function on it and storing the
     data for later retrieval in the storage."""
@@ -54,7 +55,7 @@ def get_next_progressive_result(
     dois = compute_dois(df)  # HACK: compatibility with DoiComponent class
     new_dois = dois[: len(chunk_df)]
 
-    storage.insert_chunk(chunk_df, 0)
+    storage.insert_chunk(chunk_df, chunk_no)
     save_dois(ids=chunk_df[ID].tolist(), dois=new_dois.reshape((-1,)).tolist())
 
     return chunk_df, new_dois
@@ -89,6 +90,7 @@ class Benchmark:
     measure_doi_error: bool = False
     measure_timings: bool = False
     update_dois_after_training: bool = True
+    storages = []
 
     def _compute_doi_error_stats(self, storage: StorageStrategy):
         all_items_df = storage.get_available_items()
@@ -189,7 +191,9 @@ class Benchmark:
                 # no context on first iteration because storage is empty
                 if i == 0:
                     chunk_df, new_dois = get_next_progressive_result(
-                        storage, chunk_size=chunk_size
+                        storage,
+                        chunk_size=chunk_size,
+                        chunk_no=i,
                     )
                     model.update(chunk_df, new_dois)
                 # ... otherwise use context
@@ -197,6 +201,7 @@ class Benchmark:
                     chunk_df, new_dois = get_next_progressive_result(
                         storage,
                         chunk_size=chunk_size,
+                        chunk_no=i,
                         get_context=lambda: model.get_context_items(
                             context_size, context_strat
                         ),
@@ -230,5 +235,7 @@ class Benchmark:
                     model.update(chunk_df, new_dois, update_dois_after_training)
 
                 scores += [score]
+
+            self.storages += [storage]
 
         return pd.DataFrame(scores)
