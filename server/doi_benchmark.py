@@ -6,7 +6,7 @@ import numpy as np
 
 from storage_strategy.storage_strategy import StorageStrategy
 from storage_strategy.windowing_storage import WindowingStorage
-from database import get_next_chunk_from_db, save_dois, ID
+from database import get_next_chunk_from_db, save_dois, ID, DATA_DB
 
 from database import create_tables, drop_tables, reset_progression
 from doi_function import (
@@ -38,13 +38,22 @@ def get_next_progressive_result(
     storage: StorageStrategy,
     get_context=None,
     chunk_size: int = CHUNK_SIZE,
-    chunk_no: int = 0
+    chunk_no: int = 0,
+    model: DoiRegressionModel = None
 ):
     """Wrapper function for getting a new chunk, computing the DOI function on it and storing the
     data for later retrieval in the storage."""
 
     # get chunk and compute context
-    chunk_df = get_next_chunk_from_db(chunk_size, as_df=True)
+    if model is not None:
+        query = model.get_steering_query(table_name=DATA_DB)
+        chunk_df = get_next_chunk_from_db(chunk_size, as_df=True, filters=query)
+
+        if len(chunk_df) < chunk_size:
+            unsteered_df = get_next_chunk_from_db(chunk_size - len(chunk_df), as_df=True)
+            chunk_df = pd.concat([unsteered_df, chunk_df], ignore_index=True)
+    else:
+        chunk_df = get_next_chunk_from_db(chunk_size, as_df=True)
 
     context_df = pd.DataFrame([], columns=chunk_df.columns)
     if get_context is not None:

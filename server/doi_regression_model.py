@@ -67,11 +67,18 @@ def get_interesting_leaf_nodes(tree: dict, threshold: float):
     interesting_leaf_nodes = list(filter(is_leaf_node_interesting, all_leaf_nodes))
     return interesting_leaf_nodes
 
+def get_k_most_interesting_leaf_nodes(tree: dict, k: int = 2):
+    all_leaf_nodes = get_leaf_nodes(tree)
+    interests = [node.interest for node in all_leaf_nodes]
+    top_k = np.argpartition(interests, -k)[-k:]
+    return [all_leaf_nodes[i] for i in top_k]
+
 
 def get_query_to_interesting_leaf_nodes(
     tree: dict, threshold: float, table_name: str = ""
 ):
-    interesting_leaf_nodes = get_interesting_leaf_nodes(tree, threshold)
+    # interesting_leaf_nodes = get_interesting_leaf_nodes(tree, threshold)
+    interesting_leaf_nodes = get_k_most_interesting_leaf_nodes(tree)
 
     interesting_query = ""
     for leaf_node in interesting_leaf_nodes:
@@ -117,7 +124,7 @@ class DoiRegressionModel:
         storage: StorageStrategy,
         max_depth: int = 3,
         validity_threshold: float = 0.95,
-        interest_threshold: int = 0.75,
+        interest_threshold: int = 0.5,
         include_previous_chunks_in_training: bool = False
     ) -> None:
         self.storage = storage
@@ -134,13 +141,6 @@ class DoiRegressionModel:
         tree_as_dict = _tree_to_json(self.tree, self.trained_column_labels)
         leaf_nodes = get_leaf_nodes(tree_as_dict)
         return leaf_nodes
-
-    def _is_still_valid(self, new_df: pd.DataFrame, new_dois: np.ndarray) -> bool:
-        """
-        Evaluate the regression model by comparing its prediction against actual DOI values (R**2).
-        """
-        score = self.score(new_df, new_dois)
-        return score >= self.validity_threshold
 
     def _get_n_items_for_leaf_node(self, n: int, leaf_node: LeafNode):
         query = leaf_node.get_query()
@@ -194,7 +194,7 @@ class DoiRegressionModel:
         for leaf_node in leaf_nodes:
             sample = self._get_n_items_for_leaf_node(SAMPLE_SIZE, leaf_node)
             score = self.score(
-                sample, new_tree.predict(sample.select_dtypes(include=[np.number]))
+                sample, new_tree.predict(sample.select_dtypes(include=[np.number])[self.trained_column_labels])
             )
 
             if score < self.validity_threshold:
@@ -239,6 +239,7 @@ class DoiRegressionModel:
         outdated_items = self.storage.get_available_items()
         outdated_ids = outdated_items[ID]
         outdated_items = outdated_items.select_dtypes(include=[np.number])
+        outdated_items = outdated_items[self.trained_column_labels]
 
         new_dois = self.tree.predict(outdated_items)
         update_dois(ids=outdated_ids.tolist(), dois=new_dois.tolist())
@@ -250,6 +251,7 @@ class DoiRegressionModel:
     ) -> None:
         outdated_df = self._get_outdated_items(updated_tree, outdated_tree)
         outdated_ids = outdated_df[ID]
+        outdated_df = outdated_df[self.trained_column_labels]
         outdated_df = outdated_df.select_dtypes(include=[np.number])
         new_dois = np.array([]).reshape((-1,))
 
@@ -279,11 +281,18 @@ class DoiRegressionModel:
             return 1
 
         numeric_df = new_df.select_dtypes(include=[np.number])
+        numeric_df = numeric_df[self.trained_column_labels]
         return self.tree.score(numeric_df, new_dois)
 
     def predict_doi(self, df: pd.DataFrame):
         numeric_df = df.select_dtypes(include=[np.number])
+        numeric_df = numeric_df[self.trained_column_labels]
         return self.tree.predict(numeric_df)
+
+    def get_steering_query(self, table_name: str):
+        tree_dict = _tree_to_json(self.tree, self.trained_column_labels)
+        steering_query = get_query_to_interesting_leaf_nodes(tree_dict, self.interest_threshold, table_name)
+        return steering_query
 
     def get_context_items(self, n: int, strategy: str = "stratified") -> pd.DataFrame:
         if strategy == "stratified":
