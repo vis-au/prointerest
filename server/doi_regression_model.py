@@ -67,6 +67,7 @@ def get_interesting_leaf_nodes(tree: dict, threshold: float):
     interesting_leaf_nodes = list(filter(is_leaf_node_interesting, all_leaf_nodes))
     return interesting_leaf_nodes
 
+
 def get_k_most_interesting_leaf_nodes(tree: dict, k: int = 2):
     all_leaf_nodes = get_leaf_nodes(tree)
     interests = [node.interest for node in all_leaf_nodes]
@@ -74,11 +75,15 @@ def get_k_most_interesting_leaf_nodes(tree: dict, k: int = 2):
     return [all_leaf_nodes[i] for i in top_k]
 
 
-def get_query_to_interesting_leaf_nodes(
-    tree: dict, threshold: float, table_name: str = ""
-):
-    # interesting_leaf_nodes = get_interesting_leaf_nodes(tree, threshold)
-    interesting_leaf_nodes = get_k_most_interesting_leaf_nodes(tree)
+def get_k_least_interesting_leaf_nodes(tree: dict, k: int = 2):
+    all_leaf_nodes = get_leaf_nodes(tree)
+    interests = [node.interest for node in all_leaf_nodes][::-1]
+    top_k = np.argpartition(interests, -k)[-k:]
+    return [all_leaf_nodes[i] for i in top_k]
+
+
+def get_query_to_interesting_leaf_nodes(tree: dict, k: int, table_name: str = ""):
+    interesting_leaf_nodes = get_k_most_interesting_leaf_nodes(tree, k)
 
     interesting_query = ""
     for leaf_node in interesting_leaf_nodes:
@@ -108,6 +113,7 @@ class DoiRegressionModel:
     tree: DecisionTreeRegressor  # model used of the data based on DOI function
     validity_threshold: float  # ABOVE IS GOOD, BELOW IS BAD
     interest_threshold: float  # ABOVE IS INTERESTING, BELOW IS NOT
+    interest_k: int  # number of nodes with highest interest considered "interesting"
     include_previous_chunks_in_training: bool = (
         True  # retrain on historic results or not?
     )
@@ -125,12 +131,14 @@ class DoiRegressionModel:
         max_depth: int = 3,
         validity_threshold: float = 0.95,
         interest_threshold: int = 0.5,
-        include_previous_chunks_in_training: bool = False
+        interest_k: int = 2,
+        include_previous_chunks_in_training: bool = False,
     ) -> None:
         self.storage = storage
         self.tree = DecisionTreeRegressor(max_depth=max_depth)
         self.validity_threshold = validity_threshold
         self.interest_threshold = interest_threshold
+        self.interest_k = interest_k
         self.include_previous_chunks_in_training = include_previous_chunks_in_training
 
     def __str__(self) -> str:
@@ -149,6 +157,24 @@ class DoiRegressionModel:
     def _get_all_items_for_leaf_node(self, leaf_node: LeafNode):
         query = leaf_node.get_query()
         return self.storage.get_n_items_from_query(query)
+
+    def _get_uninteresting_context(self, n: int) -> pd.DataFrame:
+        all_leaf_nodes = self._get_leaf_nodes()
+        tree_dict = _tree_to_json(self.tree, self.trained_column_labels)
+        uninteresting_leaf_nodes = get_k_least_interesting_leaf_nodes(
+            tree_dict, len(all_leaf_nodes) - self.interest_k
+        )
+        n_items_per_leaf = math.ceil(n / len(uninteresting_leaf_nodes))
+
+        context_items = []
+        for leaf_node in uninteresting_leaf_nodes:
+            context_items += [
+                self._get_n_items_for_leaf_node(n_items_per_leaf, leaf_node)
+            ]
+
+        context_items = pd.concat(context_items)
+
+        return context_items
 
     def _get_stratified_context(self, n: int) -> pd.DataFrame:
         """Samples a maximum of n/|leafs| from each leaf node into the context."""
@@ -194,7 +220,12 @@ class DoiRegressionModel:
         for leaf_node in leaf_nodes:
             sample = self._get_n_items_for_leaf_node(SAMPLE_SIZE, leaf_node)
             score = self.score(
-                sample, new_tree.predict(sample.select_dtypes(include=[np.number])[self.trained_column_labels])
+                sample,
+                new_tree.predict(
+                    sample.select_dtypes(include=[np.number])[
+                        self.trained_column_labels
+                    ]
+                ),
             )
 
             if score < self.validity_threshold:
@@ -213,21 +244,21 @@ class DoiRegressionModel:
 
         # hasattr checks if the prior model is trained
         if self.include_previous_chunks_in_training and hasattr(self.tree, "tree_"):
-        #     # retraining strategy 1: include context and predicted doi in training
-        #     # FIXME: uses same size as chunk size for training
-        #     context_df = self.get_context_items(len(df))
-        #     context_df = context_df.select_dtypes(include=[np.number])
-        #     context_dois = self.predict_doi(context_df).reshape((-1,))
-        #     dois = dois.reshape((-1,))
+            #     # retraining strategy 1: include context and predicted doi in training
+            #     # FIXME: uses same size as chunk size for training
+            #     context_df = self.get_context_items(len(df))
+            #     context_df = context_df.select_dtypes(include=[np.number])
+            #     context_dois = self.predict_doi(context_df).reshape((-1,))
+            #     dois = dois.reshape((-1,))
 
-        #     training_df = pd.concat([numeric_df, context_df], ignore_index=True)
-        #     training_dois = np.concatenate([dois, context_dois], axis=0)
-        #     self.tree.fit(training_df, training_dois)
-        # elif hasattr(self.tree, "tree_"):
+            #     training_df = pd.concat([numeric_df, context_df], ignore_index=True)
+            #     training_dois = np.concatenate([dois, context_dois], axis=0)
+            #     self.tree.fit(training_df, training_dois)
+            # elif hasattr(self.tree, "tree_"):
             # retraining strategy 2: predict the doi with the current model and include the weighted
             # sum as training labels
             prior_dois = self.predict_doi(numeric_df).reshape((-1,))
-            dois = dois.reshape((-1, ))
+            dois = dois.reshape((-1,))
             training_dois = (dois + prior_dois) / 2
             self.tree.fit(numeric_df, training_dois)
         else:
@@ -291,10 +322,16 @@ class DoiRegressionModel:
 
     def get_steering_query(self, table_name: str):
         tree_dict = _tree_to_json(self.tree, self.trained_column_labels)
-        steering_query = get_query_to_interesting_leaf_nodes(tree_dict, self.interest_threshold, table_name)
+        steering_query = get_query_to_interesting_leaf_nodes(
+            tree_dict, self.interest_k, table_name
+        )
         return steering_query
 
-    def get_context_items(self, n: int, strategy: str = "stratified") -> pd.DataFrame:
+    def get_context_items(
+        self, n: int, strategy: str = "uninteresting"
+    ) -> pd.DataFrame:
+        if strategy == "uninteresting":
+            return self._get_uninteresting_context(n)
         if strategy == "stratified":
             return self._get_stratified_context(n)
         elif strategy == "minmax":
