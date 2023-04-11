@@ -78,7 +78,8 @@ def create_tables(
     PROCESS_CHUNK_CALLBACK = process_chunk_callback  # if None, no processing is applied
 
     cursor.execute(
-        f"CREATE VIEW {DATA_DB} " f"AS SELECT * FROM read_csv_auto('{PATH}')"
+        f"CREATE VIEW {DATA_DB} "
+        f"AS SELECT * FROM read_csv_auto('{PATH}', ignore_errors=True)"
     )
     cursor.execute(
         f"CREATE VIEW {COLUMN_DATA_DB} "
