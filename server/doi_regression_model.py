@@ -159,6 +159,7 @@ class DoiRegressionModel:
         return self.storage.get_n_items_from_query(query)
 
     def _get_uninteresting_context(self, n: int) -> pd.DataFrame:
+        """Samples a maximum of n/|leafs| from all nodes except top-k interesting."""
         all_leaf_nodes = self._get_leaf_nodes()
         tree_dict = _tree_to_json(self.tree, self.trained_column_labels)
         uninteresting_leaf_nodes = get_k_least_interesting_leaf_nodes(
@@ -332,7 +333,7 @@ class DoiRegressionModel:
     ) -> pd.DataFrame:
         if strategy == "uninteresting":
             return self._get_uninteresting_context(n)
-        if strategy == "stratified":
+        elif strategy == "stratified":
             return self._get_stratified_context(n)
         elif strategy == "minmax":
             return self._get_min_max_context(n)

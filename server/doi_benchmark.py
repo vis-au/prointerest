@@ -61,7 +61,7 @@ def get_next_progressive_result(
 
     # compute the DOI over chunk + context
     df = pd.concat([chunk_df, context_df], ignore_index=True)
-    dois = compute_dois(df)  # HACK: compatibility with DoiComponent class
+    dois = compute_dois(df)
     new_dois = dois[: len(chunk_df)]
 
     storage.insert_chunk(chunk_df, chunk_no)
